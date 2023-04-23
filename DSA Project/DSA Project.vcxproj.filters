@@ -30,9 +30,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PriorityQueue.h">
-      <Filter>Header Files\DS implementation\PriorityQueue</Filter>
-    </ClInclude>
     <ClInclude Include="DS Implementation\Queue\LinkedQueue.h">
       <Filter>Header Files\DS Implementation</Filter>
     </ClInclude>

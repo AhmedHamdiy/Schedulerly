@@ -13,8 +13,12 @@ using namespace std;
 
 class Scheduler 
 {
-	LinkedQueue<Process*> NewList;
 	Processor** ProcessorList;
+	LinkedQueue<Process*> NewList;
+	LinkedQueue<Process*> BLKList;
+	LinkedQueue<Process*> TRMList;
+	LinkedQueue<Pair<int, int>> KillList;
+	int Output_Mode;
 	int NF;
 	int NS;
 	int NR;
@@ -28,9 +32,7 @@ class Scheduler
 	int ProcessorCounter;
 	Processor* MinTime;
 	Processor* MaxTime;
-	LinkedQueue<Pair<int, int>> KillList;
-	LinkedQueue<Process*> BLKList;
-	LinkedQueue<Process*> TRMList;
+
 public:
 	Scheduler();
 	void ReadFile();

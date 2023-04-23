@@ -51,28 +51,28 @@ void Scheduler::ReadFile()
 	if (inFile >> x) STL = x;
 	if (inFile >> x) ForkP = x;
 	if (inFile >> x) NumP = x;
-	Pair<int, int> r;
-	int a, b, c, d;
+	Pair<int, int> IO_Piar;
+	int Arrival_Time, PID, CPU_Time, IO_List;
 	char ch, m;
 	for (int i = 0; i < NumP; i++)
 	{
-		if (inFile >> x) a = x;
-		if (inFile >> x) b = x;
-		if (inFile >> x) c = x;
-		if (inFile >> x) d = x;
-		Process* p = new Process(a, b, c, d);
+		if (inFile >> x) Arrival_Time = x;
+		if (inFile >> x) PID = x;
+		if (inFile >> x) CPU_Time = x;
+		if (inFile >> x) IO_List = x;
+		Process* p = new Process(Arrival_Time, PID, CPU_Time, IO_List);
 		p->updateState(NEW);
 		for (int j = 0; j < x; j++)
 		{
 			if (j > 0) if (inFile >> ch) m = ch;
 			if (inFile >> ch) m = ch;
 			if (inFile >> n)
-				r.first = n;
+				IO_Piar.first = n;
 			if (inFile >> ch) m = ch;
 			if (inFile >> n)
-				r.second = n;
+				IO_Piar.second = n;
 			if (inFile >> ch) m = ch;
-			p->AddIO(r);
+			p->AddIO(IO_Piar);
 		}
 		NewList.enqueue(p);
 	}
@@ -91,10 +91,16 @@ void Scheduler::ReadFile()
 
 void Scheduler::MoveToTRM(Process* p)
 {
-	if (p != nullptr) {
+	if (p) {
 		TRMList.enqueue(p);
 		p->updateState(TRM);
 		TRMcount++;
+
+		if (p->get_LChild())
+			MoveToTRM(p->get_LChild());
+
+		if (p->get_RChild())
+			MoveToTRM(p->get_RChild());
 	}
 }
 

@@ -5,12 +5,14 @@ template<typename ItemType>
 class List
 {
 private:
-	Node<ItemType>* Head;
-	Node<ItemType>* Tail;
-	int itemCount;
 	// return A pointer to the node using the position or the data
 	Node<ItemType>* getNodeAt(int position) const;
 	Node<ItemType>* getPointerTo(const ItemType& target) const;
+
+protected:
+	Node<ItemType>* Head;
+	Node<ItemType>* Tail;
+	int itemCount;
 public:
 	List();
 	~List();						// destructor should be virtual
@@ -132,6 +134,7 @@ Node<ItemType>* List<ItemType>::getNodeAt(int position) const {
 			curPtr = curPtr->getNext();
 		return curPtr;
 	}
+	return nullptr;
 }
 
 template < class ItemType>

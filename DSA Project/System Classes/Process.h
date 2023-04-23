@@ -13,6 +13,7 @@ class Process
 	Process* LChild;
 	Process* RChild;
 	int AT;
+	int WT;
 	int PID;
 	int CT;
 	int TT;
@@ -23,7 +24,7 @@ class Process
 	bool isUpdated;
 public:
 	Process();
-	Process(int a, int id, int c, int n);
+	Process(int at, int id, int ct, int n);
 	~Process();
 	void AddIO(Pair<int, int> p);
 	void SetKillTime(int k);
@@ -32,15 +33,19 @@ public:
 	int getTRT();
 	int getAT();
 	int getCT();
+	int getID();
 	void setCT(int t);
 	int getWT();
 	bool updateState(state s);
+	void updateWT();
 	void setPID(int id);
 	void Forking(Process* &firstChild, Process* &secondChild);
 	//overloading << operator to Print The ID
 	friend ostream& operator << (ostream& out, Process *p);
 	//overloading < operator to compare  CT of two processes to sort them in priority queue
 	bool operator<(const Process* other) const;
+	Process*& get_LChild();
+	Process*& get_RChild();
 };
 
 

@@ -51,17 +51,17 @@ bool FCFS_Processor::Kill(int ID)
 
 Process* FCFS_Processor::KillRand(int RandID)
 {
-	Process* killed=NULL;
+	Process* killed=nullptr;
 	if(RDY.getEntry(RandID,killed))//checking if RandID in RDY
 	{
 		killed->updateState(TRM);
 		RDY.remove(RandID);
 	}
-	else if (GetRunProcess() &&GetRunProcess()->GetID() == RandID)//checking if RandID is the RUN Process
-	{
-		killed = GetRunProcess();
-		setRUN(NULL);
-	}
+	//else if (GetRunProcess() &&GetRunProcess()->GetID() == RandID)//checking if RandID is the RUN Process
+	//{
+	//	killed = GetRunProcess();
+	//	setRUN(nullptr);
+	//}
 	return killed; //returning pointer to to-be-killed process "NULL if not found"
 }
 

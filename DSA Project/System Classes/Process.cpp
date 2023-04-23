@@ -7,42 +7,31 @@ ostream& operator << (ostream& out, Process* p) //overloading stream operator to
 
 Process::Process()
 {
-		LChild = nullptr;
-		RChild = nullptr;
-		AT = 0;
-		PID = 0;
-		CT = 0;
-		IOcount = 0;
-		KillTime = 0;
-		State = NEW;
-		TT = 0;
-	
+	LChild = nullptr;
+	RChild = nullptr;
+	AT = 0;
+	PID = 0;
+	CT = 0;
+	IOcount = 0;
+	KillTime = 0;
+	State = NEW;
+	TT = 0;
+	WT = 0;
 }
 
-Process::Process(int a, int id, int c, int n) :AT(a), PID(id), CT(c)
-{//IOarr = new pair<int, int>[n];
+Process::Process(int at, int id, int ct, int n) :AT(at), PID(id), CT(ct)
+{
 	IOcount = 0;
 	KillTime = 0;
 	State = NEW;
 	RChild = nullptr;
 	LChild = nullptr;
+	WT = 0;
 	TT = 0;
 }
 
 Process::~Process()
-{
-	if(LChild)
-	{
-		delete LChild;
-		LChild=nullptr;
-	}
-	
-	if(RChild)
-	{
-		delete RChild;
-		RChild=nullptr;
-	}
-}
+{}
 
 void Process::AddIO(Pair<int, int> p)
 {
@@ -79,6 +68,11 @@ int Process::getCT()
 	return CT;
 }
 
+int Process::getID()
+{
+	return PID;
+}
+
 void Process::setCT(int t)
 {
 	CT = t;
@@ -100,6 +94,11 @@ bool Process::updateState(state s)
 	return false;
 }
 
+void Process::updateWT()
+{
+	WT++;
+}
+
 void Process::setPID(int id)
 {
 	PID = id;
@@ -114,4 +113,14 @@ void Process::Forking(Process*& firstChild, Process*& secondChild)
 bool Process::operator<(const Process* other) const
 {
 	return (CT < other->CT);
+}
+
+Process*& Process::get_LChild()
+{
+	return LChild;
+}
+
+Process*& Process::get_RChild()
+{
+	return RChild;
 }
