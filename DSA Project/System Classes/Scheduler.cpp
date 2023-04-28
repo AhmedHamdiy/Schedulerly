@@ -132,7 +132,7 @@ void Scheduler::NEWtoRDY(int t)
 	{
 		Process* p;
 		NewList.dequeue(p);
-		getshortestRDY()->AddProcess(p);
+		getshortestRDY(0)->AddProcess(p);
 		//ProcessorList[ProcessorCounter]->AddProcess(p); //add to rdy
 		p->updateState(READY);
 		//ProcessorCounter = (ProcessorCounter + 1) % (NF + NS + NR);
@@ -161,18 +161,32 @@ void Scheduler::IOreq(int t)
 	}
 }
 
-Processor* Scheduler::getshortestRDY()
+Processor* Scheduler::getshortestRDY(bool b)
 {
 	Processor* shortest = ProcessorList[0];
-	for (int i = 0; i < ProcessorCounter; i++)
+	if (b)  //looking for shortest RDY in FCFS Processors only
 	{
-		if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+		for (int i = 0; i < NF; i++)
 		{
-			shortest = ProcessorList[i];
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
+	else //looking for shortest RDY in All Processors
+	{
+		for (int i = 0; i < NF + NS + NR; i++)
+		{
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
 		}
 	}
 	return shortest;
 }
+
 
 void Scheduler::BLKtoRDY()
 {
@@ -185,9 +199,9 @@ void Scheduler::BLKtoRDY()
 		{
 			if (temp.second == p->getblktime())
 			{
-				Processor* shortest = getshortestRDY();
+				Processor* shortest = getshortestRDY(0);
 				p->updateState(READY);
-				getshortestRDY()->AddProcess(p);
+				getshortestRDY(0)->AddProcess(p);
 				p->deqIO();
 				BLKList.dequeue(p);
 			}
