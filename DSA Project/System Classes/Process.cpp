@@ -19,6 +19,7 @@ Process::Process()
 	WT = 0;
 	StartC = 0;
 	BLKduration = 0;
+	RemainingCT = 0;
 }
 
 Process::Process(int at, int id, int ct, int n) :AT(at), PID(id), CT(ct)
@@ -57,7 +58,7 @@ void Process::incrementTT()
 
 void Process::decrementCT()
 {
-	CT--;
+	RemainingCT--;
 }
 
 bool Process::isFinished()
@@ -75,6 +76,11 @@ int Process::getAT()
 	return AT;
 }
 
+int Process::getRemainingCT()
+{
+	return RemainingCT;
+}
+
 int Process::getCT()
 {
 	return CT;
@@ -88,6 +94,7 @@ int Process::getID()
 void Process::setCT(int t)
 {
 	CT = t;
+	RemainingCT = CT;
 }
 
 int Process::getWT()

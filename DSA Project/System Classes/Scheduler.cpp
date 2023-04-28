@@ -152,11 +152,23 @@ void Scheduler::IOreq(int t)
 	{
 		if (ProcessorList[i]->GetRunProcess() && ProcessorList[i]->GetRunProcess()->GetIO(temp))
 		{
-			if (temp.first == t - ProcessorList[i]->GetRunProcess()->getstart())
+			//if (temp.first == t - ProcessorList[i]->GetRunProcess()->getstart())
+			if (temp.first == ProcessorList[i]->GetRunProcess()->getCT()- ProcessorList[i]->GetRunProcess()->getRemainingCT())
 			{
 				RUNtoBLK(ProcessorList[i]->GetRunProcess());
 				ProcessorList[i]->setRUN(nullptr);
 			}
+		}
+	}
+}
+
+void Scheduler::updateRemainingCT()
+{
+	for (int i = 0; i < NF + NS + NR; i++)
+	{
+		if (ProcessorList[i]->GetRunProcess())
+		{
+			ProcessorList[i]->GetRunProcess()->decrementCT();
 		}
 	}
 }

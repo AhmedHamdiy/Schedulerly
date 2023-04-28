@@ -16,6 +16,7 @@ class Process
 	int WT;
 	int PID;
 	int CT;
+	int RemainingCT;
 	int StartC;
 	int BLKduration;
 	int TT;
@@ -36,8 +37,12 @@ public:
 	int getTRT();
 	int getAT();
 	int getCT();
+	int getRemainingCT();
+
 	int getID();
 	void setCT(int t);
+	void setRemainingCT(int t);
+
 	int getWT();
 
 	bool GetIO(Pair<int, int>& temp);
