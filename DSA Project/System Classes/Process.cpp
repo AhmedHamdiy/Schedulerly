@@ -5,6 +5,21 @@ ostream& operator << (ostream& out, Process* p) //overloading stream operator to
 	return out;
 }
 
+bool Process::operator<(const Process* other) const
+{
+	return CT < other->CT;
+}
+
+bool Process::operator>(const Process* other) const
+{
+	return CT > other->CT;
+}
+
+bool Process::pointerCompare(const Process* a, const Process* b)
+{
+	return *a < b;
+}
+
 Process::Process()
 {
 	LChild = nullptr;
@@ -80,18 +95,15 @@ void Process::setCT(int t)
 
 int Process::getWT()
 {
-	return getTRT() - CT;
+	if (State == TRM)
+		return getTRT() - CT;
+	else
+		return WT;
 }
 
-bool Process::updateState(state s)
+void Process::updateState(state s)
 {
-	if (!isUpdated)
-	{
 		State = s;
-		isUpdated = true;
-		return true;
-	}
-	return false;
 }
 
 void Process::updateWT()
@@ -110,10 +122,6 @@ void Process::Forking(Process*& firstChild, Process*& secondChild)
 	LChild = secondChild;
 }
 
-bool Process::operator<(const Process* other) const
-{
-	return (CT < other->CT);
-}
 
 Process*& Process::get_LChild()
 {
