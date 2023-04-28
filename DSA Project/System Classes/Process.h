@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _PROCESSES
-#define _PROCESSES
 #include<iostream>
 #include"../DS Implementation/Queue/LinkedQueue.h"
 #include"../DS Implementation/Pair/Pair.h"
@@ -21,7 +19,6 @@ class Process
 	int KillTime;
 	LinkedQueue<Pair<int,int>> IOList;
 	state State;
-	bool isUpdated;
 public:
 	Process();
 	Process(int at, int id, int ct, int n);
@@ -36,17 +33,13 @@ public:
 	int getID();
 	void setCT(int t);
 	int getWT();
-	bool updateState(state s);
+	void updateState(state s);
 	void updateWT();
 	void setPID(int id);
 	void Forking(Process* &firstChild, Process* &secondChild);
 	//overloading << operator to Print The ID
 	friend ostream& operator << (ostream& out, Process *p);
-	//overloading < operator to compare  CT of two processes to sort them in priority queue
-	bool operator<(const Process* other) const;
 	Process*& get_LChild();
 	Process*& get_RChild();
+
 };
-
-
-#endif
