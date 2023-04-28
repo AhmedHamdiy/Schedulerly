@@ -194,18 +194,18 @@ void Scheduler::Killing()
 	/*Pair<int, int> p;
 	KillList.dequeue(p);
 	*/
-	FCFS_Processor* killer;
-	int RandID = 1 + ((rand() % NumP) / (NF + NR + NS)); 
-	for (int i = 0; i < NF; i++)
-	{
-		killer = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+	int RandID = 1 + (rand() % NumP);
+		for (int i = 0; i < NF; i++)
+		{
+			FCFS_Processor* killer = nullptr;
+			killer = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
 			Process* killed = killer->KillRand(RandID);
 			if (killed)
 			{
 				MoveToTRM(killed);
 				break;
 			}
-	}
+		}
 }
 
 void Scheduler::simulation()
