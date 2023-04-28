@@ -26,6 +26,8 @@ public:
 	void setBusytime(int T);
 	void Inc_Busytime(int T);
 	void Dec_Busytime();
+	bool FinishRUN();
+	void Dec_RUNCT();
 	int getBusytime();
 	virtual bool Excuete() = 0;
 	virtual void printRDY() = 0;
