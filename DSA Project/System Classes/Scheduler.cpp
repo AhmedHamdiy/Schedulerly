@@ -116,12 +116,12 @@ int Scheduler::GetTRMcount()
 
 void Scheduler::setTS()
 {
-	/*for (int i = NF + NS; i = NR + NF + NS; i++)
+	for (int i = NF + NS; i < NR + NF + NS; i++)
 	{
 		RR_Processor* pr = nullptr;
 		pr = dynamic_cast<RR_Processor*>(ProcessorList[i]);
 		pr->setTimeSlice(RRT);
-	}*/
+	}
 }
 
 
