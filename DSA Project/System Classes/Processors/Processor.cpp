@@ -17,6 +17,14 @@ bool Processor::setRUN(Process* p) {
 void Processor::setBusytime(int T) {
 	busyTime = T;
 }
+void Processor::Inc_Busytime(int T)
+{
+	busyTime += T;
+}
+void Processor::Dec_Busytime()
+{
+	busyTime--;
+}
 int Processor::getBusytime() {
 	return busyTime;
 }

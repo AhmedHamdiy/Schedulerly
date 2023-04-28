@@ -6,10 +6,10 @@ class RR_Processor :
 {
 private:
 	LinkedQueue<Process*> RDY;
-	//static int timeSlice;
+	int timeSlice;
 public:
 	RR_Processor();
-	static void setTimeSlice(int t);
+	void setTimeSlice(int t);
 	void AddProcess(Process* p);
 	void ScheduleAlgo();
 	bool Excuete();

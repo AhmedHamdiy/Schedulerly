@@ -39,6 +39,7 @@ public:
 	void MoveToTRM(Process* p);
 	int GetNumP();
 	int GetTRMcount();
+	void setTS();
 	int getMaxW();
 	void NEWtoRDY(int t);
 	void RUNtoBLK(Process* p);
