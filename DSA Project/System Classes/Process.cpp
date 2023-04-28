@@ -101,6 +101,7 @@ void Process::setPID(int id)
 	PID = id;
 }
 
+<<<<<<< HEAD
 bool Process::setForked(Process* forkedP)
 {
 	if (!LChild)
@@ -123,6 +124,13 @@ bool Process::canFork() const
 }
 
 
+=======
+void Process::Forking(Process*& firstChild, Process*& secondChild)
+{
+	RChild = firstChild;
+	LChild = secondChild;
+}
+>>>>>>> parent of 83618ff (.)
 
 
 Process*& Process::get_LChild()
@@ -134,4 +142,7 @@ Process*& Process::get_RChild()
 {
 	return RChild;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 83618ff (.)

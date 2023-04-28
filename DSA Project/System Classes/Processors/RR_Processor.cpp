@@ -64,7 +64,7 @@ bool RR_Processor::isRDYempty()
 	return RDY.isEmpty();
 }
 
-bool RR_Processor::RDYtoRUN(int t)
+bool RR_Processor::RDYtoRUN()
 {
 	if (isRDYempty() || !isIdle())
 		return false;
@@ -72,7 +72,6 @@ bool RR_Processor::RDYtoRUN(int t)
 	RDY.dequeue(RDYprocess);
 	RDYprocess->updateState(RUNNING);
 	setRUN(RDYprocess);
-	RDYprocess->setstart(t);
 	return 1;
 }
 

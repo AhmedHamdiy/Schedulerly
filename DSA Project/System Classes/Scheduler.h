@@ -52,7 +52,10 @@ public:
 	void GetMinMax();
 	void Killing(int timestep);
 	void simulation();
+<<<<<<< HEAD
 	void Fork(int timestep);
+=======
+>>>>>>> parent of 83618ff (.)
 };
 
 
