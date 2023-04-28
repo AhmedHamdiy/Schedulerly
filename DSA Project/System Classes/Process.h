@@ -16,6 +16,8 @@ class Process
 	int WT;
 	int PID;
 	int CT;
+	int StartC;
+	int BLKduration;
 	int TT;
 	int IOcount;
 	int KillTime;
@@ -29,21 +31,30 @@ public:
 	void SetKillTime(int k);
 	int GetID();
 	void incrementTT();
+	void decrementCT();
+	bool isFinished();
 	int getTRT();
 	int getAT();
 	int getCT();
 	int getID();
 	void setCT(int t);
 	int getWT();
+
+	bool GetIO(Pair<int, int>& temp);
+	void setstart(int t);
+	int getstart();
+	void setblktime(int t);
+	int getblktime();
+	void deqIO();
+
 	void updateState(state s);
 	void updateWT();
 	void setPID(int id);
-	bool setForked(Process* forkedP);
-	bool canFork() const;
+	void Forking(Process* &firstChild, Process* &secondChild);
 	//overloading << operator to Print The ID
 	friend ostream& operator << (ostream& out, Process *p);
 	Process*& get_LChild();
 	Process*& get_RChild();
-};
 
+};
 #endif

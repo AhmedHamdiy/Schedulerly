@@ -91,7 +91,6 @@ void Scheduler::ReadFile()
 
 void Scheduler::MoveToTRM(Process* p)
 {
-	//kill orphans
 	if (p) {
 		TRMList.enqueue(p);
 		p->updateState(TRM);
@@ -133,9 +132,10 @@ void Scheduler::NEWtoRDY(int t)
 	{
 		Process* p;
 		NewList.dequeue(p);
-		ProcessorList[ProcessorCounter]->AddProcess(p); //add to rdy
+		getshortestRDY(0)->AddProcess(p);
+		//ProcessorList[ProcessorCounter]->AddProcess(p); //add to rdy
 		p->updateState(READY);
-		ProcessorCounter = (ProcessorCounter + 1) % (NF + NS + NR);
+		//ProcessorCounter = (ProcessorCounter + 1) % (NF + NS + NR);
 	}
 }
 
@@ -145,15 +145,72 @@ void Scheduler::RUNtoBLK(Process* p)
 	BLKList.enqueue(p);
 }
 
+void Scheduler::IOreq(int t)
+{
+	Pair<int, int> temp;
+	for (int i = 0; i < NF + NS + NR; i++)
+	{
+		if (ProcessorList[i]->GetRunProcess() && ProcessorList[i]->GetRunProcess()->GetIO(temp))
+		{
+			if (temp.first == t - ProcessorList[i]->GetRunProcess()->getstart())
+			{
+				RUNtoBLK(ProcessorList[i]->GetRunProcess());
+				ProcessorList[i]->setRUN(nullptr);
+			}
+		}
+	}
+}
+
+Processor* Scheduler::getshortestRDY(bool b)
+{
+	Processor* shortest = ProcessorList[0];
+	if (b)  //looking for shortest RDY in FCFS Processors only
+	{
+		for (int i = 0; i < NF; i++)
+		{
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
+	else //looking for shortest RDY in All Processors
+	{
+		for (int i = 0; i < NF + NS + NR; i++)
+		{
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
+	return shortest;
+}
+
+
 void Scheduler::BLKtoRDY()
 {
-	Process* p;
-	if (BLKList.dequeue(p))
+	Process* p = nullptr;
+	Pair<int,int> temp;
+	if (!BLKList.isEmpty())
 	{
-		ProcessorList[ProcessorCounter]->AddProcess(p);
-		if (p)
-			p->updateState(READY);
-		ProcessorCounter = (ProcessorCounter + 1) % (NF + NS + NR);
+		p = BLKList.peekFront();
+		if (p->GetIO(temp))
+		{
+			if (temp.second == p->getblktime())
+			{
+				Processor* shortest = getshortestRDY(0);
+				p->updateState(READY);
+				getshortestRDY(0)->AddProcess(p);
+				p->deqIO();
+				BLKList.dequeue(p);
+			}
+			else
+			{
+				p->setblktime(p->getblktime() + 1);
+			}
+		}
+		
 	}
 }
 
@@ -199,46 +256,24 @@ void Scheduler::MigrationFCFStoRR(Process* p)
 
 }
 
-void Scheduler::Killing(int timestep)
+void Scheduler::Killing()
 {
 	///////////PHASE 2/////////
 	/*Pair<int, int> p;
 	KillList.dequeue(p);
 	*/
-	if (KillList.isEmpty())
-		return;
-	else
-	{
-		Pair<int, int> killPair = KillList.peekFront();
-		if (killPair.first != timestep)
-			return;
-		else
+	int RandID = 1 + (rand() % NumP);
+		for (int i = 0; i < NF; i++)
 		{
-			int target_id = killPair.second;
-			Process* targetProcess = nullptr;
-			bool isDone = 0;
-			for (int i = 0; i < NF; i++)
+			FCFS_Processor* killer = nullptr;
+			killer = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+			Process* killed = killer->KillRand(RandID);
+			if (killed)
 			{
-				FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
-				if (FPro)
-					isDone=FPro->KillProcess(target_id,targetProcess);
-				if (isDone)
-				{
-					MoveToTRM(targetProcess);
-					break;
-				}
-
+				MoveToTRM(killed);
+				break;
 			}
-			//loop on FCFS processors 
-			//search for kill(in run or ready)
-			//kill it-->remove from run/ready then delete it
-			//if not found ignore
-			//kill orphans
 		}
-
-	}
-       
-
 }
 
 void Scheduler::simulation()
@@ -259,10 +294,12 @@ void Scheduler::simulation()
 		//move process from EACH rdy list to run
 		for (int i = 0; i < NF + NS + NR; i++) //(ii)
 		{
-			ProcessorList[i]->RDYtoRUN();
+			ProcessorList[i]->RDYtoRUN(timeStep);
 		}
 		int probability; //(iii)
 		Process* tempRUN = nullptr;
+		IOreq(timeStep);
+		BLKtoRDY();
 		for (int i = 0; i < NF + NS + NR; i++) //for each process in run state
 		{
 			tempRUN = ProcessorList[i]->GetRunProcess();
@@ -272,14 +309,15 @@ void Scheduler::simulation()
 			if (!ProcessorList[i]->isIdle())//there is a RUN process
 			{
 				//1. Testing to BLK ( for request I/O resources in phase2)
-				if (probability >= 1 && probability <= 15)
+				/*if (probability >= 1 && probability <= 15)
 				{
 					ProcessorList[i]->setRUN(nullptr); //remove from run
 					RUNtoBLK(tempRUN);
-				}
+				}*/
+
 
 				//2. Testing From RUN to RDY (for RR Processor in phase 2)
-				else if (probability >= 20 && probability <= 30)
+				 if (probability >= 20 && probability <= 30)
 				{
 					ProcessorList[i]->setRUN(nullptr);
 					RUNtoRDY(tempRUN);
@@ -296,12 +334,13 @@ void Scheduler::simulation()
 		}
 
 		//v.Testing Killing (for FCFS in phase 2)
-		//Killing();
+		Killing();
 
 		//iv.Testing BlK to RDY (the process has ended I/O resources in phase 2)
-		probability = 1 + (rand() % 100);
+		//probability = 1 + (rand() % 100);
+		/*probability = 5;
 		if (probability < 10)
-			BLKtoRDY();
+			BLKtoRDY();*/
 
 
 
@@ -336,29 +375,4 @@ void Scheduler::simulation()
 	}
 }
 
-//list to track parents&children???
-
-void Scheduler::Fork(int timestep)
-{
-	Process* runProcess = nullptr;
-	Process* forkedProcess = nullptr;
-	for (int i = 0; i < NF; i++) //loop on FCFS processors only
-	{
-		FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
-		if (FPro)
-		{
-			if (FPro->ForkProcess(runProcess, ForkP))
-			{
-				NumP++;
-				forkedProcess = new Process(timestep, NumP, runProcess->getCT(), 0);
-				runProcess->setForked(forkedProcess);
-				//create a process forkedProcess
-
-				//Add_to_shortest_FCFS(forkedProcess); ??
-				// shortest fcfs->addtoready(forkedProcess)??
-			}
-		}
-	}
-
-}
 
