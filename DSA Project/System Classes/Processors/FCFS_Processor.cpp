@@ -41,7 +41,7 @@ bool FCFS_Processor::Kill(int ID)
 	bool RUNCondition = (GetRunProcess()->GetID() == ID);
 	if (RDYCondition || RUNCondition)
 	{
-		//move the process to TRM 
+		//move the process to TRM
 		return true;
 	}*/
 	//ignore it
@@ -51,11 +51,12 @@ bool FCFS_Processor::Kill(int ID)
 
 Process* FCFS_Processor::KillRand(int RandID)
 {
-	Process* killed=nullptr;
-	if(RDY.getEntry(RandID,killed))//checking if RandID in RDY
+	Process* killed = nullptr;
+	int pos = RDY.search_by_ID(RandID);
+	if (pos)//checking if RandID in RDY
 	{
-		killed->updateState(TRM);
-		RDY.remove(RandID);
+		killed = RDY.getEntry(pos);
+		RDY.remove(pos);
 	}
 	//else if (GetRunProcess() &&GetRunProcess()->GetID() == RandID)//checking if RandID is the RUN Process
 	//{
@@ -72,13 +73,13 @@ bool FCFS_Processor::Fork(int ID)
 
 void FCFS_Processor::printRDY()
 {
-	RDY.print();
+	RDY.Print();
 }
 
 void FCFS_Processor::printInfo()
 {
 	//cout << "processor " << ID << " [FCFS]: "<<RDY.getcount()<<" ";
-	cout<<" [FCFS]: " << RDY.getcount() << " ";
+	cout << " [FCFS]: " << RDY.getcount() << " ";
 }
 
 bool FCFS_Processor::isRDYempty()
@@ -88,10 +89,9 @@ bool FCFS_Processor::isRDYempty()
 
 bool FCFS_Processor::RDYtoRUN()
 {
-	if(isRDYempty()||!isIdle()) 
-	return false;
-	Process* RDYprocess;
-	RDY.getEntry(1,RDYprocess);
+	if (isRDYempty() || !isIdle())
+		return false;
+	Process* RDYprocess = RDY.getEntry(1);
 	setRUN(RDYprocess);
 	RDYprocess->updateState(RUNNING);
 	RDY.remove(1); //remove from ready
