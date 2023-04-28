@@ -1,7 +1,6 @@
 #pragma once
 #include "Processor.h"
 #include"../../DS Implementation/Priority Queue/PriorityQueue.h"
-
 class SJF_Processor : public Processor
 {
 private:
