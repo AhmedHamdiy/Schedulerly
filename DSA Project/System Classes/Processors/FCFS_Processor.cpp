@@ -8,9 +8,6 @@ FCFS_Processor::FCFS_Processor()
 void FCFS_Processor::AddProcess(Process* p)
 {
 	RDY.insertEnd(p);
-	// because BusyTime is Rvalue
-	int oldBusyTime = getBusytime();
-	//set_Processor_Busytime(oldBusyTime += p->getCT());
 }
 
 void FCFS_Processor::ScheduleAlgo()

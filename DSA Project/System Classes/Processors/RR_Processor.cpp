@@ -6,7 +6,7 @@ RR_Processor::RR_Processor()
 
 void RR_Processor::setTimeSlice(int t)
 { // Use it while reading the input file
-	//timeSlice = t;
+	timeSlice = t;
 }
 
 void RR_Processor::AddProcess(Process* p)
