@@ -18,13 +18,13 @@ public:
 	~List();						// destructor should be virtual
 	int getcount() const;
 	bool isEmpty() const;
-	bool getEntry(int position,ItemType & temp)const;
+	ItemType getEntry(int position)const;
 	bool setEntry(int position, const ItemType& newEntry);
 	bool insert(int position, const ItemType& newEntry);
 	void insertEnd(const ItemType& data);
 	bool remove(int position);
 	void clear();
-	void print()const;
+	void Print()const;
 	bool find(const ItemType& anEntry) const;
 };
 
@@ -41,7 +41,7 @@ inline bool List<ItemType>::find(const ItemType& anEntry) const {
 	return (tmp != nullptr);
 }
 template<class ItemType>
-inline void List<ItemType>::print() const {
+inline void List<ItemType>::Print() const {
 	Node<ItemType>* p = Head;
 	while (p)
 	{
@@ -138,15 +138,13 @@ Node<ItemType>* List<ItemType>::getNodeAt(int position) const {
 }
 
 template < class ItemType>
-bool List<ItemType>::getEntry(int position, ItemType& temp) const //returns true if found
+ItemType List<ItemType>::getEntry(int position) const //returns true if found
 {
 	if ((position >= 1) && (position <= itemCount))
 	{
 		Node<ItemType>* nodePtr = getNodeAt(position);
-		temp= nodePtr->getItem(); //sending item by reference
-		return 1;
+		return nodePtr->getItem();
 	}
-	return 0;
 }
 template <class ItemType>
 void List<ItemType>::clear()
