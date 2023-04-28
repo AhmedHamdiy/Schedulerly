@@ -30,45 +30,52 @@ bool FCFS_Processor::Excuete()
 	}
 }
 
-bool FCFS_Processor::Kill(int ID)
-{
-	/*Process* p;
-	//p = get_Process(ID);
-	//We need a Function to get the process by using its ID???
-	bool RDYCondition=1;
-	//= (RDY.getPointerto(p) == nullptr);
-	bool RUNCondition = (GetRunProcess()->GetID() == ID);
-	if (RDYCondition || RUNCondition)
-	{
-		//move the process to TRM
-		return true;
-	}*/
-	//ignore it
-	return false;
 
-}
 
-Process* FCFS_Processor::KillRand(int RandID)
+
+
+bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
 {
-	Process* killed = nullptr;
-	int pos = RDY.search_by_ID(RandID);
-	if (pos)//checking if RandID in RDY
+	if (isIdle()) //lw mafesh run aslan
+		return false;
+	int random;
+	random = rand();
+	if (random <= forkP)
 	{
-		killed = RDY.getEntry(pos);
-		RDY.remove(pos);
+		runProcess = GetRunProcess();
+		if (runProcess->canFork())
+		{
+			return true;
+		}
+		else
+		{
+			runProcess = nullptr;
+			return false;
+		}
 	}
-	//else if (GetRunProcess() &&GetRunProcess()->GetID() == RandID)//checking if RandID is the RUN Process
-	//{
-	//	killed = GetRunProcess();
-	//	setRUN(nullptr);
-	//}
-	return killed; //returning pointer to to-be-killed process "NULL if not found"
+	else
+		return false;
 }
 
-bool FCFS_Processor::Fork(int ID)
+bool FCFS_Processor::KillProcess(int ID, Process*& target)
 {
-	return 0;
+	if (GetRunProcess()->GetID() == ID)
+	{
+		target = GetRunProcess();
+		setRUN(nullptr);
+		return true;
+	}
+	int pos = -1;
+	Process* KProcess = RDY.search_by_ID(ID, pos);
+	if (KProcess)
+	{
+		target = KProcess;
+		RDY.remove(pos);
+		return true;
+	}
+	return false;
 }
+
 
 void FCFS_Processor::printRDY()
 {

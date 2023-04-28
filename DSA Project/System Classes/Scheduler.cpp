@@ -256,24 +256,40 @@ void Scheduler::MigrationFCFStoRR(Process* p)
 
 }
 
-void Scheduler::Killing()
+void Scheduler::Killing(int timestep)
 {
-	///////////PHASE 2/////////
-	/*Pair<int, int> p;
-	KillList.dequeue(p);
-	*/
-	int RandID = 1 + (rand() % NumP);
-		for (int i = 0; i < NF; i++)
+	if (KillList.isEmpty())
+		return;
+	else
+	{
+		Pair<int, int> killPair = KillList.peekFront();
+		if (killPair.first != timestep)
+			return;
+		else
 		{
-			FCFS_Processor* killer = nullptr;
-			killer = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
-			Process* killed = killer->KillRand(RandID);
-			if (killed)
+			int target_id = killPair.second;
+			Process* targetProcess = nullptr;
+			bool isDone = 0;
+			for (int i = 0; i < NF; i++)
 			{
-				MoveToTRM(killed);
-				break;
+				FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+				if (FPro)
+					isDone = FPro->KillProcess(target_id, targetProcess);
+				if (isDone)
+				{
+					MoveToTRM(targetProcess);
+					break;
+				}
+
 			}
+			//loop on FCFS processors 
+			//search for kill(in run or ready)
+			//kill it-->remove from run/ready then delete it
+			//if not found ignore
+			//kill orphans
 		}
+
+	}
 }
 
 void Scheduler::simulation()
@@ -334,7 +350,7 @@ void Scheduler::simulation()
 		}
 
 		//v.Testing Killing (for FCFS in phase 2)
-		Killing();
+		//Killing();
 
 		//iv.Testing BlK to RDY (the process has ended I/O resources in phase 2)
 		//probability = 1 + (rand() % 100);
@@ -372,6 +388,29 @@ void Scheduler::simulation()
 	{
 		Sleep(100);
 			userInterface->printSilent(0);
+	}
+}
+
+void Scheduler::Fork(int timestep)
+{
+	Process* runProcess = nullptr;
+	Process* forkedProcess = nullptr;
+	for (int i = 0; i < NF; i++) //loop on FCFS processors only
+	{
+		FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+		if (FPro)
+		{
+			if (FPro->ForkProcess(runProcess, ForkP))
+			{
+				NumP++;
+				forkedProcess = new Process(timestep, NumP, runProcess->getCT(), 0);
+				runProcess->setForked(forkedProcess);
+				//create a process forkedProcess
+
+				//Add_to_shortest_FCFS(forkedProcess); ??
+				// shortest fcfs->addtoready(forkedProcess)??
+			}
+		}
 	}
 }
 

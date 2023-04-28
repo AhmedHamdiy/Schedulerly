@@ -51,6 +51,8 @@ public:
 	void updateWT();
 	void setPID(int id);
 	bool setForked(Process* forkedP);
+	bool canFork() const;
+
 	//overloading << operator to Print The ID
 	friend ostream& operator << (ostream& out, Process *p);
 	Process*& get_LChild();

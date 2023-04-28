@@ -4,21 +4,22 @@
 class PList : public List<Process*>
 {
 public:
-	int search_by_ID(int id)
+	Process* search_by_ID(int id,int &pos)
 	{
 		if (!Head)
-			return 0;
+			return nullptr;
 				Node<Process*>* tmp = Head;
 				int Pos = 1;
 				while (tmp)
 				{
 					if (tmp->getItem()->getID() == id)
 					{
-						return Pos;
+						pos = Pos;
+						return tmp->getItem();
 					}
 					tmp = tmp->getNext();
 					Pos++;
 				}
-				return 0;
+				return nullptr;
 	}
 };

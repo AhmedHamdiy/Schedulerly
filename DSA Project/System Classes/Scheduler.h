@@ -56,7 +56,7 @@ public:
 	void WorkStealing(){};
 	void CreateForked(){};
 	void GetMinMax();
-	void Killing();
+	void Killing(int timestep);
 	void simulation();
 	void Fork(int timestep);
 

@@ -116,7 +116,22 @@ void Process::setPID(int id)
 
 bool Process::setForked(Process* forkedP)
 {
-	return 1;
+	if (!LChild)
+	{
+		LChild = forkedP;
+		return true;
+	}
+	else if (!RChild)
+	{
+		RChild = forkedP;
+		return true;
+	}
+	else
+		return false;
+}
+bool Process::canFork() const
+{
+	return (!RChild || LChild);
 }
 void Process::setstart(int t)
 {

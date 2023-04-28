@@ -11,15 +11,15 @@ public:
 	void AddProcess(Process* p);
 	void ScheduleAlgo();
 	bool Excuete();
-	bool Kill(int ID);
-	bool Fork(int ID);
+	
+	
 	void printRDY();
 	virtual void printInfo();
-	virtual Process* KillRand(int ID);
+	
 	bool isRDYempty();
 	bool RDYtoRUN(){};
-	bool ForkProcess(Process*& runProcess, int forkP){};
-	bool KillProcess(int ID,Process* &target){};
+	bool ForkProcess(Process*& runProcess, int forkP);
+	bool KillProcess(int ID,Process* &target);
 	bool RDYtoRUN(int t);
 };
 
