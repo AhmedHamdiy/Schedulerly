@@ -17,12 +17,9 @@ public:
 	virtual void printInfo();
 	virtual Process* KillRand(int ID);
 	bool isRDYempty();
-	bool RDYtoRUN();
-<<<<<<< HEAD
-	bool ForkProcess(Process*& runProcess, int forkP);
-	bool KillProcess(int ID,Process* &target);
-=======
->>>>>>> parent of 83618ff (.)
+	bool RDYtoRUN(){};
+	bool ForkProcess(Process*& runProcess, int forkP){};
+	bool KillProcess(int ID,Process* &target){};
 	bool RDYtoRUN(int t);
 };
 

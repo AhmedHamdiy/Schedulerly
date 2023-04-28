@@ -113,8 +113,11 @@ void Process::setPID(int id)
 	PID = id;
 }
 
-<<<<<<< HEAD
+
 bool Process::setForked(Process* forkedP)
+{
+	return 1;
+}
 void Process::setstart(int t)
 {
 	StartC = t;
@@ -141,18 +144,10 @@ void Process::deqIO()
 	IOList.dequeue(p);
 }
 
-void Process::Forking(Process*& firstChild, Process*& secondChild)
-{
-	RChild = firstChild;
-	LChild = secondChild;
-}
-=======
-void Process::Forking(Process*& firstChild, Process*& secondChild)
-{
-	RChild = firstChild;
-	LChild = secondChild;
-}
->>>>>>> parent of 83618ff (.)
+
+
+
+
 
 
 Process*& Process::get_LChild()
@@ -171,7 +166,4 @@ bool Process::GetIO(Pair<int, int>& temp)
 	temp = IOList.peekFront();
 	return 1; 
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> parent of 83618ff (.)

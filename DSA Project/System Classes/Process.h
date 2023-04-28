@@ -50,7 +50,7 @@ public:
 	void updateState(state s);
 	void updateWT();
 	void setPID(int id);
-	void Forking(Process* &firstChild, Process* &secondChild);
+	bool setForked(Process* forkedP);
 	//overloading << operator to Print The ID
 	friend ostream& operator << (ostream& out, Process *p);
 	Process*& get_LChild();
