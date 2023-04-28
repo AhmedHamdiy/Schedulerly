@@ -1,117 +1,152 @@
-#pragma once
-#include<iostream>
-#define MAX 400
-using namespace std;
-template <class ItemType>
-class PriorityQueue {  //This Priority Queue Is Implemented Using Min Heap
-private:
-	int size;
-	ItemType Items[MAX];
-	int free;
-	//Utiliy Functions To Get The Index 
-	int LChild_Indx(int i) { return (2 * i) + 1; }
-	int RChild_Indx(int i) { return 2 * (i + 1); }
-	int Parent_Indx(int i) { return (i - 1) / 2; }
-	void Swap(ItemType& a, ItemType& b);
-	//A Function To Heapify The Queue After Insertion
-	void HeapifyUp(int index);
-	//A Function To Heapify The Queue After Deletion
-	void HeapifyDown(int index);
+#include <iostream>
+#include <algorithm>
+#define MAX 200
+template <typename T>
+class pnode
+{
 public:
-	PriorityQueue();
-	int getsize() const { return size; };
-	bool enqueue(const ItemType& entry);
-	bool dequeue();
-	ItemType peekFront()const;
-	bool isEmpty()const;
-	void Print()const;
+    T data;
+    int pri;
+    pnode operator = (const pnode<T> other)
+    {
+        data = other.data;
+        pri = other.pri;
+        return *this;
+    }
 };
+template <typename T>
 
-template<class ItemType>
-inline PriorityQueue<ItemType>::PriorityQueue() { size = 0; }
+class PriorityQueue {
+public:
+    PriorityQueue() : size(0) {}
 
-
-template<class ItemType>
-inline void PriorityQueue<ItemType>::HeapifyDown(int index) {
-
-	int Rchild_idx = RChild_Indx(index);
-	int Lchild_idx = LChild_Indx(index);
-	int SmallestChild_idx = index;
-
-	if (Lchild_idx < size && Items[Lchild_idx] < Items[SmallestChild_idx]) {
-		SmallestChild_idx = Lchild_idx;
-	}
-	else if (Rchild_idx < size && Items[Rchild_idx] < Items[SmallestChild_idx]) {
-		SmallestChild_idx = Rchild_idx;
-	}
-	if (SmallestChild_idx != index)
-	{
-		Swap(Items[SmallestChild_idx], Items[index]);
-		HeapifyDown(SmallestChild_idx);
-	}
-}
-
-
-template<class ItemType>
-inline void PriorityQueue<ItemType>::HeapifyUp(int index) {
-	 int parentIndex = (index - 1) / 2;
-
-        while (index > 0 && Items[parentIndex] > Items[index]) {
-            Swap(Items[parentIndex], Items[index]);
-            index = parentIndex;
-            parentIndex = (index - 1) / 2;
+    void enqueue(T& value,int pri) {
+        if (size >= MAX) {
+            throw std::overflow_error("Priority queue is full");
         }
-}
+        pnode<T>* NewNode = new pnode<T>;
+            NewNode->data = value;
+        NewNode->pri = pri;
+        heap[size]=*NewNode;
+        size++;
+        HeapifyUp(size - 1);
+    }
 
-template<class ItemType>
-inline void PriorityQueue<ItemType>::Swap(ItemType& a, ItemType& b) {
-	ItemType temp = a;
-	a = b;
-	b = temp;
-}
+    void dequeue() {
+        if (size == 0) {
+            throw std::underflow_error("Priority queue is empty");
+        }
+        size--;
+        swap(heap[0], heap[size]);
+        HeapifyDown(0);
+    }
 
+    T Peek() const {
+        if (size == 0) {
+            throw std::underflow_error("Priority queue is empty");
+        }
+        pnode<T> top = heap[0];
+        return top.data;
+    }
 
+    bool isEmpty() const {
+        return size == 0;
+    }
 
-template<class ItemType>
-inline bool PriorityQueue<ItemType>::enqueue(const ItemType& entry) {
-	if (size < MAX)
-	{
-		Items[size] = entry;
-		HeapifyUp(size);
-		size++;
-		return true;
-	}
-	//There is an Overflow
-	return false;
-}
+    void Print() {
+        heapsort(heap, size);
+        for (int i = 0; i < size; i++) {
+            pnode<T> c = heap[i];
+            cout << c.data << " ";
+        }
+        cout << endl;
+    }
+    int getCount()
+    {
+        return size;
+    }
+private:
+    pnode<T> heap[MAX];
+    int size;
 
+    void HeapifyUp(int i) {
+        while (i > 0) {
+            int parent = (i - 1) / 2;
+            pnode<T> my = heap[i];
+            pnode<T>par = heap[parent];
+            if (my.pri <par.pri ) {
+                swap(heap[i], heap[parent]);
+                i = parent;
+            }
+            else {
+                break;
+            }
+        }
+    }
 
+    void HeapifyDown(int i) {
+        while (true) {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+            int min_child = i;
+            pnode<T> mym = heap[left];
+            pnode<T>par = heap[min_child];
+            if (left < size && mym.pri < par.pri) {
+                min_child = left;
+            }
+            pnode<T> my = heap[right];
+            pnode<T>par2 = heap[min_child];
+            if (right < size && my.pri < par2.pri) {
+                min_child = right;
+            }
+            if (min_child != i) {
+                swap(heap[i], heap[min_child]);
+                i = min_child;
+            }
+            else {
+                break;
+            }
+        }
+    }
 
-template<class ItemType>
-inline bool PriorityQueue<ItemType>::dequeue() {
-	if (!isEmpty())
-	{
-		Items[0] = Items[size - 1];
-		size--;
-		HeapifyDown(0);
-		return true;
-	}
-	return false;
-}
+    void heapify(pnode<T> arr[], int n, int i) {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+        pnode<T> lft = heap[left];
+        pnode<T>lar = heap[largest];
+        
+        if (left < n && lft.pri >lar.pri) {
+            largest = left;
+        }
+        pnode<T>lr = heap[largest];
+        pnode<T>rgt = heap[right];
 
-template<class ItemType>
-inline ItemType PriorityQueue<ItemType>::peekFront()const {
-	if (!isEmpty())
-		return Items[0];
-}
+        if (right < n && rgt.pri > lr.pri) {
+            largest = right;
+        }
 
-template<class ItemType>
-inline bool PriorityQueue<ItemType>::isEmpty()const {
-	return size == 0;
-}
-template<class ItemType>
-inline void PriorityQueue<ItemType>::Print()const {
-	for (int i = 0; i < size; i++)
-		cout << Items[i]<<" ";
-	cout << endl;
-}
+        if (largest != i) {
+            swap(arr[i], arr[largest]);
+            heapify(arr, n, largest);
+        }
+    }
+
+    void heapsort(pnode<T> arr[], int n) {
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(arr, n, i);
+        }
+
+        for (int i = n - 1; i >= 0; i--) {
+            swap(arr[0], arr[i]);
+            heapify(arr, i, 0);
+        }
+    }
+    void swap(pnode<T>& first, pnode<T>& second)
+    {
+        pnode<T> temp = first;
+        first = second;
+        second = temp;
+    }
+    
+};
