@@ -4,11 +4,17 @@ int Processor::nextID = 1;
 Processor::Processor() {
 	busyTime = 0;
 	RUN = nullptr;
+	state = IDLE;
 }
-void Processor::setRUN(Process* p){
-	RUN = p; 
+bool Processor::setRUN(Process* p) {
+	if (state == IDLE)
+	{
+		RUN = p;
+		return true;
+	}
+	return false;
 }
-void Processor::setBusytime(int T) { 
+void Processor::setBusytime(int T) {
 	busyTime = T;
 }
 int Processor::getBusytime() {
@@ -22,6 +28,13 @@ ostream& operator<<(std::ostream& os, const Processor& p) {
 int Processor::getID() {
 	return ID;
 }
+void Processor::FlipState()
+{
+	if (state = BUSY)
+		state = IDLE;
+	else
+		state = BUSY;
+}
 bool Processor::operator<(Processor* p1)
 {
 	return (busyTime < p1->busyTime);
@@ -32,17 +45,20 @@ bool Processor::operator>(Processor* p1)
 }
 bool Processor::isIdle()
 {
-	 
-		return (GetRunProcess() == nullptr);
-	
+	return (state == IDLE);
 }
 
 Process* Processor::GetRunProcess()
 {
 	return RUN;
 }
-
-Process* Processor::KillRand(int ID)
+bool Processor::removeProcess()
 {
-	return NULL;
+	if (state == BUSY)
+	{
+		RUN = nullptr;
+		FlipState();
+		return true;
+	}
+	return false;
 }
