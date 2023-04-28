@@ -45,7 +45,7 @@ bool Processor::operator>(Processor* p1)
 }
 bool Processor::isIdle()
 {
-	return (state == IDLE);
+	return (RUN == nullptr);
 }
 
 Process* Processor::GetRunProcess()
