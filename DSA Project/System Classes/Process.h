@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _PROCESSES
+#define _PROCESSES
 #include<iostream>
 #include"../DS Implementation/Queue/LinkedQueue.h"
 #include"../DS Implementation/Pair/Pair.h"
@@ -43,3 +45,5 @@ public:
 	Process*& get_RChild();
 
 };
+
+#endif
