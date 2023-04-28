@@ -17,7 +17,9 @@ public:
 	virtual void printInfo();
 	virtual Process* KillRand(int ID);
 	bool isRDYempty();
-	bool RDYtoRUN(int t);
+	bool RDYtoRUN();
+	bool ForkProcess(Process*& runProcess, int forkP);
+	bool KillProcess(int ID,Process* &target);
 };
 
 

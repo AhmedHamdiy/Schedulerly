@@ -43,22 +43,16 @@ public:
 	int getMaxW();
 	void NEWtoRDY(int t);
 	void RUNtoBLK(Process* p);
-
-	void IOreq(int t);
 	void BLKtoRDY();
-	Processor* getshortestRDY(bool b);
-	
-
-
 	void RUNtoRDY(Process*p);
 	bool MigrationRRtoSJF(Process* p);
 	void MigrationFCFStoRR(Process* p);
 	void WorkStealing(){};
 	void CreateForked(){};
 	void GetMinMax();
-	void Killing();
+	void Killing(int timestep);
 	void simulation();
-	void OutputFile();
+	void Fork(int timestep);
 };
 
 

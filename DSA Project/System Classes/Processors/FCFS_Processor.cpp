@@ -8,8 +8,6 @@ FCFS_Processor::FCFS_Processor()
 void FCFS_Processor::AddProcess(Process* p)
 {
 	RDY.insertEnd(p);
-		Inc_Busytime(p->getCT());
-
 }
 
 void FCFS_Processor::ScheduleAlgo()
@@ -48,22 +46,6 @@ bool FCFS_Processor::Kill(int ID)
 
 }
 
-Process* FCFS_Processor::KillRand(int RandID)
-{
-	Process* killed = nullptr;
-	int pos = RDY.search_by_ID(RandID);
-	if (pos)//checking if RandID in RDY
-	{
-		killed = RDY.getEntry(pos);
-		RDY.remove(pos);
-	}
-	//else if (GetRunProcess() &&GetRunProcess()->GetID() == RandID)//checking if RandID is the RUN Process
-	//{
-	//	killed = GetRunProcess();
-	//	setRUN(nullptr);
-	//}
-	return killed; //returning pointer to to-be-killed process "NULL if not found"
-}
 
 bool FCFS_Processor::Fork(int ID)
 {
@@ -86,17 +68,58 @@ bool FCFS_Processor::isRDYempty()
 	return RDY.getcount() == 0;
 }
 
-bool FCFS_Processor::RDYtoRUN(int t)
+bool FCFS_Processor::RDYtoRUN()
 {
 	if (isRDYempty() || !isIdle())
 		return false;
 	Process* RDYprocess = RDY.getEntry(1);
 	setRUN(RDYprocess);
-	RDYprocess->setstart(t);
 	RDYprocess->updateState(RUNNING);
 	RDY.remove(1); //remove from ready
 	return true;
 
+}
+
+bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
+{
+	if (isIdle()) //lw mafesh run aslan
+		return false;
+	int random;
+	random = rand();
+	if (random <= forkP)
+	{
+		runProcess = GetRunProcess();
+		if (runProcess->canFork())
+		{
+			return true;
+		}
+		else
+		{
+			runProcess = nullptr;
+			return false;
+		}
+	}
+	else
+		return false;
+}
+
+bool FCFS_Processor::KillProcess(int ID,Process* &target)
+{
+	if (GetRunProcess()->GetID() == ID)
+	{
+		target = GetRunProcess();
+		setRUN(nullptr);
+		return true;
+	}
+	int pos = -1;
+	Process* KProcess=RDY.search_by_ID(ID,pos);
+	if (KProcess)
+	{
+		target = KProcess;
+		RDY.remove(pos);
+		return true;
+	}
+	return false;
 }
 
 
