@@ -12,8 +12,12 @@ public:
 	int chooseMode()
 	{
 		char c;
-		cout << "please choose output mode(enter 's' for silent,'i' for interactive,'b' for stepbystep" << endl;
+		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(col, 7); // sets Console color 
+		cout << "Please Choose Output Mode ( Enter 's' For Silent,'i' For Interactive,'b' For Stepbystep )" << endl;
+		SetConsoleTextAttribute(col, 1); // sets Console color 
 		cin >> c;
+
 		if (c == 'b') //stepbystep
 			return 0;
 		else if (c == 'i') //interactive
@@ -89,10 +93,20 @@ public:
 	//called by passing(0) at end of the simulation
 	void printSilent(bool start)
 	{
+		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
+		
 		if (start)
+		{
+			SetConsoleTextAttribute(col, 6); // sets Console color 
 			cout << "Silent Mode......  Simulation Starts..." << endl;
+		}
 		else
+		{
+			SetConsoleTextAttribute(col, 10); // sets Console color 
 			cout << "Similation ends,Output file is created" << endl;
+			SetConsoleTextAttribute(col, 7); // sets Console color 
+
+		}
 
 	}
 };

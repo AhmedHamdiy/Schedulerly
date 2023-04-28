@@ -17,6 +17,9 @@ void Scheduler::ReadFile()
 
 
 {
+	Pair<int, int> IO_Piar;
+	int Arrival_Time, PID, CPU_Time, IO_List;
+	char ch, m;
 	ifstream inFile;
 	inFile.open("Input Sample.txt");
 	if (!inFile)
@@ -45,15 +48,11 @@ void Scheduler::ReadFile()
 		ProcessorList[i] = pro;
 	}
 	if (inFile >> x) RRT = x;
-	RR_Processor::setTimeSlice(RRT);
 	if (inFile >> x) RTF = x;
 	if (inFile >> x) MaxW = x;
 	if (inFile >> x) STL = x;
 	if (inFile >> x) ForkP = x;
 	if (inFile >> x) NumP = x;
-	Pair<int, int> IO_Piar;
-	int Arrival_Time, PID, CPU_Time, IO_List;
-	char ch, m;
 	for (int i = 0; i < NumP; i++)
 	{
 		if (inFile >> x) Arrival_Time = x;
@@ -76,6 +75,7 @@ void Scheduler::ReadFile()
 		}
 		NewList.enqueue(p);
 	}
+	setTS();
 
 	while (inFile >> x)
 	{
@@ -112,6 +112,16 @@ int Scheduler::GetNumP()
 int Scheduler::GetTRMcount()
 {
 	return TRMcount;
+}
+
+void Scheduler::setTS()
+{
+	/*for (int i = NF + NS; i = NR + NF + NS; i++)
+	{
+		RR_Processor* pr = nullptr;
+		pr = dynamic_cast<RR_Processor*>(ProcessorList[i]);
+		pr->setTimeSlice(RRT);
+	}*/
 }
 
 
@@ -210,6 +220,11 @@ void Scheduler::Killing()
 
 void Scheduler::simulation()
 {
+	UI* userInterface = new UI;
+	int mode = userInterface->chooseMode();
+	if (mode == 2)
+		userInterface->printSilent(1);
+
 	int timeStep = 0;
 	ReadFile(); //read input from file
 	while (true)
@@ -281,10 +296,9 @@ void Scheduler::simulation()
 		//increament IO time 
 		//if IOtime=IO duration move to rdy
 
-
-
-		UI* userInterface = new UI;
-		userInterface->printOutput(1, timeStep, BLKList, TRMList, ProcessorList, NF + NS + NR);
+		
+		if(mode!=2)
+		userInterface->printOutput(mode, timeStep, BLKList, TRMList, ProcessorList, NF + NS + NR);
 
 		if (NumP == TRMcount) //break loop condition
 			break;
@@ -292,8 +306,11 @@ void Scheduler::simulation()
 		timeStep++;
 	}
 
-
-
+	if (mode == 2)
+	{
+		Sleep(100);
+			userInterface->printSilent(0);
+	}
 }
 
 
