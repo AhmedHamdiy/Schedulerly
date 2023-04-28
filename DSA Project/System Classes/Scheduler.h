@@ -46,7 +46,9 @@ public:
 
 	void IOreq(int t);
 	void BLKtoRDY();
-	Processor* getshortestRDY();
+	Processor* getshortestRDY(bool b);
+	
+
 
 	void RUNtoRDY(Process*p);
 	bool MigrationRRtoSJF(Process* p);
