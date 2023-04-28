@@ -17,7 +17,7 @@ public:
 	virtual void printInfo();
 	virtual Process* KillRand(int ID);
 	bool isRDYempty();
-	bool RDYtoRUN();
+	bool RDYtoRUN(int t);
 };
 
 

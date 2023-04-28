@@ -17,6 +17,8 @@ Process::Process()
 	State = NEW;
 	TT = 0;
 	WT = 0;
+	StartC = 0;
+	BLKduration = 0;
 }
 
 Process::Process(int at, int id, int ct, int n) :AT(at), PID(id), CT(ct)
@@ -101,6 +103,32 @@ void Process::setPID(int id)
 	PID = id;
 }
 
+void Process::setstart(int t)
+{
+	StartC = t;
+}
+
+int Process::getstart()
+{
+	return StartC;
+}
+
+void Process::setblktime(int t)
+{
+	BLKduration = t;
+}
+
+int Process::getblktime()
+{
+	return BLKduration;
+}
+
+void Process::deqIO()
+{
+	Pair<int, int> p;
+	IOList.dequeue(p);
+}
+
 void Process::Forking(Process*& firstChild, Process*& secondChild)
 {
 	RChild = firstChild;
@@ -116,4 +144,11 @@ Process*& Process::get_LChild()
 Process*& Process::get_RChild()
 {
 	return RChild;
+}
+bool Process::GetIO(Pair<int, int>& temp)
+{
+	if (IOList.isEmpty())
+		return 0;
+	temp = IOList.peekFront();
+	return 1; 
 }

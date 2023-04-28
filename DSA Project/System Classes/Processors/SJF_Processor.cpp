@@ -50,7 +50,7 @@ bool SJF_Processor::isRDYempty()
 	return RDY.isEmpty();
 }
 
-bool SJF_Processor::RDYtoRUN()
+bool SJF_Processor::RDYtoRUN(int t)
 {
 	if (isRDYempty() || !isIdle())
 		return false;
@@ -58,6 +58,7 @@ bool SJF_Processor::RDYtoRUN()
 	RDY.dequeue();
 	RDYprocess->updateState(RUNNING);
 	setRUN(RDYprocess);
+	RDYprocess->setstart(t);
 	return 1;
 }
 

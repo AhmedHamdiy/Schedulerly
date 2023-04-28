@@ -16,6 +16,8 @@ class Process
 	int WT;
 	int PID;
 	int CT;
+	int StartC;
+	int BLKduration;
 	int TT;
 	int IOcount;
 	int KillTime;
@@ -35,6 +37,14 @@ public:
 	int getID();
 	void setCT(int t);
 	int getWT();
+
+	bool GetIO(Pair<int, int>& temp);
+	void setstart(int t);
+	int getstart();
+	void setblktime(int t);
+	int getblktime();
+	void deqIO();
+
 	void updateState(state s);
 	void updateWT();
 	void setPID(int id);

@@ -87,12 +87,13 @@ bool FCFS_Processor::isRDYempty()
 	return RDY.getcount() == 0;
 }
 
-bool FCFS_Processor::RDYtoRUN()
+bool FCFS_Processor::RDYtoRUN(int t)
 {
 	if (isRDYempty() || !isIdle())
 		return false;
 	Process* RDYprocess = RDY.getEntry(1);
 	setRUN(RDYprocess);
+	RDYprocess->setstart(t);
 	RDYprocess->updateState(RUNNING);
 	RDY.remove(1); //remove from ready
 	return true;

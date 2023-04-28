@@ -42,7 +42,11 @@ public:
 	int getMaxW();
 	void NEWtoRDY(int t);
 	void RUNtoBLK(Process* p);
+
+	void IOreq(int t);
 	void BLKtoRDY();
+	Processor* getshortestRDY();
+
 	void RUNtoRDY(Process*p);
 	bool MigrationRRtoSJF(Process* p);
 	void MigrationFCFStoRR(Process* p);
@@ -51,6 +55,7 @@ public:
 	void GetMinMax();
 	void Killing();
 	void simulation();
+	void OutputFile();
 };
 
 

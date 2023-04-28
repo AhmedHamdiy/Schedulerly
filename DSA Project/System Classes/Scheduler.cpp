@@ -122,9 +122,10 @@ void Scheduler::NEWtoRDY(int t)
 	{
 		Process* p;
 		NewList.dequeue(p);
-		ProcessorList[ProcessorCounter]->AddProcess(p); //add to rdy
+		getshortestRDY()->AddProcess(p);
+		//ProcessorList[ProcessorCounter]->AddProcess(p); //add to rdy
 		p->updateState(READY);
-		ProcessorCounter = (ProcessorCounter + 1) % (NF + NS + NR);
+		//ProcessorCounter = (ProcessorCounter + 1) % (NF + NS + NR);
 	}
 }
 
@@ -134,15 +135,58 @@ void Scheduler::RUNtoBLK(Process* p)
 	BLKList.enqueue(p);
 }
 
+void Scheduler::IOreq(int t)
+{
+	Pair<int, int> temp;
+	for (int i = 0; i < NF + NS + NR; i++)
+	{
+		if (ProcessorList[i]->GetRunProcess() && ProcessorList[i]->GetRunProcess()->GetIO(temp))
+		{
+			if (temp.first == t - ProcessorList[i]->GetRunProcess()->getstart())
+			{
+				RUNtoBLK(ProcessorList[i]->GetRunProcess());
+				ProcessorList[i]->setRUN(nullptr);
+			}
+		}
+	}
+}
+
+Processor* Scheduler::getshortestRDY()
+{
+	Processor* shortest = ProcessorList[0];
+	for (int i = 0; i < ProcessorCounter; i++)
+	{
+		if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+		{
+			shortest = ProcessorList[i];
+		}
+	}
+	return shortest;
+}
+
 void Scheduler::BLKtoRDY()
 {
-	Process* p;
-	if (BLKList.dequeue(p))
+	Process* p = nullptr;
+	Pair<int,int> temp;
+	if (!BLKList.isEmpty())
 	{
-		ProcessorList[ProcessorCounter]->AddProcess(p);
-		if (p)
-			p->updateState(READY);
-		ProcessorCounter = (ProcessorCounter + 1) % (NF + NS + NR);
+		p = BLKList.peekFront();
+		if (p->GetIO(temp))
+		{
+			if (temp.second == p->getblktime())
+			{
+				Processor* shortest = getshortestRDY();
+				p->updateState(READY);
+				getshortestRDY()->AddProcess(p);
+				p->deqIO();
+				BLKList.dequeue(p);
+			}
+			else
+			{
+				p->setblktime(p->getblktime() + 1);
+			}
+		}
+		
 	}
 }
 
@@ -221,10 +265,12 @@ void Scheduler::simulation()
 		//move process from EACH rdy list to run
 		for (int i = 0; i < NF + NS + NR; i++) //(ii)
 		{
-			ProcessorList[i]->RDYtoRUN();
+			ProcessorList[i]->RDYtoRUN(timeStep);
 		}
 		int probability; //(iii)
 		Process* tempRUN = nullptr;
+		IOreq(timeStep);
+		BLKtoRDY();
 		for (int i = 0; i < NF + NS + NR; i++) //for each process in run state
 		{
 			tempRUN = ProcessorList[i]->GetRunProcess();
@@ -234,14 +280,15 @@ void Scheduler::simulation()
 			if (!ProcessorList[i]->isIdle())//there is a RUN process
 			{
 				//1. Testing to BLK ( for request I/O resources in phase2)
-				if (probability >= 1 && probability <= 15)
+				/*if (probability >= 1 && probability <= 15)
 				{
 					ProcessorList[i]->setRUN(nullptr); //remove from run
 					RUNtoBLK(tempRUN);
-				}
+				}*/
+
 
 				//2. Testing From RUN to RDY (for RR Processor in phase 2)
-				else if (probability >= 20 && probability <= 30)
+				 if (probability >= 20 && probability <= 30)
 				{
 					ProcessorList[i]->setRUN(nullptr);
 					RUNtoRDY(tempRUN);
@@ -261,9 +308,10 @@ void Scheduler::simulation()
 		Killing();
 
 		//iv.Testing BlK to RDY (the process has ended I/O resources in phase 2)
-		probability = 1 + (rand() % 100);
+		//probability = 1 + (rand() % 100);
+		/*probability = 5;
 		if (probability < 10)
-			BLKtoRDY();
+			BLKtoRDY();*/
 
 
 
