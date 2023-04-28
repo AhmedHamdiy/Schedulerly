@@ -12,9 +12,7 @@ void RR_Processor::setTimeSlice(int t)
 void RR_Processor::AddProcess(Process* p)
 {
 	RDY.enqueue(p);
-	// because BusyTime is Rvalue
-	int oldBusyTime = getBusytime();
-	setBusytime(oldBusyTime += p->getCT());
+	Inc_Busytime(p->getCT());
 }
 
 void RR_Processor::ScheduleAlgo()

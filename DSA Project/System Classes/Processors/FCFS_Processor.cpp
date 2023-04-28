@@ -8,6 +8,8 @@ FCFS_Processor::FCFS_Processor()
 void FCFS_Processor::AddProcess(Process* p)
 {
 	RDY.insertEnd(p);
+		Inc_Busytime(p->getCT());
+
 }
 
 void FCFS_Processor::ScheduleAlgo()

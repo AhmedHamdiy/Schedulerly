@@ -15,10 +15,9 @@ void SJF_Processor::ScheduleAlgo()
 
 void SJF_Processor::AddProcess(Process* p)
 {
-	RDY.enqueue(p,p->getCT());
-	// because BusyTime is Rvalue
-	int oldBusyTime = getBusytime();
-	setBusytime(oldBusyTime += p->getCT());
+	RDY.enqueue(p,p->getCT());	
+	Inc_Busytime(p->getCT());
+
 }
 
 bool SJF_Processor::Excuete()

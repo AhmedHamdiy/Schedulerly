@@ -55,6 +55,16 @@ void Process::incrementTT()
 	TT++;
 }
 
+void Process::decrementCT()
+{
+	CT--;
+}
+
+bool Process::isFinished()
+{
+	return CT==0;
+}
+
 int Process::getTRT()
 {
 	return TT - AT;

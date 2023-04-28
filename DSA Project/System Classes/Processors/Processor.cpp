@@ -25,6 +25,24 @@ void Processor::Dec_Busytime()
 {
 	busyTime--;
 }
+
+bool Processor::FinishRUN()
+{
+	if (RUN)
+	{
+		if (RUN->getCT() == 0) {
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+void Processor::Dec_RUNCT()
+{
+	if (RUN)
+		RUN->decrementCT();
+}
+
 int Processor::getBusytime() {
 	return busyTime;
 }

@@ -31,6 +31,8 @@ public:
 	void SetKillTime(int k);
 	int GetID();
 	void incrementTT();
+	void decrementCT();
+	bool isFinished();
 	int getTRT();
 	int getAT();
 	int getCT();
@@ -55,5 +57,4 @@ public:
 	Process*& get_RChild();
 
 };
-
 #endif
