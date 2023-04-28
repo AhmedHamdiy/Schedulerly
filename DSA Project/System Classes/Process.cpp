@@ -5,21 +5,6 @@ ostream& operator << (ostream& out, Process* p) //overloading stream operator to
 	return out;
 }
 
-bool Process::operator<(const Process* other) const
-{
-	return CT < other->CT;
-}
-
-bool Process::operator>(const Process* other) const
-{
-	return CT > other->CT;
-}
-
-bool Process::pointerCompare(const Process* a, const Process* b)
-{
-	return *a < b;
-}
-
 Process::Process()
 {
 	LChild = nullptr;
