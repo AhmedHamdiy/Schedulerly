@@ -40,6 +40,6 @@ public:
 	// Overload the << operator as a friend function:
 	friend ostream& operator<<(std::ostream& os, const Processor& p);
 	
-	virtual bool RDYtoRUN(int t) = 0;//FOR PHASE 1 ONLY(alternative for scheduelalgo.)//
+	virtual bool RDYtoRUN() = 0;//FOR PHASE 1 ONLY(alternative for scheduelalgo.)//
 	
 };

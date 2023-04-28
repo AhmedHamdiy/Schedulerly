@@ -13,6 +13,6 @@ public:
 	void printRDY();
 	virtual void printInfo();
 	bool isRDYempty();
-	bool RDYtoRUN(int t);
+	bool RDYtoRUN();
 };
 
