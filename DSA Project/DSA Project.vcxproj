@@ -137,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DS Implementation\List\List.h" />
+    <ClInclude Include="DS Implementation\List\PList.h" />
     <ClInclude Include="DS Implementation\Pair\pair.h" />
     <ClInclude Include="DS Implementation\Priority Queue\PriorityQueue.h" />
     <ClInclude Include="DS Implementation\Queue\LinkedQueue.h" />
