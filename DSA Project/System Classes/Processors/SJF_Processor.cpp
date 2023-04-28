@@ -15,7 +15,7 @@ void SJF_Processor::ScheduleAlgo()
 
 void SJF_Processor::AddProcess(Process* p)
 {
-	RDY.enqueue(p);
+	RDY.enqueue(p,p->getCT());
 	// because BusyTime is Rvalue
 	int oldBusyTime = getBusytime();
 	setBusytime(oldBusyTime += p->getCT());
@@ -42,7 +42,7 @@ void SJF_Processor::printRDY()
 void SJF_Processor::printInfo()
 {
 	//cout << "processor " << ID << " [SJF]: " << RDY.getsize() << " ";
-	cout << " [SJF ]: " << RDY.getsize() << " ";
+	cout << " [SJF ]: " << RDY.getCount() << " ";
 }
 
 bool SJF_Processor::isRDYempty()
@@ -54,7 +54,7 @@ bool SJF_Processor::RDYtoRUN()
 {
 	if (isRDYempty() || !isIdle())
 		return false;
-	Process* RDYprocess = RDY.peekFront();
+	Process* RDYprocess = RDY.Peek();
 	RDY.dequeue();
 	RDYprocess->updateState(RUNNING);
 	setRUN(RDYprocess);
