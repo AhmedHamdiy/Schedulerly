@@ -1,10 +1,11 @@
 #pragma once
 #include "Processor.h"
-#include"../../DS Implementation/List/List.h"
+#include<windows.h> 
+#include"../../DS Implementation/List/PList.h"
 class FCFS_Processor :public Processor
 {
 private:
-	List<Process*> RDY;
+	PList RDY;
 public:
 	FCFS_Processor();
 	void AddProcess(Process* p);
