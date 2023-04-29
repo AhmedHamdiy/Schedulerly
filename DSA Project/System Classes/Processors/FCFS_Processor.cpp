@@ -40,9 +40,9 @@ bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
 		return false;
 	srand(time(NULL));
 	int random;
-	random = 1 + (rand() % 100);
+	random =(rand() % 100);
 	runProcess = nullptr;
-	if (random <= forkP)
+	if (random < forkP)
 	{
 		runProcess = GetRunProcess();
 		if (runProcess->canFork())

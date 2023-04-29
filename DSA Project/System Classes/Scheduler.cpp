@@ -413,17 +413,21 @@ void Scheduler::simulation()
 		if(mode!=2)
 		userInterface->printOutput(mode, timeStep, BLKList, TRMList, ProcessorList, NF + NS + NR);
 
-		if (NumP == TRMcount) //break loop condition
+		if (NumP == TRMcount)
+		{
+			if (mode == 2)
+			{
+				Sleep(100);
+				userInterface->printSilent(0);
+			}
 			break;
+		}//break loop condition
+			
 
 		timeStep++;
 	}
 
-	if (mode == 2)
-	{
-		Sleep(100);
-			userInterface->printSilent(0);
-	}
+	
 }
 
 void Scheduler::Fork(int timestep)

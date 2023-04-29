@@ -137,9 +137,9 @@ bool Process::setForked(Process* forkedP)
 	else
 		return false;
 }
-bool Process::canFork() const
+bool Process::canFork() const 
 {
-	return (!RChild || LChild);
+	return (!RChild || !LChild);
 }
 void Process::setstart(int t)
 {
