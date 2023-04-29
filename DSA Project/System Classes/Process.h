@@ -60,6 +60,7 @@ public:
 
 	//overloading << operator to Print The ID
 	friend ostream& operator << (ostream& out, Process *p);
+
 	Process*& get_LChild();
 	Process*& get_RChild();
 

@@ -38,8 +38,10 @@ bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
 {
 	if (isIdle()) //lw mafesh run aslan
 		return false;
+	srand(time(NULL));
 	int random;
-	random = rand();
+	random = 1 + (rand() % 100);
+	runProcess = nullptr;
 	if (random <= forkP)
 	{
 		runProcess = GetRunProcess();
@@ -58,8 +60,9 @@ bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
 }
 
 bool FCFS_Processor::KillProcess(int ID, Process*& target)
+//search for process,remove it from ready/run if exists then return a pointer to it
 {
-	if (GetRunProcess()->GetID() == ID)
+	if (GetRunProcess()&&GetRunProcess()->GetID() == ID)
 	{
 		target = GetRunProcess();
 		setRUN(nullptr);

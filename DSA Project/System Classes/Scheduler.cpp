@@ -95,13 +95,24 @@ void Scheduler::MoveToTRM(Process* p)
 		TRMList.enqueue(p);
 		p->updateState(TRM);
 		TRMcount++;
+		Process* leftChild = p->get_LChild();
+		Process* rightChild = p->get_RChild();
 
-		if (p->get_LChild())
-			MoveToTRM(p->get_LChild());
+		if (leftChild)
+		{
+			killOrphan(leftChild); 
+			//killOrphan calls killProcess=>search for process and remove from run or ready
 
-		if (p->get_RChild())
-			MoveToTRM(p->get_RChild());
+			MoveToTRM(leftChild);
+		}
+
+		if (rightChild)
+		{
+			killOrphan(rightChild);
+			MoveToTRM(rightChild);
+		}
 	}
+	//kill orphans(remove from ready or run of fcfs before moving to trm)
 }
 
 int Scheduler::GetNumP()
@@ -277,8 +288,9 @@ void Scheduler::Killing(int timestep)
 		Pair<int, int> killPair = KillList.peekFront();
 		if (killPair.first != timestep)
 			return;
-		else
+		else //SIGKILL is now
 		{
+			KillList.dequeue(killPair); 
 			int target_id = killPair.second;
 			Process* targetProcess = nullptr;
 			bool isDone = 0;
@@ -286,6 +298,7 @@ void Scheduler::Killing(int timestep)
 			{
 				FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
 				if (FPro)
+					//search for process&remove it from rdy/run if exists
 					isDone = FPro->KillProcess(target_id, targetProcess);
 				if (isDone)
 				{
@@ -293,12 +306,7 @@ void Scheduler::Killing(int timestep)
 					break;
 				}
 
-			}
-			//loop on FCFS processors 
-			//search for kill(in run or ready)
-			//kill it-->remove from run/ready then delete it
-			//if not found ignore
-			//kill orphans
+			} //if process not found ignore kill signal
 		}
 
 	}
@@ -360,7 +368,8 @@ void Scheduler::simulation()
 
 			}
 		}
-
+		Killing(timeStep);
+		Fork(timeStep);
 		//v.Testing Killing (for FCFS in phase 2)
 		//Killing();
 
@@ -412,17 +421,36 @@ void Scheduler::Fork(int timestep)
 		FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
 		if (FPro)
 		{
+			//check if rand within probability and RUN process can fork
 			if (FPro->ForkProcess(runProcess, ForkP))
 			{
 				NumP++;
-				forkedProcess = new Process(timestep, NumP, runProcess->getCT(), 0);
+				forkedProcess = new Process(timestep, NumP, runProcess->getRemainingCT(), 0);
 				runProcess->setForked(forkedProcess);
 				//create a process forkedProcess
 
-				//Add_to_shortest_FCFS(forkedProcess); ??
-				// shortest fcfs->addtoready(forkedProcess)??
+				//add to shortest FCFS
+				Processor* shortest_FCFS = getshortestRDY(1);
+				shortest_FCFS->AddProcess(forkedProcess);
+				forkedProcess->updateState(READY);
+				
 			}
 		}
+	}
+}
+
+void Scheduler::killOrphan(Process* orphan)
+{
+	bool isDone = 0;
+	int target_id = orphan->GetID();
+	for (int i = 0; i < NF; i++)
+	{
+		FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+		if (FPro)
+			//search for process&remove it from rdy/run if exists
+			isDone = FPro->KillProcess(target_id,orphan);
+		if (isDone)
+			return;
 	}
 }
 

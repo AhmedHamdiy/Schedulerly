@@ -59,6 +59,7 @@ public:
 	void Killing(int timestep);
 	void simulation();
 	void Fork(int timestep);
+	void killOrphan(Process* orphan);
 
 	void OutputFile();
 };
