@@ -31,6 +31,7 @@ Process::Process(int at, int id, int ct, int n) :AT(at), PID(id), CT(ct)
 	LChild = nullptr;
 	WT = 0;
 	TT = 0;
+	RemainingCT = ct;
 }
 
 Process::~Process()
@@ -94,7 +95,7 @@ int Process::getID()
 void Process::setCT(int t)
 {
 	CT = t;
-	RemainingCT = CT;
+	RemainingCT = t;
 }
 
 int Process::getWT()

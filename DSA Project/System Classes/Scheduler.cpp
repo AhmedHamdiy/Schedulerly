@@ -163,7 +163,6 @@ void Scheduler::IOreq(int t)
 	{
 		if (ProcessorList[i]->GetRunProcess() && ProcessorList[i]->GetRunProcess()->GetIO(temp))
 		{
-			//if (temp.first == t - ProcessorList[i]->GetRunProcess()->getstart())
 			if (temp.first == ProcessorList[i]->GetRunProcess()->getCT()- ProcessorList[i]->GetRunProcess()->getRemainingCT())
 			{
 				RUNtoBLK(ProcessorList[i]->GetRunProcess());
@@ -227,6 +226,7 @@ void Scheduler::BLKtoRDY()
 				getshortestRDY(0)->AddProcess(p);
 				p->deqIO();
 				BLKList.dequeue(p);
+				p->setblktime(0);
 			}
 			else
 			{
@@ -334,8 +334,11 @@ void Scheduler::simulation()
 		}
 		int probability; //(iii)
 		Process* tempRUN = nullptr;
+
+		updateRemainingCT();
 		IOreq(timeStep);
 		BLKtoRDY();
+
 		for (int i = 0; i < NF + NS + NR; i++) //for each process in run state
 		{
 			tempRUN = ProcessorList[i]->GetRunProcess();
@@ -353,17 +356,17 @@ void Scheduler::simulation()
 
 
 				//2. Testing From RUN to RDY (for RR Processor in phase 2)
-				 if (probability >= 20 && probability <= 30)
+				/* if (probability >= 20 && probability <= 30)
 				{
 					ProcessorList[i]->setRUN(nullptr);
 					RUNtoRDY(tempRUN);
-				}
+				}*/
 				//3. Testing to TRM (the process has ended in phase2) 
-				else if (probability >= 50 && probability <= 60)
+				/*else if (probability >= 50 && probability <= 60)
 				{
 					ProcessorList[i]->setRUN(nullptr);
 					MoveToTRM(tempRUN);
-				}
+				}*/
 
 
 			}
