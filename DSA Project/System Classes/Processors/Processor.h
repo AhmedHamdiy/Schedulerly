@@ -25,7 +25,7 @@ public:
 	virtual void AddProcess(Process* p) = 0;
 	void setBusytime(int T);
 	void Inc_Busytime(int T);
-	void Dec_Busytime();
+	void Dec_Busytime(int T);
 	bool FinishRUN();
 	void Dec_RUNCT();
 	int getBusytime();

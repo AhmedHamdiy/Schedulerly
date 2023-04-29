@@ -336,8 +336,19 @@ void Scheduler::simulation()
 		Process* tempRUN = nullptr;
 
 		updateRemainingCT();
+		Process* TempProcess;
+		for (int i = 0; i < NF + NS + NR; i++)
+		{
+			if (ProcessorList[i]->FinishRUN())
+			{
+				MoveToTRM(ProcessorList[i]->GetRunProcess());
+				ProcessorList[i]->setRUN(nullptr);
+			}
+		}
+
 		IOreq(timeStep);
 		BLKtoRDY();
+
 
 		for (int i = 0; i < NF + NS + NR; i++) //for each process in run state
 		{

@@ -16,8 +16,7 @@ void SJF_Processor::ScheduleAlgo()
 void SJF_Processor::AddProcess(Process* p)
 {
 	RDY.enqueue(p,p->getCT());	
-	Inc_Busytime(p->getCT());
-
+	Inc_Busytime(p->getRemainingCT());
 }
 
 bool SJF_Processor::Excuete()
@@ -56,6 +55,7 @@ bool SJF_Processor::RDYtoRUN(int t)
 	Process* RDYprocess = RDY.Peek();
 	RDY.dequeue();
 	RDYprocess->updateState(RUNNING);
+	Dec_Busytime(RDYprocess->getRemainingCT());
 	setRUN(RDYprocess);
 	return 1;
 }

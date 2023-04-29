@@ -21,19 +21,19 @@ void Processor::Inc_Busytime(int T)
 {
 	busyTime += T;
 }
-void Processor::Dec_Busytime()
+void Processor::Dec_Busytime(int T)
 {
-	busyTime--;
+	busyTime-=T;
 }
 
 bool Processor::FinishRUN()
 {
 	if (RUN)
 	{
-		if (RUN->getCT() == 0) {
+		if (RUN->getRemainingCT() == 0) {
 			return true;
 		}
-		return false;
+		//return false;
 	}
 	return false;
 }

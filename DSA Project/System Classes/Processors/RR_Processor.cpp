@@ -12,7 +12,7 @@ void RR_Processor::setTimeSlice(int t)
 void RR_Processor::AddProcess(Process* p)
 {
 	RDY.enqueue(p);
-	Inc_Busytime(p->getCT());
+	Inc_Busytime(p->getRemainingCT());
 }
 
 void RR_Processor::ScheduleAlgo()
@@ -71,6 +71,7 @@ bool RR_Processor::RDYtoRUN(int t)
 	Process* RDYprocess;
 	RDY.dequeue(RDYprocess);
 	RDYprocess->updateState(RUNNING);
+	Dec_Busytime(RDYprocess->getRemainingCT());
 	setRUN(RDYprocess);
 	return 1;
 }

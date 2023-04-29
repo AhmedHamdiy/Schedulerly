@@ -8,7 +8,7 @@ FCFS_Processor::FCFS_Processor()
 void FCFS_Processor::AddProcess(Process* p)
 {
 	RDY.insertEnd(p);
-		Inc_Busytime(p->getCT());
+	Inc_Busytime(p->getRemainingCT());
 
 }
 
@@ -103,10 +103,10 @@ bool FCFS_Processor::RDYtoRUN(int t)
 	Process* RDYprocess = RDY.getEntry(1);
 	setRUN(RDYprocess);
 	RDYprocess->setstart(t);
+	Dec_Busytime(RDYprocess->getRemainingCT());
 	RDYprocess->updateState(RUNNING);
 	RDY.remove(1); //remove from ready
 	return true;
-
 }
 
 
