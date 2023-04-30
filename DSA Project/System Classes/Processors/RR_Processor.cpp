@@ -1,12 +1,8 @@
 #include "RR_Processor.h"
-RR_Processor::RR_Processor()
+RR_Processor::RR_Processor(int Id, int TS)
 {
-	ID = nextID++; // Assign unique ID 
-}
-
-void RR_Processor::setTimeSlice(int t)
-{ // Use it while reading the input file
-	timeSlice = t;
+	ID = Id;  // Assign unique ID
+	timeSlice = TS; // Assign TimeSlice
 }
 
 void RR_Processor::AddProcess(Process* p)

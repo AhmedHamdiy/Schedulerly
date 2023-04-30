@@ -7,7 +7,7 @@ class FCFS_Processor :public Processor
 private:
 	PList RDY;
 public:
-	FCFS_Processor();
+	FCFS_Processor(int Id);
 	void AddProcess(Process* p);
 	void ScheduleAlgo();
 	bool Excuete();

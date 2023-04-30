@@ -6,11 +6,11 @@ enum PState { BUSY, IDLE };
 class Processor
 {
 protected:
-	static int nextID; // Static data member to keep track of next available ID
 	int ID;
 private:
 	Process* RUN;
-	int busyTime;
+	int BusyTime;
+	int FinishTime;
 	PState state;
 public:
 

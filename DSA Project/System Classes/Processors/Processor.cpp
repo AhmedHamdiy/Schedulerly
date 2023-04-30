@@ -1,10 +1,10 @@
 #include"Processor.h"
-int Processor::nextID = 1;
 
 Processor::Processor() {
-	busyTime = 0;
+	BusyTime = 0;
 	RUN = nullptr;
 	state = IDLE;
+	FinishTime = 0;
 }
 bool Processor::setRUN(Process* p) {
 	if (state == IDLE)
@@ -15,15 +15,15 @@ bool Processor::setRUN(Process* p) {
 	return false;
 }
 void Processor::setBusytime(int T) {
-	busyTime = T;
+	BusyTime = T;
 }
 void Processor::Inc_Busytime(int T)
 {
-	busyTime += T;
+	BusyTime += T;
 }
 void Processor::Dec_Busytime(int T)
 {
-	busyTime-=T;
+	BusyTime-=T;
 }
 
 bool Processor::FinishRUN()
@@ -44,7 +44,7 @@ void Processor::Dec_RUNCT()
 }
 
 int Processor::getBusytime() {
-	return busyTime;
+	return BusyTime;
 }
 ostream& operator<<(std::ostream& os, const Processor& p) {
 	os << "(P" << p.ID << ")";
@@ -63,11 +63,11 @@ void Processor::FlipState()
 }
 bool Processor::operator<(Processor* p1)
 {
-	return (busyTime < p1->busyTime);
+	return (BusyTime < p1->BusyTime);
 }
 bool Processor::operator>(Processor* p1)
 {
-	return (busyTime > p1->busyTime);
+	return (BusyTime > p1->BusyTime);
 }
 bool Processor::isIdle()
 {

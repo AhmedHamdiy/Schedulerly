@@ -8,8 +8,7 @@ private:
 	LinkedQueue<Process*> RDY;
 	int timeSlice;
 public:
-	RR_Processor();
-	void setTimeSlice(int t);
+	RR_Processor(int Id, int TS);
 	void AddProcess(Process* p);
 	void ScheduleAlgo();
 	bool Excuete();

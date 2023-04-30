@@ -1,8 +1,8 @@
 #include "SJF_Processor.h"
 
-SJF_Processor::SJF_Processor()
+SJF_Processor::SJF_Processor(int Id)
 {
-	ID = nextID++; // Assign unique ID 
+	ID = Id; // Assign unique ID 
 }
 
 void SJF_Processor::ScheduleAlgo()

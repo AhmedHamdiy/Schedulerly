@@ -1,8 +1,8 @@
 #include "FCFS_Processor.h"
 
-FCFS_Processor::FCFS_Processor()
+FCFS_Processor::FCFS_Processor(int Id)
 {
-	ID = nextID++; // Assign unique ID 
+	ID = Id; // Assign unique ID 
 }
 
 void FCFS_Processor::AddProcess(Process* p)

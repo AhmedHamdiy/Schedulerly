@@ -6,7 +6,7 @@ class SJF_Processor : public Processor
 private:
 	PriorityQueue<Process*> RDY;
 public:
-	SJF_Processor();
+	SJF_Processor(int Id);
 	void ScheduleAlgo();
 	void AddProcess(Process* p);
 	bool Excuete();

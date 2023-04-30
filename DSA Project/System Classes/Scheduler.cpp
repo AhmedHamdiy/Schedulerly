@@ -30,29 +30,32 @@ void Scheduler::ReadFile()
 	if (inFile >> x) NF = x;
 	if (inFile >> x) NS = x;
 	if (inFile >> x) NR = x;
-	ProcessorList = new Processor * [NF + NS + NR];
-
-	for (; i < NF; i++)
-	{
-		Processor* pro = new FCFS_Processor;
-		ProcessorList[i] = pro;
-	}
-	for (; i < NF + NS; i++)
-	{
-		Processor* pro = new SJF_Processor;
-		ProcessorList[i] = pro;
-	}
-	for (; i < NF + NS + NR; i++)
-	{
-		Processor* pro = new RR_Processor;
-		ProcessorList[i] = pro;
-	}
 	if (inFile >> x) RRT = x;
 	if (inFile >> x) RTF = x;
 	if (inFile >> x) MaxW = x;
 	if (inFile >> x) STL = x;
 	if (inFile >> x) ForkP = x;
 	if (inFile >> x) NumP = x;
+
+	//Allocating The ProcessorList With Unique IDs:
+	ProcessorList = new Processor * [NF + NS + NR];
+	for (; i < NF; i++)
+	{
+		Processor* pro = new FCFS_Processor(i + 1);
+		ProcessorList[i] = pro;
+	}
+	for (; i < NF + NS; i++)
+	{
+		Processor* pro = new SJF_Processor(i + 1);
+		ProcessorList[i] = pro;
+	}
+	for (; i < NF + NS + NR; i++)
+	{
+		Processor* pro = new RR_Processor(i + 1, RRT);
+		ProcessorList[i] = pro;
+	}
+
+	//Allocating The Processes With:
 	for (int i = 0; i < NumP; i++)
 	{
 		if (inFile >> x) Arrival_Time = x;
@@ -75,8 +78,7 @@ void Scheduler::ReadFile()
 		}
 		NewList.enqueue(p);
 	}
-	setTS();
-
+	
 	while (inFile >> x)
 	{
 		if (inFile >> n)
@@ -125,15 +127,7 @@ int Scheduler::GetTRMcount()
 	return TRMcount;
 }
 
-void Scheduler::setTS()
-{
-	for (int i = NF + NS; i < NR + NF + NS; i++)
-	{
-		RR_Processor* pr = nullptr;
-		pr = dynamic_cast<RR_Processor*>(ProcessorList[i]);
-		pr->setTimeSlice(RRT);
-	}
-}
+
 
 
 //Moving Process from NEW to RDY at AT
