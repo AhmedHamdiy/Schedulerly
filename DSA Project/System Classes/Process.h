@@ -48,8 +48,9 @@ public:
 	bool GetIO(Pair<int, int>& temp);
 	void setstart(int t);
 	int getstart();
-	void setblktime(int t);
+	void inc_blktime();
 	int getblktime();
+	void resetblktime();
 	void deqIO();
 
 	void updateState(state s);

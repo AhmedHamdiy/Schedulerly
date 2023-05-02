@@ -157,7 +157,7 @@ void Scheduler::IOreq(int t)
 	{
 		if (ProcessorList[i]->GetRunProcess() && ProcessorList[i]->GetRunProcess()->GetIO(temp))
 		{
-			if (temp.first == ProcessorList[i]->GetRunProcess()->getCT()- ProcessorList[i]->GetRunProcess()->getRemainingCT())
+			if (temp.first == (ProcessorList[i]->GetRunProcess()->getCT()- ProcessorList[i]->GetRunProcess()->getRemainingCT()))
 			{
 				RUNtoBLK(ProcessorList[i]->GetRunProcess());
 				ProcessorList[i]->setRUN(nullptr);
@@ -177,11 +177,12 @@ void Scheduler::updateRemainingCT()
 	}
 }
 
-Processor* Scheduler::getshortestRDY(bool b)
+Processor* Scheduler::getshortestRDY(int b)
 {
-	Processor* shortest = ProcessorList[0];
-	if (b)  //looking for shortest RDY in FCFS Processors only
+	Processor* shortest = nullptr;
+	if (b==1)  //looking for shortest RDY in FCFS Processors only
 	{
+		shortest = ProcessorList[0];
 		for (int i = 0; i < NF; i++)
 		{
 			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
@@ -190,8 +191,20 @@ Processor* Scheduler::getshortestRDY(bool b)
 			}
 		}
 	}
-	else //looking for shortest RDY in All Processors
+	else if (b == 2)  //looking for shortest RDY in SJF Processors only
 	{
+		shortest = ProcessorList[NF];
+		for (int i = NF; i < NF+NS; i++)
+		{
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
+	else if(b==0) //looking for shortest RDY in All Processors
+	{
+		shortest = ProcessorList[0];
 		for (int i = 0; i < NF + NS + NR; i++)
 		{
 			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
@@ -220,11 +233,11 @@ void Scheduler::BLKtoRDY()
 				getshortestRDY(0)->AddProcess(p);
 				p->deqIO();
 				BLKList.dequeue(p);
-				p->setblktime(0);
+				p->resetblktime();
 			}
 			else
 			{
-				p->setblktime(p->getblktime() + 1);
+				p->inc_blktime();
 			}
 		}
 		
@@ -255,10 +268,10 @@ void Scheduler::GetMinMax()
 
 bool Scheduler::MigrationRRtoSJF(Process* p)
 {
-	if (p->getCT() < RTF && NS != 0)
+	if (p->getRemainingCT() < RTF && NS != 0) 
 	{
-		ProcessorList[NF]->AddProcess(p);
-		return true;
+		getshortestRDY(2)->AddProcess(p);
+		return 1;
 	}
 	return false;
 }
@@ -339,7 +352,6 @@ void Scheduler::simulation()
 				ProcessorList[i]->setRUN(nullptr);
 			}
 		}
-
 		IOreq(timeStep);
 		BLKtoRDY();
 

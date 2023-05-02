@@ -45,7 +45,7 @@ public:
 
 	void IOreq(int t);
 	void BLKtoRDY();
-	Processor* getshortestRDY(bool b);
+	Processor* getshortestRDY(int b);
 	void updateRemainingCT();
 
 
