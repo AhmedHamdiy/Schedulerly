@@ -71,12 +71,6 @@ bool RR_Processor::RDYtoRUN(int t)
 	Process* RDYprocess;
 	RDY.dequeue(RDYprocess);
 	Dec_Busytime(RDYprocess->getRemainingCT());
-	/*while (sc->MigrationRRtoSJF(RDYprocess))
-	{
-		RDY.dequeue(RDYprocess);
-		Dec_Busytime(RDYprocess->getRemainingCT());
-	}
-	Dec_Busytime(RDYprocess->getRemainingCT());*/
 	RDYprocess->updateState(RUNNING);
 	setRUN(RDYprocess);
 	return 1;

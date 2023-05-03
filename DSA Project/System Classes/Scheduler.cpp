@@ -337,7 +337,16 @@ void Scheduler::simulation()
 		//move process from EACH rdy list to run
 		for (int i = 0; i < NF + NS + NR; i++) //(ii)
 		{
-			ProcessorList[i]->RDYtoRUN(timeStep);
+			if (i >= NF + NS && NR != 0 && ProcessorList[i]->RDYtoRUN(timeStep))
+			{
+				while (MigrationRRtoSJF(ProcessorList[i]->GetRunProcess()))
+				{
+					ProcessorList[i]->RDYtoRUN(timeStep);
+				}
+			}
+			else {
+				ProcessorList[i]->RDYtoRUN(timeStep);
+			}
 		}
 		int probability; //(iii)
 		Process* tempRUN = nullptr;
