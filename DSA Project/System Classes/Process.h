@@ -42,7 +42,7 @@ public:
 	int getID();
 	void setCT(int t);
 	void setRemainingCT(int t);
-
+	void setTT(int t);
 	int getWT();
 
 	bool GetIO(Pair<int, int>& temp);

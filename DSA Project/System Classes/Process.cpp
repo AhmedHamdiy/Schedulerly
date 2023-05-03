@@ -177,10 +177,10 @@ void Process::deqIO()
 	IOList.dequeue(p);
 }
 
-
-
-
-
+void Process::setTT(int t)
+{
+	TT = t;
+}
 
 
 Process*& Process::get_LChild()

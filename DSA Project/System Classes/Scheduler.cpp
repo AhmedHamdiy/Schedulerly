@@ -91,11 +91,12 @@ void Scheduler::ReadFile()
 	inFile.close();
 }
 
-void Scheduler::MoveToTRM(Process* p)
+void Scheduler::MoveToTRM(Process* p,int t)
 {
 	if (p) {
 		TRMList.enqueue(p);
 		p->updateState(TRM);
+		p->setTT(t);
 		TRMcount++;
 		Process* leftChild = p->get_LChild();
 		Process* rightChild = p->get_RChild();
@@ -105,13 +106,13 @@ void Scheduler::MoveToTRM(Process* p)
 			killOrphan(leftChild); 
 			//killOrphan calls killProcess=>search for process and remove from run or ready
 
-			MoveToTRM(leftChild);
+			MoveToTRM(leftChild,t);
 		}
 
 		if (rightChild)
 		{
 			killOrphan(rightChild);
-			MoveToTRM(rightChild);
+			MoveToTRM(rightChild,t);
 		}
 	}
 	//kill orphans(remove from ready or run of fcfs before moving to trm)
@@ -202,6 +203,17 @@ Processor* Scheduler::getshortestRDY(int b)
 			}
 		}
 	}
+	else if (b == 3)   //looking for shortest RDY in RR Processors
+	{
+		shortest = ProcessorList[NF + NS];
+		for (int i = NF + NS; i < NF + NS + NR; i++)
+		{
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
 	else if(b==0) //looking for shortest RDY in All Processors
 	{
 		shortest = ProcessorList[0];
@@ -271,6 +283,7 @@ bool Scheduler::MigrationRRtoSJF(Process* p)
 	if (p->getRemainingCT() < RTF && NS != 0) 
 	{
 		getshortestRDY(2)->AddProcess(p);
+		p->updateState(READY);
 		return 1;
 	}
 	return false;
@@ -281,9 +294,15 @@ int Scheduler::getMaxW()
 	return MaxW;
 }
 
-void Scheduler::MigrationFCFStoRR(Process* p)
+bool Scheduler::MigrationFCFStoRR(Process* p)
 {
-
+	if (p->getWT() > MaxW && NR!=0)
+	{
+		getshortestRDY(3)->AddProcess(p);
+		p->updateState(READY);
+		return 1;
+	}
+	return 0;
 }
 
 void Scheduler::Killing(int timestep)
@@ -309,7 +328,7 @@ void Scheduler::Killing(int timestep)
 					isDone = FPro->KillProcess(target_id, targetProcess);
 				if (isDone)
 				{
-					MoveToTRM(targetProcess);
+					MoveToTRM(targetProcess,timestep);
 					break;
 				}
 
@@ -357,7 +376,7 @@ void Scheduler::simulation()
 		{
 			if (ProcessorList[i]->FinishRUN())
 			{
-				MoveToTRM(ProcessorList[i]->GetRunProcess());
+				MoveToTRM(ProcessorList[i]->GetRunProcess(),timeStep);
 				ProcessorList[i]->setRUN(nullptr);
 			}
 		}
