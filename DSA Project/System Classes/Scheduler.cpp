@@ -89,11 +89,12 @@ void Scheduler::ReadFile()
 	inFile.close();
 }
 
-void Scheduler::MoveToTRM(Process* p)
+void Scheduler::MoveToTRM(Process* p,int t)
 {
 	if (p) {
 		TRMList.enqueue(p);
 		p->updateState(TRM);
+		p->setTT(t);
 		TRMcount++;
 		Process* leftChild = p->get_LChild();
 		Process* rightChild = p->get_RChild();
@@ -103,13 +104,13 @@ void Scheduler::MoveToTRM(Process* p)
 			killOrphan(leftChild);
 			//killOrphan calls killProcess=>search for process and remove from run or ready
 
-			MoveToTRM(leftChild);
+			MoveToTRM(leftChild,t);
 		}
 
 		if (rightChild)
 		{
 			killOrphan(rightChild);
-			MoveToTRM(rightChild);
+			MoveToTRM(rightChild,t);
 		}
 	}
 	//kill orphans(remove from ready or run of fcfs before moving to trm)
@@ -155,7 +156,7 @@ void Scheduler::IOreq(int t)
 	{
 		if (ProcessorList[i]->GetRunProcess() && ProcessorList[i]->GetRunProcess()->GetIO(temp))
 		{
-			if (temp.first == ProcessorList[i]->GetRunProcess()->getCT() - ProcessorList[i]->GetRunProcess()->getRemainingCT())
+			if (temp.first == (ProcessorList[i]->GetRunProcess()->getCT()- ProcessorList[i]->GetRunProcess()->getRemainingCT()))
 			{
 				RUNtoBLK(ProcessorList[i]->GetRunProcess());
 				ProcessorList[i]->setRUN(nullptr);
@@ -177,9 +178,10 @@ void Scheduler::updateRemainingCT()
 
 Processor* Scheduler::Get_ShortestRDY(bool b)
 {
-	Processor* shortest = ProcessorList[0];
-	if (b)  //looking for shortest RDY in FCFS Processors only
+	Processor* shortest = nullptr;
+	if (b==1)  //looking for shortest RDY in FCFS Processors only
 	{
+		shortest = ProcessorList[0];
 		for (int i = 0; i < NF; i++)
 		{
 			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime())
@@ -188,8 +190,31 @@ Processor* Scheduler::Get_ShortestRDY(bool b)
 			}
 		}
 	}
-	else //looking for shortest RDY in All Processors
+	else if (b == 2)  //looking for shortest RDY in SJF Processors only
 	{
+		shortest = ProcessorList[NF];
+		for (int i = NF; i < NF+NS; i++)
+		{
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
+	else if (b == 3)   //looking for shortest RDY in RR Processors
+	{
+		shortest = ProcessorList[NF + NS];
+		for (int i = NF + NS; i < NF + NS + NR; i++)
+		{
+			if (ProcessorList[i]->getBusytime() < shortest->getBusytime())
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
+	else if(b==0) //looking for shortest RDY in All Processors
+	{
+		shortest = ProcessorList[0];
 		for (int i = 0; i < NF + NS + NR; i++)
 		{
 			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime())
@@ -218,11 +243,11 @@ void Scheduler::BLKtoRDY()
 				Get_ShortestRDY(0)->AddProcess(p);
 				p->deqIO();
 				BLKList.dequeue(p);
-				p->setblktime(0);
+				p->resetblktime();
 			}
 			else
 			{
-				p->setblktime(p->getblktime() + 1);
+				p->inc_blktime();
 			}
 		}
 
@@ -251,10 +276,11 @@ Processor* Scheduler::Get_LongestRDY()
 
 bool Scheduler::MigrationRRtoSJF(Process* p)
 {
-	if (p->getCT() < RTF && NS != 0)
+	if (p->getRemainingCT() < RTF && NS != 0) 
 	{
-		ProcessorList[NF]->AddProcess(p);
-		return true;
+		getshortestRDY(2)->AddProcess(p);
+		p->updateState(READY);
+		return 1;
 	}
 	return false;
 }
@@ -264,9 +290,25 @@ int Scheduler::getMaxW()
 	return MaxW;
 }
 
-void Scheduler::MigrationFCFStoRR(Process* p)
+bool Scheduler::MigrationFCFStoRR(Process* p)
 {
+	if (p->getWT() > MaxW && NR!=0)
+	{
+		getshortestRDY(3)->AddProcess(p);
+		p->updateState(READY);
+		return 1;
+	}
+	return 0;
+}
 
+void Scheduler::UpdateWT()
+{
+	for (int i = 0; i < NF; i++)
+	{
+		FCFS_Processor* temp = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+		if (temp)
+			temp->Inc_WT();
+	}
 }
 
 void Scheduler::Killing(int timestep)
@@ -292,7 +334,7 @@ void Scheduler::Killing(int timestep)
 					isDone = FPro->KillProcess(target_id, targetProcess);
 				if (isDone)
 				{
-					MoveToTRM(targetProcess);
+					MoveToTRM(targetProcess,timestep);
 					break;
 				}
 
@@ -338,20 +380,33 @@ void Scheduler::simulation()
 		//move process from EACH rdy list to run
 		for (int i = 0; i < NF + NS + NR; i++)
 		{
-			ProcessorList[i]->RDYtoRUN(timeStep);
+			bool check = ProcessorList[i]->RDYtoRUN(timeStep);
+			if (i >= NF + NS && NR != 0 && check)
+			{
+				while (MigrationRRtoSJF(ProcessorList[i]->GetRunProcess()))
+				{
+					ProcessorList[i]->RDYtoRUN(timeStep);
+				}
+			}
+			else if (NF != 0 && i<NF && check)
+			{
+				while (MigrationFCFStoRR(ProcessorList[i]->GetRunProcess()))
+				{
+					ProcessorList[i]->RDYtoRUN(timeStep);
+				}
+			}
 		}
-
+		UpdateWT();
 		updateRemainingCT();
 		//move finished processes to TRM 
 		for (int i = 0; i < NF + NS + NR; i++)
 		{
 			if (ProcessorList[i]->FinishRUN())
 			{
-				MoveToTRM(ProcessorList[i]->GetRunProcess());
+				MoveToTRM(ProcessorList[i]->GetRunProcess(),timeStep);
 				ProcessorList[i]->setRUN(nullptr);
 			}
 		}
-
 		IOreq(timeStep);
 		BLKtoRDY();
 

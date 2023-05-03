@@ -1,8 +1,11 @@
 #include "RR_Processor.h"
+#include"../Scheduler.h"
 RR_Processor::RR_Processor(int Id, int TS)
 {
 	ID = Id;  // Assign unique ID
 	timeSlice = TS; // Assign TimeSlice
+	
+
 }
 
 void RR_Processor::AddProcess(Process* p)
@@ -13,18 +16,18 @@ void RR_Processor::AddProcess(Process* p)
 
 void RR_Processor::ScheduleAlgo()
 {
-	/*Process* currentProcess = RDY.peekFront();
+	Process* currentProcess = RDY.peekFront();
+	//Scheduler* sc;
 	setRUN(currentProcess);
 	RDY.dequeue(currentProcess);
 	if (Excuete())
 	{
-		sc = nullptr;
-		sc->MoveToTRM(currentProcess);
+		//sc->MoveToTRM(currentProcess);
 	}
-	else //if (!sc->MigrationRRtoSJF(currentProcess))   -> Phase 2
+	else //if (!sc->MigrationRRtoSJF(currentProcess))  
 	{
 		RDY.enqueue(currentProcess);
-	}*/
+	}
 }
 
 Process* RR_Processor::remove_Top()
@@ -47,7 +50,7 @@ bool RR_Processor::Excuete()
 	//else if -->>> requires I/O return false
 	else {
 		//Decrement the process CT by Time slice
-		//CurProcess->setCT(CurProcess->getCT() - timeSlice);
+		CurProcess->setRemainingCT(CurProcess->getRemainingCT() - timeSlice);
 		if (CurProcess->getCT() == 0)
 			return true;
 		else
@@ -73,6 +76,7 @@ bool RR_Processor::isRDYempty()
 
 bool RR_Processor::RDYtoRUN(int t)
 {
+	//Scheduler* sc;
 	if (isRDYempty() || !isIdle())
 		return false;
 	Process* RDYprocess;

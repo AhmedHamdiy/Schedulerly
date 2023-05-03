@@ -62,6 +62,11 @@ void Process::decrementCT()
 	RemainingCT--;
 }
 
+void Process::setRemainingCT(int T)
+{
+	RemainingCT=T;
+}
+
 bool Process::isFinished()
 {
 	return CT==0;
@@ -152,9 +157,14 @@ int Process::getstart()
 	return StartC;
 }
 
-void Process::setblktime(int t)
+void Process::inc_blktime()
 {
-	BLKduration = t;
+	BLKduration++;
+}
+
+void Process::resetblktime()
+{
+	BLKduration = 0;
 }
 
 int Process::getblktime()
@@ -168,10 +178,10 @@ void Process::deqIO()
 	IOList.dequeue(p);
 }
 
-
-
-
-
+void Process::setTT(int t)
+{
+	TT = t;
+}
 
 
 Process*& Process::get_LChild()

@@ -1,19 +1,20 @@
 #pragma once
 #include<iostream>
 #include"../Process.h"
+
 using namespace std;
 enum PState { BUSY, IDLE };
 class Processor
 {
 protected:
 	int ID;
+	
 private:
 	Process* RUN;
 	int BusyTime;
 	int FinishTime;
 	PState state;
 public:
-
 	Processor(); //Constructor
 	virtual void ScheduleAlgo() = 0; //For PHASE2 deteremine how to decide the RUN process
 	bool setRUN(Process* p);

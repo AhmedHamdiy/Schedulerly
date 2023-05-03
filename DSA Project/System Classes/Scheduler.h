@@ -33,13 +33,13 @@ class Scheduler
 public:
 	Scheduler();
 	void ReadFile();
-	void MoveToTRM(Process* p);
+	void MoveToTRM(Process* p,int t);
 	int GetNumP();
 	int GetTRMcount();
 	int getMaxW();
 	void NEWtoRDY(int t);
 	void RUNtoBLK(Process* p);
-
+	void UpdateWT();
 	void IOreq(int t);
 	void BLKtoRDY();
 	Processor* Get_ShortestRDY(bool b);
@@ -48,8 +48,8 @@ public:
 
 	void RUNtoRDY(Process*p);
 	bool MigrationRRtoSJF(Process* p);
-	void MigrationFCFStoRR(Process* p);
 	Processor* Get_LongestRDY();
+	bool MigrationFCFStoRR(Process* p);
 	void Killing(int timestep);
 	void Stealing(int timestep);
 	double Calc_StealLimit(Processor* longest, Processor* shortest);
