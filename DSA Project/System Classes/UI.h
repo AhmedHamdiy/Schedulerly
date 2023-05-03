@@ -28,7 +28,7 @@ public:
 
 	}
 	//print output for step by step and interactive 
-	void printOutput(bool mode, int timestep, LinkedQueue<Process*>& blk, LinkedQueue<Process*>& trm,Processor* Parr[],int pCount)
+	void printOutput(bool mode, int timestep,const LinkedQueue<Process*>& blk,const LinkedQueue<Process*>& trm,Processor* Parr[],int pCount)
 		//works for stepbystep and interactive since they are almost similar
 	{
 		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);

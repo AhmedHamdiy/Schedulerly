@@ -1,10 +1,10 @@
 #include"Processor.h"
 
 Processor::Processor() {
-	BusyTime = 0;
 	RUN = nullptr;
 	state = IDLE;
 	FinishTime = 0;
+	BusyTime = 0;
 }
 bool Processor::setRUN(Process* p) {
 	if (state == IDLE)
@@ -14,16 +14,22 @@ bool Processor::setRUN(Process* p) {
 	}
 	return false;
 }
-void Processor::setBusytime(int T) {
-	BusyTime = T;
+int Processor::getBusytime() {
+	return BusyTime;
 }
-void Processor::Inc_Busytime(int T)
+void Processor::Inc_Finishtime(int T)
 {
-	BusyTime += T;
+	FinishTime += T;
 }
-void Processor::Dec_Busytime(int T)
+void Processor::Dec_Finishtime(int T)
 {
-	BusyTime-=T;
+	FinishTime -=T;
+}
+
+void Processor::Inc_BusyTime()
+{
+	if(!isIdle())
+	BusyTime++;
 }
 
 bool Processor::FinishRUN()
@@ -31,9 +37,10 @@ bool Processor::FinishRUN()
 	if (RUN)
 	{
 		if (RUN->getRemainingCT() == 0) {
+			RUN = nullptr;
+			FlipState();
 			return true;
 		}
-		//return false;
 	}
 	return false;
 }
@@ -43,9 +50,10 @@ void Processor::Dec_RUNCT()
 		RUN->decrementCT();
 }
 
-int Processor::getBusytime() {
-	return BusyTime;
+int Processor::get_Finishtime() {
+	return FinishTime;
 }
+
 ostream& operator<<(std::ostream& os, const Processor& p) {
 	os << "(P" << p.ID << ")";
 	return os;
@@ -61,14 +69,7 @@ void Processor::FlipState()
 	else
 		state = BUSY;
 }
-bool Processor::operator<(Processor* p1)
-{
-	return (BusyTime < p1->BusyTime);
-}
-bool Processor::operator>(Processor* p1)
-{
-	return (BusyTime > p1->BusyTime);
-}
+
 bool Processor::isIdle()
 {
 	return (RUN == nullptr);
@@ -78,13 +79,4 @@ Process* Processor::GetRunProcess()
 {
 	return RUN;
 }
-bool Processor::removeProcess()
-{
-	if (state == BUSY)
-	{
-		RUN = nullptr;
-		FlipState();
-		return true;
-	}
-	return false;
-}
+

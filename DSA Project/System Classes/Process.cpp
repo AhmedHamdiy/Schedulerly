@@ -79,6 +79,7 @@ int Process::getAT()
 
 int Process::getRemainingCT()
 {
+
 	return RemainingCT;
 }
 

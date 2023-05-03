@@ -8,7 +8,7 @@ RR_Processor::RR_Processor(int Id, int TS)
 void RR_Processor::AddProcess(Process* p)
 {
 	RDY.enqueue(p);
-	Inc_Busytime(p->getRemainingCT());
+	Inc_Finishtime(p->getRemainingCT());
 }
 
 void RR_Processor::ScheduleAlgo()
@@ -27,14 +27,25 @@ void RR_Processor::ScheduleAlgo()
 	}*/
 }
 
+Process* RR_Processor::remove_Top()
+{
+	Process* p=nullptr;
+	if (!RDY.isEmpty())
+	{
+		RDY.dequeue(p);
+		Dec_Finishtime(p->getRemainingCT());
+	}
+	return p;
+}
+
 bool RR_Processor::Excuete()
 {
 	//if it returns true this means the process has ended and will be moved to the TRM list?? 
 	Process* CurProcess = GetRunProcess();
-	if (CurProcess ==nullptr)
-	return false;
+	if (CurProcess == nullptr)
+		return false;
 	//else if -->>> requires I/O return false
-	else { 
+	else {
 		//Decrement the process CT by Time slice
 		//CurProcess->setCT(CurProcess->getCT() - timeSlice);
 		if (CurProcess->getCT() == 0)
@@ -67,7 +78,7 @@ bool RR_Processor::RDYtoRUN(int t)
 	Process* RDYprocess;
 	RDY.dequeue(RDYprocess);
 	RDYprocess->updateState(RUNNING);
-	Dec_Busytime(RDYprocess->getRemainingCT());
+	Dec_Finishtime(RDYprocess->getRemainingCT());
 	setRUN(RDYprocess);
 	return 1;
 }

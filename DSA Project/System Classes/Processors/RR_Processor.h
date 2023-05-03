@@ -11,6 +11,7 @@ public:
 	RR_Processor(int Id, int TS);
 	void AddProcess(Process* p);
 	void ScheduleAlgo();
+	virtual Process* remove_Top();
 	bool Excuete();
 	void printRDY();
 	virtual void printInfo();
