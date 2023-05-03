@@ -278,7 +278,7 @@ bool Scheduler::MigrationRRtoSJF(Process* p)
 {
 	if (p->getRemainingCT() < RTF && NS != 0) 
 	{
-		getshortestRDY(2)->AddProcess(p);
+		Get_ShortestRDY(2)->AddProcess(p);
 		p->updateState(READY);
 		return 1;
 	}
@@ -294,7 +294,7 @@ bool Scheduler::MigrationFCFStoRR(Process* p)
 {
 	if (p->getWT() > MaxW && NR!=0)
 	{
-		getshortestRDY(3)->AddProcess(p);
+		Get_ShortestRDY(3)->AddProcess(p);
 		p->updateState(READY);
 		return 1;
 	}
