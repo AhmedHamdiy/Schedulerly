@@ -366,22 +366,20 @@ void Scheduler::simulation()
 		//move process from EACH rdy list to run
 		for (int i = 0; i < NF + NS + NR; i++) //(ii)
 		{
-			if (i >= NF + NS && NR != 0 && ProcessorList[i]->RDYtoRUN(timeStep))
+			bool check = ProcessorList[i]->RDYtoRUN(timeStep);
+			if (i >= NF + NS && NR != 0 && check)
 			{
 				while (MigrationRRtoSJF(ProcessorList[i]->GetRunProcess()))
 				{
 					ProcessorList[i]->RDYtoRUN(timeStep);
 				}
 			}
-			else if (NF != 0 && i<NF && ProcessorList[i]->RDYtoRUN(timeStep))
+			else if (NF != 0 && i<NF && check)
 			{
 				while (MigrationFCFStoRR(ProcessorList[i]->GetRunProcess()))
 				{
 					ProcessorList[i]->RDYtoRUN(timeStep);
 				}
-			}
-			else {
-				ProcessorList[i]->RDYtoRUN(timeStep);
 			}
 		}
 		int probability; //(iii)
