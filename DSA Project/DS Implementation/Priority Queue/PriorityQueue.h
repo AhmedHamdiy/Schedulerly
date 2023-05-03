@@ -33,20 +33,20 @@ public:
     }
 
     void dequeue() {
-        if (size == 0) {
-            throw std::underflow_error("Priority queue is empty");
-        }
-        size--;
-        swap(heap[0], heap[size]);
-        HeapifyDown(0);
+           if(!isEmpty())
+           {
+               size--;
+               swap(heap[0], heap[size]);
+               HeapifyDown(0);
+           }
     }
 
     T Peek() const {
-        if (size == 0) {
-            throw std::underflow_error("Priority queue is empty");
-        }
-        pnode<T> top = heap[0];
-        return top.data;
+       if(!isEmpty())
+       {
+           pnode<T> top = heap[0];
+           return top.data;
+       }
     }
 
     bool isEmpty() const {

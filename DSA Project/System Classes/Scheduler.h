@@ -18,7 +18,6 @@ class Scheduler
 	LinkedQueue<Process*> BLKList;
 	LinkedQueue<Process*> TRMList;
 	LinkedQueue<Pair<int, int>> KillList;
-	int Output_Mode;
 	int NF;
 	int NS;
 	int NR;
@@ -30,9 +29,7 @@ class Scheduler
 	int NumP;
 	int TRMcount;
 	int ProcessorCounter;
-	Processor* MinTime;
-	Processor* MaxTime;
-
+	
 public:
 	Scheduler();
 	void ReadFile();
@@ -45,17 +42,17 @@ public:
 	void UpdateWT();
 	void IOreq(int t);
 	void BLKtoRDY();
-	Processor* getshortestRDY(int b);
+	Processor* Get_ShortestRDY(bool b);
 	void updateRemainingCT();
 
 
 	void RUNtoRDY(Process*p);
 	bool MigrationRRtoSJF(Process* p);
+	Processor* Get_LongestRDY();
 	bool MigrationFCFStoRR(Process* p);
-	void WorkStealing(){};
-	void CreateForked(){};
-	void GetMinMax();
 	void Killing(int timestep);
+	void Stealing(int timestep);
+	double Calc_StealLimit(Processor* longest, Processor* shortest);
 	void simulation();
 	void Fork(int timestep);
 	void killOrphan(Process* orphan);

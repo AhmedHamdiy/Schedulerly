@@ -11,7 +11,8 @@ public:
 	void AddProcess(Process* p);
 	void ScheduleAlgo();
 	bool Excuete();
-	
+	virtual Process* remove_Top();
+
 	
 	void printRDY();
 	virtual void printInfo();

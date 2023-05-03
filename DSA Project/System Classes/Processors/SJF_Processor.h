@@ -8,6 +8,7 @@ private:
 public:
 	SJF_Processor(int Id);
 	void ScheduleAlgo();
+	virtual Process* remove_Top();
 	void AddProcess(Process* p);
 	bool Excuete();
 	void printRDY();

@@ -8,8 +8,7 @@ FCFS_Processor::FCFS_Processor(int Id)
 void FCFS_Processor::AddProcess(Process* p)
 {
 	RDY.insertEnd(p);
-	Inc_Busytime(p->getRemainingCT());
-
+	Inc_Finishtime(p->getRemainingCT());
 }
 
 void FCFS_Processor::ScheduleAlgo()
@@ -28,6 +27,18 @@ bool FCFS_Processor::Excuete()
 		CurProcess->setCT(0);
 		return true;
 	}
+}
+
+Process* FCFS_Processor::remove_Top()
+{
+	Process* p=nullptr;
+	if (!RDY.isEmpty())
+	{
+		p = RDY.getEntry(1);
+		RDY.remove(1);
+		Dec_Finishtime(p->getRemainingCT());
+	}
+	return p;
 }
 
 
@@ -103,7 +114,7 @@ bool FCFS_Processor::RDYtoRUN(int t)
 	Process* RDYprocess = RDY.getEntry(1);
 	setRUN(RDYprocess);
 	RDYprocess->setstart(t);
-	Dec_Busytime(RDYprocess->getRemainingCT());
+	Dec_Finishtime(RDYprocess->getRemainingCT());
 	RDYprocess->updateState(RUNNING);
 	RDY.remove(1); //remove from ready
 	return true;
