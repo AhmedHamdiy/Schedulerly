@@ -15,7 +15,7 @@ public:
 	
 	void printRDY();
 	virtual void printInfo();
-	
+	void Inc_WT();
 	bool isRDYempty();
 	bool RDYtoRUN(){};
 	bool ForkProcess(Process*& runProcess, int forkP);

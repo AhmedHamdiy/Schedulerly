@@ -305,6 +305,16 @@ bool Scheduler::MigrationFCFStoRR(Process* p)
 	return 0;
 }
 
+void Scheduler::UpdateWT()
+{
+	for (int i = 0; i < NF; i++)
+	{
+		FCFS_Processor* temp = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+		if (temp)
+			temp->Inc_WT();
+	}
+}
+
 void Scheduler::Killing(int timestep)
 {
 	if (KillList.isEmpty())
@@ -363,13 +373,20 @@ void Scheduler::simulation()
 					ProcessorList[i]->RDYtoRUN(timeStep);
 				}
 			}
+			else if (NF != 0 && i<NF && ProcessorList[i]->RDYtoRUN(timeStep))
+			{
+				while (MigrationFCFStoRR(ProcessorList[i]->GetRunProcess()))
+				{
+					ProcessorList[i]->RDYtoRUN(timeStep);
+				}
+			}
 			else {
 				ProcessorList[i]->RDYtoRUN(timeStep);
 			}
 		}
 		int probability; //(iii)
 		Process* tempRUN = nullptr;
-
+		UpdateWT();
 		updateRemainingCT();
 		Process* TempProcess;
 		for (int i = 0; i < NF + NS + NR; i++)

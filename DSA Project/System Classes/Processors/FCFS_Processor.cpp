@@ -109,4 +109,11 @@ bool FCFS_Processor::RDYtoRUN(int t)
 	return true;
 }
 
-
+void FCFS_Processor::Inc_WT()
+{
+	for (int i = 0; i < RDY.getcount(); i++)
+	{
+		Process* p = RDY.getEntry(i);
+		p->updateWT();
+	}
+}

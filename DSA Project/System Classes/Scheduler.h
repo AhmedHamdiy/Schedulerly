@@ -42,7 +42,7 @@ public:
 	int getMaxW();
 	void NEWtoRDY(int t);
 	void RUNtoBLK(Process* p);
-
+	void UpdateWT();
 	void IOreq(int t);
 	void BLKtoRDY();
 	Processor* getshortestRDY(int b);
