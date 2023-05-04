@@ -42,7 +42,7 @@ public:
 	void UpdateWT();
 	void IOreq(int t);
 	void BLKtoRDY();
-	Processor* Get_ShortestRDY(bool b);
+	Processor* Get_ShortestRDY(int b);
 	void updateRemainingCT();
 
 

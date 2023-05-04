@@ -117,16 +117,29 @@ bool FCFS_Processor::RDYtoRUN(int t, Scheduler* scptr)
 	RDYprocess->setstart(t);
 	Dec_Finishtime(RDYprocess->getRemainingCT());
 	RDY.remove(1); //remove from ready
+	//setRUN(RDYprocess);
+	//RDYprocess->updateState(RUNNING);
 
-	while (sc->MigrationFCFStoRR(RDYprocess))
+	bool migrated = sc->MigrationFCFStoRR(RDYprocess);
+	while (migrated && RDY.getcount() != 0)
 	{
 		RDYprocess = RDY.getEntry(1);
 		RDYprocess->setstart(t);
 		Dec_Finishtime(RDYprocess->getRemainingCT());
 		RDY.remove(1); //remove from ready
+		migrated = sc->MigrationFCFStoRR(RDYprocess);
 	}
-	RDYprocess->updateState(RUNNING);
-	setRUN(RDYprocess);
+	if (migrated && RDY.getcount() == 0)
+	{
+		setRUN(nullptr);
+		return 0;
+	}
+	else if (!migrated)
+	{
+		setRUN(RDYprocess);
+		RDYprocess->updateState(RUNNING);
+	}
+	
 	return true;
 }
 

@@ -81,14 +81,28 @@ bool RR_Processor::RDYtoRUN(int t, Scheduler* scptr)
 	Process* RDYprocess;
 	RDY.dequeue(RDYprocess);
 	Dec_Finishtime(RDYprocess->getRemainingCT());
-	while (sc->MigrationRRtoSJF(RDYprocess))
+	//setRUN(RDYprocess);
+//RDYprocess->updateState(RUNNING);
+
+	bool migrated = sc->MigrationRRtoSJF(RDYprocess);
+	while (migrated && RDY.getcount() != 0)
 	{
 		RDY.dequeue(RDYprocess);
 		Dec_Finishtime(RDYprocess->getRemainingCT());
+		migrated = sc->MigrationRRtoSJF(RDYprocess);
 	}
-	RDYprocess->updateState(RUNNING);
-	setRUN(RDYprocess);
-	return 1;
+	if (migrated && RDY.getcount() == 0)
+	{
+		setRUN(nullptr);
+		return 0;
+	}
+	else if (!migrated)
+	{
+		setRUN(RDYprocess);
+		RDYprocess->updateState(RUNNING);
+	}
+
+	return true;
 }
 
 

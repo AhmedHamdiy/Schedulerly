@@ -176,7 +176,7 @@ void Scheduler::updateRemainingCT()
 	}
 }
 
-Processor* Scheduler::Get_ShortestRDY(bool b)
+Processor* Scheduler::Get_ShortestRDY(int b)
 {
 	Processor* shortest = nullptr;
 	if (b==1)  //looking for shortest RDY in FCFS Processors only
@@ -276,7 +276,7 @@ Processor* Scheduler::Get_LongestRDY()
 
 bool Scheduler::MigrationRRtoSJF(Process* p)
 {
-	if (p->getRemainingCT() < RTF && NS != 0 && p->getParent() == nullptr)
+	if (p != nullptr && p->getRemainingCT() < RTF && NS != 0 && p->getParent() == nullptr)
 	{
 		cout << "rrmig" << endl;
 		Get_ShortestRDY(2)->AddProcess(p);
@@ -288,7 +288,7 @@ bool Scheduler::MigrationRRtoSJF(Process* p)
 
 bool Scheduler::MigrationFCFStoRR(Process* p)
 {
-	if (p->getWT() > MaxW && NR!=0&&p->getParent()==nullptr )
+	if (p!=nullptr&&p->getWT() > MaxW && NR!=0&&p->getParent()==nullptr )
 	{
 		cout << "fcfsmig" << endl;
 		Get_ShortestRDY(3)->AddProcess(p);
@@ -396,8 +396,8 @@ void Scheduler::simulation()
 
 		Killing(timeStep);
 		Fork(timeStep);
-		if (timeStep % STL == 0)
-			Stealing(timeStep);
+		/*if (timeStep % STL == 0)
+			Stealing(timeStep);*/
 
 
 
