@@ -396,8 +396,8 @@ void Scheduler::simulation()
 
 		Killing(timeStep);
 		Fork(timeStep);
-		/*if (timeStep % STL == 0)
-			Stealing(timeStep);*/
+		if (timeStep % STL == 0)
+			Stealing(timeStep);
 
 
 
