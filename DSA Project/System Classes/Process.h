@@ -13,8 +13,10 @@ class Process
 	Process* LChild;
 	Process* RChild;
 	Process* Parent;
+	
 	int AT;
 	int WT;
+	int RT;
 	int PID;
 	int CT;
 	int RemainingCT;
@@ -26,12 +28,12 @@ class Process
 	LinkedQueue<Pair<int,int>> IOList;
 	state State;
 public:
+	int startfirst;
 	Process();
-	Process(int at, int id, int ct, int n);
+	Process(int at, int id, int ct, int n,Process* P=nullptr);
 	~Process();
 	void AddIO(Pair<int, int> p);
 	void SetKillTime(int k);
-	int GetID();
 	void incrementTT();
 	void decrementCT();
 	bool isFinished();
@@ -39,6 +41,8 @@ public:
 	int getAT();
 	int getCT();
 	int getRemainingCT();
+	int getRT();
+	int getTT();
 	
 	int getID();
 	void setCT(int t);
@@ -46,6 +50,7 @@ public:
 	void setTT(int t);
 	int getWT();
 
+	//I/O
 	bool GetIO(Pair<int, int>& temp);
 	void setstart(int t);
 	int getstart();
@@ -54,19 +59,21 @@ public:
 	void resetblktime();
 	void deqIO();
 
-	void updateState(state s);
-	void updateWT();
-	void setPID(int id);
-	bool setForked(Process* forkedP);
-	bool canFork() const;
+	void updateState(state s); //? do we use it
+	void updateWT(); //increments waiting time
+	void setPID(int id); //can we set it in constructor w nsheel dy?
 
 	//overloading << operator to Print The ID
 	friend ostream& operator << (ostream& out, Process *p);
 
+	//forking
 	Process*& get_LChild();
 	Process*& get_RChild();
-	Process* getParent();
-	void setParent(Process* p);
+	Process* getParent(); 
+	bool setForked(Process* forkedP); //assign left or right child
+	bool canFork() const; //has empty slot for a child?
+
+	//void setParent(Process* p); //set in constructor 
 
 };
 #endif

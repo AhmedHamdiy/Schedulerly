@@ -23,7 +23,7 @@ Process::Process()
 	RemainingCT = 0;
 }
 
-Process::Process(int at, int id, int ct, int n) :AT(at), PID(id), CT(ct)
+Process::Process(int at, int id, int ct, int n,Process* p) :AT(at), PID(id), CT(ct)
 {
 	IOcount = 0;
 	KillTime = 0;
@@ -33,6 +33,7 @@ Process::Process(int at, int id, int ct, int n) :AT(at), PID(id), CT(ct)
 	WT = 0;
 	TT = 0;
 	RemainingCT = ct;
+	Parent = p;
 }
 
 Process::~Process()
@@ -48,10 +49,6 @@ void Process::SetKillTime(int k)
 	KillTime = k;
 }
 
-int Process::GetID()
-{
-	return PID;
-}
 
 void Process::incrementTT()
 {
@@ -60,6 +57,7 @@ void Process::incrementTT()
 
 void Process::decrementCT()
 {
+
 	RemainingCT--;
 }
 
@@ -75,7 +73,7 @@ bool Process::isFinished()
 
 int Process::getTRT()
 {
-	return TT - AT;
+	return TT+1 - AT;
 }
 
 int Process::getAT()
@@ -148,8 +146,18 @@ bool Process::canFork() const
 {
 	return (!RChild || !LChild);
 }
+int Process::getRT()
+{
+	return startfirst - AT;
+}
+int Process::getTT()
+{
+	return TT+1;
+}
 void Process::setstart(int t)
 {
+	if (CT == RemainingCT)
+		startfirst = t;
 	StartC = t;
 }
 
@@ -198,10 +206,7 @@ Process* Process::getParent()
 {
 	return Parent;
 }
-void Process::setParent(Process* p)
-{
-	Parent = p;
-}
+
 bool Process::GetIO(Pair<int, int>& temp)
 {
 	if (IOList.isEmpty())

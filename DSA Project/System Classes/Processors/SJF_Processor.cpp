@@ -70,6 +70,7 @@ bool SJF_Processor::RDYtoRUN(int t, Scheduler* scptr)
 	RDYprocess->updateState(RUNNING);
 	Dec_Finishtime(RDYprocess->getRemainingCT());
 	setRUN(RDYprocess);
+	RDYprocess->setstart(t);
 	return 1;
 }
 

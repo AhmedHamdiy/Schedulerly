@@ -81,8 +81,9 @@ bool RR_Processor::RDYtoRUN(int t, Scheduler* scptr)
 	Process* RDYprocess;
 	RDY.dequeue(RDYprocess);
 	Dec_Finishtime(RDYprocess->getRemainingCT());
-	//setRUN(RDYprocess);
-//RDYprocess->updateState(RUNNING);
+   setRUN(RDYprocess);
+   RDYprocess->updateState(RUNNING);
+   RDYprocess->setstart(t);
 
 	bool migrated = sc->MigrationRRtoSJF(RDYprocess);
 	while (migrated && RDY.getcount() != 0)

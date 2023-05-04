@@ -55,9 +55,15 @@ public:
 	double Calc_StealLimit(Processor* longest, Processor* shortest);
 	void simulation();
 	void Fork(int timestep);
-	void killOrphan(Process* orphan);
+	bool killOrphan(Process* orphan);
 
 	void OutputFile();
+
+	void ProcessStatistics(int& avWT, int& avRT, int& avTRT);
+	
+
+
+
 };
 
 

@@ -3,6 +3,7 @@
 #include"Processors/SJF_Processor.h"
 #include"Processors/RR_Processor.h"
 #include"UI.h"
+using namespace std;
 
 
 Scheduler::Scheduler()
@@ -10,6 +11,7 @@ Scheduler::Scheduler()
 	TRMcount = 0;
 	ProcessorCounter = 0;
 }
+////-------------------------files Read&Output-------------------///
 
 void Scheduler::ReadFile()
 
@@ -89,6 +91,68 @@ void Scheduler::ReadFile()
 	inFile.close();
 }
 
+void Scheduler::OutputFile()
+{
+	ofstream OutFile("output file.txt");
+	if (!OutFile.is_open())
+		return;
+	else
+	{
+		LinkedQueue<Process*> auxilary;
+		Process* p;
+		for (int i = 0; i < NumP; i++)
+		{
+			TRMList.dequeue(p);
+			auxilary.enqueue(p);
+			OutFile<<p->getTT()<<" "<<p->getID()<<" "<< p->getAT() << " " << p->getCT() << " ";
+			OutFile << p->getblktime() << " " << p->getWT() << " " << p->getRT() << " " << "TRT:" << p->getTRT() << endl;
+		}
+		for (int i = 0; i < NumP; i++)
+		{
+			auxilary.dequeue(p);
+			TRMList.enqueue(p);
+		}
+		int avWT, avRT, avTRT;
+		ProcessStatistics(avWT, avRT, avTRT);
+		OutFile << avWT << " " << avRT << " " << avTRT<<endl;
+		//% migration
+		//% stealing
+		//% forking
+		double totUti = 0;
+		for (int i = 0; i < NF + NR + NS; i++)
+		{
+			//load
+			//utilization
+		}
+		OutFile << totUti / (NF + NS + NR);
+		OutFile.close();
+	}
+
+}
+
+void Scheduler::ProcessStatistics(int& avWT, int& avRT, int& avTRT)
+{
+	LinkedQueue<Process*> auxilary;
+	Process* item;
+	int totalWT = 0, totalRT = 0, totalTRT = 0;
+	for (int i = 0; i < NumP; i++)
+	{
+		if (!TRMList.isEmpty())
+		{
+			TRMList.dequeue(item);
+			totalWT += item->getWT();
+			totalRT += item->getRT();
+			totalTRT += item->getTRT();
+			auxilary.enqueue(item);
+		}
+	}
+	TRMList = auxilary;
+	avWT = totalWT / (float)NumP;
+	avRT = totalRT / (float)NumP;
+	avTRT = totalTRT / (float)NumP;
+}
+
+//////////////////////////////////////////////////////
 void Scheduler::MoveToTRM(Process* p,int t)
 {
 	if (p) {
@@ -98,18 +162,21 @@ void Scheduler::MoveToTRM(Process* p,int t)
 		TRMcount++;
 		Process* leftChild = p->get_LChild();
 		Process* rightChild = p->get_RChild();
+		bool orphanKilled;
 
 		if (leftChild)
 		{
-			killOrphan(leftChild);
+			orphanKilled=killOrphan(leftChild);
 			//killOrphan calls killProcess=>search for process and remove from run or ready
-
+			if(orphanKilled)
 			MoveToTRM(leftChild,t);
+			//otherwise the orphan has already terminated before its Parent
 		}
 
 		if (rightChild)
 		{
-			killOrphan(rightChild);
+			orphanKilled=killOrphan(rightChild);
+			if(orphanKilled)
 			MoveToTRM(rightChild,t);
 		}
 	}
@@ -406,6 +473,7 @@ void Scheduler::simulation()
 		cout <<endl<< NumP<<"num trm" << TRMcount;
 		if (NumP == TRMcount)
 		{
+			OutputFile();
 			if (mode == 2)
 			{
 				Sleep(100);
@@ -434,10 +502,9 @@ void Scheduler::Fork(int timestep)
 			if (FPro->ForkProcess(runProcess, ForkP))
 			{
 				NumP++;
-				forkedProcess = new Process(timestep, NumP, runProcess->getRemainingCT(), 0);
+				forkedProcess = new Process(timestep, NumP, runProcess->getRemainingCT(), 0,runProcess);
 				runProcess->setForked(forkedProcess);
 				//create a process forkedProcess
-				forkedProcess->setParent(runProcess);
 				//add to shortest FCFS
 				Processor* shortest_FCFS = Get_ShortestRDY(1);
 				shortest_FCFS->AddProcess(forkedProcess);
@@ -448,10 +515,10 @@ void Scheduler::Fork(int timestep)
 	}
 }
 
-void Scheduler::killOrphan(Process* orphan)
+bool Scheduler::killOrphan(Process* orphan)
 {
 	bool isDone = 0;
-	int target_id = orphan->GetID();
+	int target_id = orphan->getID();
 	for (int i = 0; i < NF; i++)
 	{
 		FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
@@ -459,8 +526,11 @@ void Scheduler::killOrphan(Process* orphan)
 			//search for process&remove it from rdy/run if exists
 			isDone = FPro->KillProcess(target_id, orphan);
 		if (isDone)
-			return;
+			return 1;
 	}
+	return 0;
 }
+
+
 
 

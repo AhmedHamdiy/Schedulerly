@@ -74,7 +74,7 @@ bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
 bool FCFS_Processor::KillProcess(int ID, Process*& target)
 //search for process,remove it from ready/run if exists then return a pointer to it
 {
-	if (GetRunProcess()&&GetRunProcess()->GetID() == ID)
+	if (GetRunProcess()&&GetRunProcess()->getID() == ID)
 	{
 		target = GetRunProcess();
 		setRUN(nullptr);
