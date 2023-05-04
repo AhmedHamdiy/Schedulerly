@@ -276,8 +276,9 @@ Processor* Scheduler::Get_LongestRDY()
 
 bool Scheduler::MigrationRRtoSJF(Process* p)
 {
-	if (p->getRemainingCT() < RTF && NS != 0) 
+	if (p->getRemainingCT() < RTF && NS != 0 && p->getParent() == nullptr)
 	{
+		cout << "rrmig" << endl;
 		Get_ShortestRDY(2)->AddProcess(p);
 		p->updateState(READY);
 		return 1;
@@ -285,15 +286,11 @@ bool Scheduler::MigrationRRtoSJF(Process* p)
 	return false;
 }
 
-int Scheduler::getMaxW()
-{
-	return MaxW;
-}
-
 bool Scheduler::MigrationFCFStoRR(Process* p)
 {
-	if (p->getWT() > MaxW && NR!=0)
+	if (p->getWT() > MaxW && NR!=0&&p->getParent()==nullptr )
 	{
+		cout << "fcfsmig" << endl;
 		Get_ShortestRDY(3)->AddProcess(p);
 		p->updateState(READY);
 		return 1;
@@ -380,21 +377,7 @@ void Scheduler::simulation()
 		//move process from EACH rdy list to run
 		for (int i = 0; i < NF + NS + NR; i++)
 		{
-			bool check = ProcessorList[i]->RDYtoRUN(timeStep);
-			if (i >= NF + NS && NR != 0 && check)
-			{
-				while (MigrationRRtoSJF(ProcessorList[i]->GetRunProcess()))
-				{
-					ProcessorList[i]->RDYtoRUN(timeStep);
-				}
-			}
-			else if (NF != 0 && i<NF && check)
-			{
-				while (MigrationFCFStoRR(ProcessorList[i]->GetRunProcess()))
-				{
-					ProcessorList[i]->RDYtoRUN(timeStep);
-				}
-			}
+			ProcessorList[i]->RDYtoRUN(timeStep,this);
 		}
 		UpdateWT();
 		updateRemainingCT();
@@ -420,7 +403,7 @@ void Scheduler::simulation()
 
 		if (mode != 2)
 			userInterface->printOutput(mode, timeStep, BLKList, TRMList, ProcessorList, NF + NS + NR);
-
+		cout <<endl<< NumP<<"num trm" << TRMcount;
 		if (NumP == TRMcount)
 		{
 			if (mode == 2)
@@ -454,7 +437,7 @@ void Scheduler::Fork(int timestep)
 				forkedProcess = new Process(timestep, NumP, runProcess->getRemainingCT(), 0);
 				runProcess->setForked(forkedProcess);
 				//create a process forkedProcess
-
+				forkedProcess->setParent(runProcess);
 				//add to shortest FCFS
 				Processor* shortest_FCFS = Get_ShortestRDY(1);
 				shortest_FCFS->AddProcess(forkedProcess);

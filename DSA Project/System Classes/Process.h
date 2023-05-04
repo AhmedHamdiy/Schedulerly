@@ -12,6 +12,7 @@ class Process
 	//for Bonus Forking In phase 2
 	Process* LChild;
 	Process* RChild;
+	Process* Parent;
 	int AT;
 	int WT;
 	int PID;
@@ -38,7 +39,7 @@ public:
 	int getAT();
 	int getCT();
 	int getRemainingCT();
-
+	
 	int getID();
 	void setCT(int t);
 	void setRemainingCT(int t);
@@ -64,6 +65,8 @@ public:
 
 	Process*& get_LChild();
 	Process*& get_RChild();
+	Process* getParent();
+	void setParent(Process* p);
 
 };
 #endif

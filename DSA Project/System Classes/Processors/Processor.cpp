@@ -36,9 +36,8 @@ bool Processor::FinishRUN()
 {
 	if (RUN)
 	{
-		if (RUN->getRemainingCT() == 0) {
-			RUN = nullptr;
-			FlipState();
+		if (RUN->getRemainingCT() == 0) 
+		{
 			return true;
 		}
 	}

@@ -9,6 +9,7 @@ Process::Process()
 {
 	LChild = nullptr;
 	RChild = nullptr;
+	Parent = nullptr;
 	AT = 0;
 	PID = 0;
 	CT = 0;
@@ -192,6 +193,14 @@ Process*& Process::get_LChild()
 Process*& Process::get_RChild()
 {
 	return RChild;
+}
+Process* Process::getParent()
+{
+	return Parent;
+}
+void Process::setParent(Process* p)
+{
+	Parent = p;
 }
 bool Process::GetIO(Pair<int, int>& temp)
 {

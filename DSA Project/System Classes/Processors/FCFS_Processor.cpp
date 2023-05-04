@@ -1,4 +1,5 @@
 #include "FCFS_Processor.h"
+#include"../Scheduler.h"
 
 FCFS_Processor::FCFS_Processor(int Id)
 {
@@ -107,22 +108,31 @@ bool FCFS_Processor::isRDYempty()
 	return RDY.getcount() == 0;
 }
 
-bool FCFS_Processor::RDYtoRUN(int t)
+bool FCFS_Processor::RDYtoRUN(int t, Scheduler* scptr)
 {
 	if (isRDYempty() || !isIdle())
 		return false;
+	Scheduler* sc = scptr;
 	Process* RDYprocess = RDY.getEntry(1);
-	setRUN(RDYprocess);
 	RDYprocess->setstart(t);
 	Dec_Finishtime(RDYprocess->getRemainingCT());
-	RDYprocess->updateState(RUNNING);
 	RDY.remove(1); //remove from ready
+
+	while (sc->MigrationFCFStoRR(RDYprocess))
+	{
+		RDYprocess = RDY.getEntry(1);
+		RDYprocess->setstart(t);
+		Dec_Finishtime(RDYprocess->getRemainingCT());
+		RDY.remove(1); //remove from ready
+	}
+	RDYprocess->updateState(RUNNING);
+	setRUN(RDYprocess);
 	return true;
 }
 
 void FCFS_Processor::Inc_WT()
 {
-	for (int i = 0; i < RDY.getcount(); i++)
+	for (int i = 1; i <= RDY.getcount(); i++)
 	{
 		Process* p = RDY.getEntry(i);
 		p->updateWT();

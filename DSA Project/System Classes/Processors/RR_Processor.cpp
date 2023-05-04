@@ -4,8 +4,6 @@ RR_Processor::RR_Processor(int Id, int TS)
 {
 	ID = Id;  // Assign unique ID
 	timeSlice = TS; // Assign TimeSlice
-	
-
 }
 
 void RR_Processor::AddProcess(Process* p)
@@ -74,15 +72,21 @@ bool RR_Processor::isRDYempty()
 	return RDY.isEmpty();
 }
 
-bool RR_Processor::RDYtoRUN(int t)
+bool RR_Processor::RDYtoRUN(int t, Scheduler* scptr)
 {
-	//Scheduler* sc;
+	Scheduler* sc;
+	sc = scptr;
 	if (isRDYempty() || !isIdle())
 		return false;
 	Process* RDYprocess;
 	RDY.dequeue(RDYprocess);
-	RDYprocess->updateState(RUNNING);
 	Dec_Finishtime(RDYprocess->getRemainingCT());
+	while (sc->MigrationRRtoSJF(RDYprocess))
+	{
+		RDY.dequeue(RDYprocess);
+		Dec_Finishtime(RDYprocess->getRemainingCT());
+	}
+	RDYprocess->updateState(RUNNING);
 	setRUN(RDYprocess);
 	return 1;
 }

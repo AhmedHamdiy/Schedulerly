@@ -21,7 +21,7 @@ public:
 	bool RDYtoRUN(){};
 	bool ForkProcess(Process*& runProcess, int forkP);
 	bool KillProcess(int ID,Process* &target);
-	bool RDYtoRUN(int t);
+	bool RDYtoRUN(int t, Scheduler* scptr);
 };
 
 

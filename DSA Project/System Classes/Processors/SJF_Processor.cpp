@@ -61,7 +61,7 @@ bool SJF_Processor::isRDYempty()
 	return RDY.isEmpty();
 }
 
-bool SJF_Processor::RDYtoRUN(int t)
+bool SJF_Processor::RDYtoRUN(int t, Scheduler* scptr)
 {
 	if (isRDYempty() || !isIdle())
 		return false;

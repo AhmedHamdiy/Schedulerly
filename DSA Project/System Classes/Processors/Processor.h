@@ -2,6 +2,8 @@
 #include<iostream>
 #include"../Process.h"
 
+class Scheduler;
+
 using namespace std;
 enum PState { BUSY, IDLE };
 class Processor
@@ -37,5 +39,5 @@ public:
 	virtual bool isRDYempty() = 0; // returns true if there isn't RUN process
 	// Overload the << operator as a friend function:
 	friend ostream& operator<<(std::ostream& os, const Processor& p);
-	virtual bool RDYtoRUN(int t) = 0;//FOR PHASE 1 ONLY(alternative for scheduelalgo.)//
+	virtual bool RDYtoRUN(int t,Scheduler* scptr) = 0;//FOR PHASE 1 ONLY(alternative for scheduelalgo.)//
 };
