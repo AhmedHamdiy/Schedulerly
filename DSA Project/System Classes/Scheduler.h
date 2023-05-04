@@ -57,7 +57,7 @@ public:
 	void Fork(int timestep);
 	bool killOrphan(Process* orphan);
 
-	void OutputFile();
+	void OutputFile(int t);
 
 	void ProcessStatistics(int& avWT, int& avRT, int& avTRT);
 	

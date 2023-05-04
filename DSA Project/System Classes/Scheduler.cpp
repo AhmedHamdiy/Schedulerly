@@ -91,7 +91,7 @@ void Scheduler::ReadFile()
 	inFile.close();
 }
 
-void Scheduler::OutputFile()
+void Scheduler::OutputFile(int t)
 {
 	ofstream OutFile("output file.txt");
 	if (!OutFile.is_open())
@@ -100,12 +100,13 @@ void Scheduler::OutputFile()
 	{
 		LinkedQueue<Process*> auxilary;
 		Process* p;
+		OutFile << "TT PID AT CT IO_D WT RT TRT" << endl;
 		for (int i = 0; i < NumP; i++)
 		{
 			TRMList.dequeue(p);
 			auxilary.enqueue(p);
-			OutFile<<p->getTT()<<" "<<p->getID()<<" "<< p->getAT() << " " << p->getCT() << " ";
-			OutFile << p->getblktime() << " " << p->getWT() << " " << p->getRT() << " " << "TRT:" << p->getTRT() << endl;
+			OutFile<<p->getTT()<<"  "<<p->getID()<<"  "<< p->getAT() << "  " << p->getCT() << "  ";
+			OutFile << p->getblktime() << "  " << p->getWT() << "  " << p->getRT() << "  " << p->getTRT() << endl;
 		}
 		for (int i = 0; i < NumP; i++)
 		{
@@ -114,17 +115,33 @@ void Scheduler::OutputFile()
 		}
 		int avWT, avRT, avTRT;
 		ProcessStatistics(avWT, avRT, avTRT);
-		OutFile << avWT << " " << avRT << " " << avTRT<<endl;
+		OutFile << "Processes: " << NumP << endl;
+		OutFile << "Avg WT = "<<avWT << ",   " <<"Avg RT = "<< avRT << ",   " <<"Avg TRT = "<< avTRT << endl;
 		//% migration
 		//% stealing
 		//% forking
 		double totUti = 0;
+		int totalTRT = avTRT * NumP;
+		double u, totU = 0;
+		OutFile << "Processors: " << NF + NS + NR << " [" << NF << " FCFS, " << NS << " SJF, " << NR << " RR]" << endl;
+
+		OutFile << "Processors Load" << endl;
 		for (int i = 0; i < NF + NR + NS; i++)
 		{
-			//load
-			//utilization
+			OutFile<<"p"<<i<<"="<<ProcessorList[i]->processorLoad(totalTRT) << "%";
+			if (i != NF + NS + NR - 1)
+				OutFile << ",  ";
+        }
+		OutFile <<endl<< "Processor Utiliz" << endl;
+		for (int i = 0; i < NF + NR + NS; i++)
+		{
+			u = ProcessorList[i]->processorUtilization(t);
+			OutFile << "p" << i << "=" << u << "%";
+			if (i != NF + NR + NS)
+				OutFile << ",  ";
+			totU += u;
 		}
-		OutFile << totUti / (NF + NS + NR);
+		OutFile <<endl<<"Avg utilization"<<totUti / (NF + NS + NR) << "%";
 		OutFile.close();
 	}
 
@@ -473,7 +490,7 @@ void Scheduler::simulation()
 		cout <<endl<< NumP<<"num trm" << TRMcount;
 		if (NumP == TRMcount)
 		{
-			OutputFile();
+			OutputFile(timeStep);
 			if (mode == 2)
 			{
 				Sleep(100);

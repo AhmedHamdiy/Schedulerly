@@ -79,3 +79,12 @@ Process* Processor::GetRunProcess()
 	return RUN;
 }
 
+double Processor::processorLoad(int totalTRT)
+{
+	return (BusyTime/(float)totalTRT)*100;
+}
+
+double Processor::processorUtilization(int timeStep)
+{
+	return (BusyTime/(float)timeStep)*100;
+}
