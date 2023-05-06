@@ -95,6 +95,7 @@ void SJF_Processor::ScheduleAlgo(int t)
 		setRUN(RDYprocess);
 		RDYprocess->setstart(t);
 	}
+
 }
  
 			//-----------------------------------------( Printing )------------------------------------------------//

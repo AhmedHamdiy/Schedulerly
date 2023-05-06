@@ -12,6 +12,7 @@ Process::Process(int at, int id, int ct, int n,Process* p) :AT(at), PID(id), CT(
 	TT = 0;
 	RemainingCT = ct;
 	Parent = p;
+	IOduration = 0;
 }
 
 
@@ -77,6 +78,11 @@ int Process::getTS()
 	return TS;
 }
 
+int Process::getIOduration()
+{
+	return IOduration;
+}
+
 
 						//-------------------------------------( Setters )------------------------------------------------//
 
@@ -138,6 +144,11 @@ bool Process::IncrementTS(int TSlice)
 	}
 }
 
+void Process::Inc_IOduration(int t)
+{
+	IOduration += t;
+}
+
 
 						//-------------------------------------( Forking )------------------------------------------------//
 
@@ -193,6 +204,7 @@ void Process::deqIO()
 {
 	Pair<int, int> p;
 	IOList.dequeue(p);
+	Inc_IOduration(p.second);
 }
 
 int Process::getblktime()

@@ -337,7 +337,6 @@ void Scheduler::BLKtoRDY()
 		{
 			if (temp.second == p->getblktime())
 			{
-				Processor* shortest = Get_ShortestRDY(0);
 				p->updateState(READY);
 				Get_ShortestRDY(0)->AddProcess(p);
 				p->deqIO();
