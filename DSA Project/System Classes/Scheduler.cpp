@@ -130,7 +130,7 @@ void Scheduler::OutputFile(string FileName)
 			TRMList.dequeue(p);
 			auxilary.enqueue(p);
 			OutFile << p->getTT() << "  " << p->getID() << "  " << p->getAT() << "  " << p->getCT() << "  ";
-			OutFile << p->getblktime() << "  " << p->getWT() << "  " << p->getRT() << "  " << p->getTRT() << endl;
+			OutFile << p->getIOduration() << "  " << p->getWT() << "  " << p->getRT() << "  " << p->getTRT() << endl;
 		}
 		for (int i = 0; i < NumP; i++)
 		{
