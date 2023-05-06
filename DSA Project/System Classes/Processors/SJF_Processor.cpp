@@ -75,11 +75,12 @@ void SJF_Processor::ScheduleAlgo(int t)
 		MYSch->MoveToTRM(GetRunProcess());
 		setRUN(nullptr);
 	}
-	IO_Req();
+
 	if (!isIdle())
 	{
 		Inc_BusyTime();	
 		Dec_RUNCT();
+		IO_Req();
 	}
 	else{
 
