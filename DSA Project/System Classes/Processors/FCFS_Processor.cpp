@@ -91,7 +91,7 @@ void FCFS_Processor::ScheduleAlgo(int t)
 	if(v)
 	MYSch->Fork(runP);
 
-	IO_Req();
+	
 	if (!isIdle()) {
 		Inc_BusyTime();
 		Dec_RUNCT();
