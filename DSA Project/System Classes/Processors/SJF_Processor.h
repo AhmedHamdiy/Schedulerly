@@ -6,14 +6,19 @@ class SJF_Processor : public Processor
 private:
 	PriorityQueue<Process*> RDY;
 public:
-	SJF_Processor(int Id);
-	void ScheduleAlgo();
-	virtual Process* remove_Top();
+
+	//Constructor:
+	SJF_Processor(int Id, Scheduler* sc);
+
+	//Processes Handling:
 	void AddProcess(Process* p);
-	bool Excuete();
+	virtual Process* remove_Top();
+	virtual int OverHeat(Processor* Shortest, int TimeStep, int TStop);
+	bool isRDYempty();
+	virtual void ScheduleAlgo(int t);
+
+	//Printing:
 	void printRDY();
 	virtual void printInfo();
-	bool isRDYempty();
-	bool RDYtoRUN(int t, Scheduler* scptr);
 };
 

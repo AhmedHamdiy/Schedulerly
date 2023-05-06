@@ -13,57 +13,73 @@ using namespace std;
 
 class Scheduler 
 {
+private:
+	int timestep;
+
+	//Scheduler Lists:
 	Processor** ProcessorList;
 	LinkedQueue<Process*> NewList;
 	LinkedQueue<Process*> BLKList;
 	LinkedQueue<Process*> TRMList;
 	LinkedQueue<Pair<int, int>> KillList;
+
+	//Counters Data Members:
 	int NF;
 	int NS;
 	int NR;
+	int ProcessorNUM;
+	int NumP;
+	int TRMcount;
+
+	//Special Boundaries Data Members:
 	int RRT;
 	int RTF;
 	int MaxW;
 	int STL;
+	int StopTime;
+
+	//Statistics Data Members:
+	int Stl_Cntr;
 	int ForkP;
-	int NumP;
-	int TRMcount;
-	int ProcessorCounter;
-	
+	int Fork_Cntr;
+	int RTF_Mig_Cntr;
+	int MaxW_Mig_Cntr;
+	int Kill_Cntr;
+	int OverHeat_Processes;
 public:
+	//Constructor And Destructor:
 	Scheduler();
-	void ReadFile();
-	void MoveToTRM(Process* p,int t);
-	int GetNumP();
-	int GetTRMcount();
-	int getMaxW();
-	void NEWtoRDY(int t);
-	void RUNtoBLK(Process* p);
-	void UpdateWT();
-	void IOreq(int t);
-	void BLKtoRDY();
+	~Scheduler();
+
+	//File Handling:
+	void ReadFile(string FileName);
+	void OutputFile(string FileName);
+	void ProcessStatistics(int& avWT, int& avRT, int& avTRT, int& Tct);
+
+	//Data Members Getters:
 	Processor* Get_ShortestRDY(int b);
-	void updateRemainingCT();
-
-
-	void RUNtoRDY(Process*p);
-	bool MigrationRRtoSJF(Process* p);
 	Processor* Get_LongestRDY();
-	bool MigrationFCFStoRR(Process* p);
-	void Killing(int timestep);
-	void Stealing(int timestep);
+	
+	//Moving Between The Lists:
+	void MoveToTRM(Process* p);
+	void NEWtoRDY();
+	void RUNtoBLK(Process* p);
+	void BLKtoRDY();
+
+	//Stealing And Migration:
+	void Stealing();
 	double Calc_StealLimit(Processor* longest, Processor* shortest);
-	void simulation();
-	void Fork(int timestep);
+	bool MigrationRRtoSJF(Process* p);
+	bool MigrationFCFStoRR(Process* p);
+	void TurnON_Off_Processors();
+
+	//Killing And Forking:
+	void Killing();
+	void Fork();
 	bool killOrphan(Process* orphan);
 
-	void OutputFile();
-
-	void ProcessStatistics(int& avWT, int& avRT, int& avTRT);
-	
-
-
-
+	//Simulation
+	void Simulation();
 };
 
 

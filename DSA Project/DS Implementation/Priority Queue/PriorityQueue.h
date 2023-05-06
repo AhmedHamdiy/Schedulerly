@@ -1,6 +1,6 @@
 #include <iostream>
 #include <algorithm>
-#define MAX 200
+#define MAX 1000
 template <typename T>
 class pnode
 {
@@ -23,6 +23,7 @@ public:
     void enqueue(T& value,int pri) {
         if (size >= MAX) {
             throw std::overflow_error("Priority queue is full");
+            return;
         }
         pnode<T>* NewNode = new pnode<T>;
             NewNode->data = value;

@@ -8,14 +8,20 @@ private:
 	LinkedQueue<Process*> RDY;
 	int timeSlice;
 public:
-	RR_Processor(int Id, int TS);
+
+	//Constructor:
+	RR_Processor(int Id, Scheduler* sc, int TS);
+
+	//Processes Handling:
 	void AddProcess(Process* p);
-	void ScheduleAlgo();
 	virtual Process* remove_Top();
-	bool Excuete();
+	virtual int OverHeat(Processor* Shortest, int TimeStep, int TStop);
+	bool isRDYempty();
+	virtual void ScheduleAlgo(int t);
+
+	//Printing:
 	void printRDY();
 	virtual void printInfo();
-	bool isRDYempty();
-	bool RDYtoRUN(int t, Scheduler* scptr);
+
 };
 

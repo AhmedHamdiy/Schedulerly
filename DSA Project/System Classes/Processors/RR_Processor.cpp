@@ -1,31 +1,14 @@
 #include "RR_Processor.h"
 #include"../Scheduler.h"
-RR_Processor::RR_Processor(int Id, int TS)
-{
-	ID = Id;  // Assign unique ID
-	timeSlice = TS; // Assign TimeSlice
-}
+RR_Processor::RR_Processor(int Id, Scheduler* sc, int TS):Processor(Id,sc), timeSlice(TS)
+{}
+
+				//-------------------------------------( Scheduling )------------------------------------------------//
 
 void RR_Processor::AddProcess(Process* p)
 {
 	RDY.enqueue(p);
 	Inc_Finishtime(p->getRemainingCT());
-}
-
-void RR_Processor::ScheduleAlgo()
-{
-	Process* currentProcess = RDY.peekFront();
-	//Scheduler* sc;
-	setRUN(currentProcess);
-	RDY.dequeue(currentProcess);
-	if (Excuete())
-	{
-		//sc->MoveToTRM(currentProcess);
-	}
-	else //if (!sc->MigrationRRtoSJF(currentProcess))  
-	{
-		RDY.enqueue(currentProcess);
-	}
 }
 
 Process* RR_Processor::remove_Top()
@@ -39,22 +22,107 @@ Process* RR_Processor::remove_Top()
 	return p;
 }
 
-bool RR_Processor::Excuete()
+int RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	//if it returns true this means the process has ended and will be moved to the TRM list?? 
-	Process* CurProcess = GetRunProcess();
-	if (CurProcess == nullptr)
-		return false;
-	//else if -->>> requires I/O return false
-	else {
-		//Decrement the process CT by Time slice
-		CurProcess->setRemainingCT(CurProcess->getRemainingCT() - timeSlice);
-		if (CurProcess->getCT() == 0)
-			return true;
-		else
-			return false;
+	int Travelled_Proces(0);
+	int randNum = rand() % 100;
+	if (TimeStep - StopTime >= TStop)
+	{
+		if (getState() == BUSY)
+			UpdateState(BUSY);
+		if (getState() == IDLE)
+			UpdateState(IDLE);
 	}
+	else
+	if (randNum < 35)
+	{
+		if (!isIdle())
+		{
+			Process* Rn = GetRunProcess();
+			Shortest->AddProcess(Rn);
+			Travelled_Proces++;
+			setRUN(nullptr);
+		}
+		if (!isRDYempty())
+		{
+			for (int i = 0; i < RDY.getcount(); i++)
+			{
+
+				Process* p = nullptr;
+				RDY.dequeue(p);
+				Shortest->AddProcess(p);
+				Dec_Finishtime(p->getRemainingCT());
+				Travelled_Proces++;
+			}
+		}
+		StopTime = TimeStep;
+		UpdateState(STOP);
+	}
+	return Travelled_Proces;
 }
+
+bool RR_Processor::isRDYempty()
+{
+	return RDY.isEmpty();
+}
+
+void RR_Processor::ScheduleAlgo(int t)
+{
+	if (FinishRUN()) //The Run Prcocess has Finished
+	{
+		MYSch->MoveToTRM(GetRunProcess());
+		setRUN(nullptr);
+	}
+	IO_Req();
+	if(!isIdle()){
+		Inc_BusyTime();
+		Process* Rn = GetRunProcess();
+		if (Rn->IncrementTS(timeSlice))
+		{
+			Inc_Finishtime(Rn->getRemainingCT());
+			RDY.enqueue(Rn);
+			setRUN(nullptr);
+		}
+	else
+		Dec_RUNCT();
+	}
+	
+	else
+	{
+
+		if (isRDYempty())
+			return;
+
+		//Choose The Next Run Process 
+		Process* RDYprocess;
+		RDY.dequeue(RDYprocess);
+		
+		//The Migration part:
+		 bool migrated = MYSch->MigrationRRtoSJF(RDYprocess);
+		 while (migrated && RDY.getcount() != 0)
+		 {
+			 RDY.dequeue(RDYprocess);
+			 Dec_Finishtime(RDYprocess->getRemainingCT());
+			 migrated = MYSch->MigrationRRtoSJF(RDYprocess);
+		 }
+		 if (migrated && RDY.getcount() == 0)
+		 {
+			 setRUN(nullptr);
+			 return;
+		 }
+		 else if (!migrated&& isIdle())
+		 {
+		 	//Just set The curent Process as A running process
+			 Dec_Finishtime(RDYprocess->getRemainingCT());
+			 RDYprocess->setstart(t);
+			 setRUN(RDYprocess);
+			RDYprocess->updateState(RUNNING);
+		 }  
+	}
+
+}
+
+			//-----------------------------------------( Printing )------------------------------------------------//
 
 void RR_Processor::printRDY()
 {
@@ -63,47 +131,6 @@ void RR_Processor::printRDY()
 
 void RR_Processor::printInfo()
 {
-	//cout << "processor " << ID << " [RR]: " << RDY.getcount() << " ";
 	cout << " [RR  ]: " << RDY.getcount() << " ";
 }
-
-bool RR_Processor::isRDYempty()
-{
-	return RDY.isEmpty();
-}
-
-bool RR_Processor::RDYtoRUN(int t, Scheduler* scptr)
-{
-	Scheduler* sc;
-	sc = scptr;
-	if (isRDYempty() || !isIdle())
-		return false;
-	Process* RDYprocess;
-	RDY.dequeue(RDYprocess);
-	Dec_Finishtime(RDYprocess->getRemainingCT());
-   setRUN(RDYprocess);
-   RDYprocess->updateState(RUNNING);
-   RDYprocess->setstart(t);
-
-	bool migrated = sc->MigrationRRtoSJF(RDYprocess);
-	while (migrated && RDY.getcount() != 0)
-	{
-		RDY.dequeue(RDYprocess);
-		Dec_Finishtime(RDYprocess->getRemainingCT());
-		migrated = sc->MigrationRRtoSJF(RDYprocess);
-	}
-	if (migrated && RDY.getcount() == 0)
-	{
-		setRUN(nullptr);
-		return 0;
-	}
-	else if (!migrated)
-	{
-		setRUN(RDYprocess);
-		RDYprocess->updateState(RUNNING);
-	}
-
-	return true;
-}
-
 

@@ -5,7 +5,7 @@ using namespace std;
 template<class ItemType>
 class LinkedQueue
 {
-private:
+protected:
 	// The queue is implemented as a chain of linked nodes that has
 	// two external pointers, a head pointer for the front of the
 	// queue and a tail pointer for the back of the queue.
@@ -22,6 +22,7 @@ public:
 	bool dequeue(ItemType& frntEntry);
 	ItemType peekFront() const;
 	int getcount() const;
+	void clear();
 };
 
 template<class ItemType>
@@ -52,23 +53,10 @@ inline LinkedQueue<ItemType>::LinkedQueue(const LinkedQueue& aQueue)
 	count = aQueue.count;
 }
 
-/*template<class ItemType>
-inline LinkedQueue<ItemType>::~LinkedQueue()
-{
-	ItemType temp;
-	while (!isEmpty())
-	{
-		dequeue(temp);
-	}
-}*/
-
 template <class ItemType>
 LinkedQueue<ItemType>::~LinkedQueue()
 {
-	ItemType temp;
-
-	//Free (Dequeue) all nodes in the queue
-	while (dequeue(temp));
+	clear();
 }
 
 template<class ItemType>
@@ -91,35 +79,8 @@ inline bool LinkedQueue<ItemType>::enqueue(const ItemType& newEntry)
 	return true;
 }
 
-/*template<class ItemType>
-inline bool LinkedQueue<ItemType>::dequeue()
-{
-	bool result = false;
-
-	if (!isEmpty())
-	{
-		// Queue is not empty: remove front
-		Node<ItemType>* nodeToDeletePtr = frontPtr;
-		
-		if (frontPtr == backPtr) // Special case: one node in queue
-		{
-			frontPtr = nullptr;
-			backPtr = nullptr;
-		}
-		else
-			frontPtr = frontPtr->getNext();
-		
-		nodeToDeletePtr->setNext(nullptr);
-		delete nodeToDeletePtr;
-		nodeToDeletePtr = nullptr;
-		count--;
-		result = true;
-	}
-	return result;
-}*/
-
 template <typename ItemType>
-inline bool LinkedQueue<ItemType>::dequeue( ItemType& frntEntry)
+inline bool LinkedQueue<ItemType>::dequeue(ItemType& frntEntry)
 {
 	if (isEmpty())
 		return false;
@@ -132,7 +93,7 @@ inline bool LinkedQueue<ItemType>::dequeue( ItemType& frntEntry)
 		backPtr = nullptr;
 	count--;
 	// Free memory reserved for the dequeued node
-	delete nodeToDeletePtr;
+	//delete nodeToDeletePtr;
 
 	return true;
 
@@ -150,6 +111,16 @@ inline int LinkedQueue<ItemType>::getcount() const
 	return count;
 }
 
+template<class ItemType>
+inline void LinkedQueue<ItemType>::clear()
+{
+	ItemType temp;
+
+	//Free (Dequeue) all nodes in the queue
+	while (dequeue(temp));
+
+}
+
 
 template<class ItemType>
 inline void LinkedQueue<ItemType>::print()const
@@ -157,7 +128,7 @@ inline void LinkedQueue<ItemType>::print()const
 	Node<ItemType>* Myptr = frontPtr;
 	while (Myptr)
 	{
-		cout << Myptr->getItem()<<" ";
+		cout << Myptr->getItem() << " ";
 		Myptr = Myptr->getNext();
 	}
 	cout << endl;

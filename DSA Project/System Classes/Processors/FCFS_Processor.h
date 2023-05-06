@@ -7,21 +7,25 @@ class FCFS_Processor :public Processor
 private:
 	PList RDY;
 public:
-	FCFS_Processor(int Id);
-	void AddProcess(Process* p);
-	void ScheduleAlgo();
-	bool Excuete();
-	virtual Process* remove_Top();
 
-	
+	//Constructor:
+	FCFS_Processor(int Id, Scheduler* sc);
+
+	//Processes Handling:
+	void AddProcess(Process* p);
+	virtual Process* remove_Top();
+	virtual int OverHeat(Processor* Shortest, int TimeStep, int TStop) ;
+	bool isRDYempty();
+	virtual void ScheduleAlgo(int t);
+
+	//Printing:
 	void printRDY();
 	virtual void printInfo();
+
+	//FCFS Special Functions:
 	void Inc_WT();
-	bool isRDYempty();
-	bool RDYtoRUN(){};
 	bool ForkProcess(Process*& runProcess, int forkP);
 	bool KillProcess(int ID,Process* &target);
-	bool RDYtoRUN(int t, Scheduler* scptr);
 };
 
 
