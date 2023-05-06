@@ -25,6 +25,7 @@ class Process
 	int BLKduration;
 	int TT;
 	int IOcount;
+	int IOduration;
 	int KillTime;
 	int startfirst;
 	state State;
@@ -39,6 +40,7 @@ public:
 	int getAT();
 	int getCT();
 	int getRemainingCT();
+	int getIOduration();
 	int getRT();
 	int getTT();
 	int getWT();
@@ -53,6 +55,7 @@ public:
 	//I/O Handling:
 	void AddIO(Pair<int, int> p);
 	bool GetIO(Pair<int, int>& temp);
+	void Inc_IOduration(int t);
 	int getstart();
 	void inc_blktime();
 	int getblktime();
