@@ -185,7 +185,7 @@ void FCFS_Processor::Inc_WT()
 	for (int i = 1; i <= RDY.getcount(); i++)
 	{
 		Process* p = RDY.getEntry(i);
-		p->updateWT();
+		//p->updateWT();
 	}
 }
 

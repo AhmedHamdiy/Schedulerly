@@ -3,6 +3,7 @@
 Process::Process(int at, int id, int ct, int dead_line, int n,  Process* P) :AT(at), PID(id), CT(ct)
 {
 	DeadLine = dead_line;
+	IOduration = 0;
 	IOcount = 0;
 	KillTime = 0;
 	State = NEW;

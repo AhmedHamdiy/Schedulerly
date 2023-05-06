@@ -78,7 +78,9 @@ public:
 
 	//Killing And Forking:
 	void Killing();
-	void Fork();
+	void Fork(Process* runP);
+	int getForkP() const;
+	
 	bool killOrphan(Process* orphan);
 
 	//Simulation

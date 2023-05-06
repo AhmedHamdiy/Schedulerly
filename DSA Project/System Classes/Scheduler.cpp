@@ -95,6 +95,7 @@ void Scheduler::ReadFile(string FileName)
 		if (inFile >> x) DeadLine = x;
 		if (inFile >> x) IO_List = x;
 		Process* p = new Process(Arrival_Time, PID, CPU_Time,DeadLine, IO_List);
+		p->updateState(NEW);
 		for (int j = 0; j < x; j++)
 		{
 			if (j > 0) if (inFile >> ch) m = ch;
@@ -478,32 +479,21 @@ void Scheduler::Killing()
 
 	}
 }
-
-void Scheduler::Fork()
+int Scheduler::getForkP() const
 {
-	Process* runProcess = nullptr;
-	Process* forkedProcess = nullptr;
-	for (int i = 0; i < NF; i++) //loop on FCFS processors only
-	{
-		FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
-		if (FPro)
-		{
-			//check if rand within probability and RUN process can fork
-			if (FPro->ForkProcess(runProcess, ForkP))
-			{
-				Fork_Cntr++;
-				NumP++;
-				forkedProcess = new Process(timestep, NumP, runProcess->getRemainingCT(), 0,0, runProcess);
-				runProcess->setForked(forkedProcess);
-				//create a process forkedProcess
-				//add to shortest FCFS
-				Processor* shortest_FCFS = Get_ShortestRDY(1);
-				shortest_FCFS->AddProcess(forkedProcess);
-				forkedProcess->updateState(READY);
-
-			}
-		}
-	}
+	return ForkP;
+}
+void Scheduler::Fork(Process* runP)
+{
+	NumP++;
+	Fork_Cntr++;
+	Process* forkedProcess = new Process(timestep, NumP, runP->getRemainingCT(), 0,0, runP);
+	runP->setForked(forkedProcess);
+	//create a process forkedProcess
+	//add to shortest FCFS
+	Processor* shortest_FCFS = Get_ShortestRDY(1);
+	shortest_FCFS->AddProcess(forkedProcess);
+	forkedProcess->updateState(READY);
 }
 
 bool Scheduler::killOrphan(Process* orphan)
@@ -554,7 +544,6 @@ void Scheduler::Simulation()
 		for (int i = 0; i < ProcessorNUM; i++)
 			ProcessorList[i]->ScheduleAlgo(timestep);	
 		Killing();
-		Fork();
 		BLKtoRDY();		
 		 //Processor OverHeat:
 		//TurnON_Off_Processors();
