@@ -139,6 +139,7 @@
     <ClInclude Include="DS Implementation\List\List.h" />
     <ClInclude Include="DS Implementation\List\PList.h" />
     <ClInclude Include="DS Implementation\Pair\pair.h" />
+    <ClInclude Include="DS Implementation\Priority Queue\My_PriQueue.h" />
     <ClInclude Include="DS Implementation\Priority Queue\PriorityQueue.h" />
     <ClInclude Include="DS Implementation\Queue\LinkedQueue.h" />
     <ClInclude Include="DS Implementation\Queue\Node.h" />
@@ -151,7 +152,12 @@
     <ClInclude Include="System Classes\UI.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Input Sample.txt" />
+    <Text Include="Input1.txt" />
+    <Text Include="Input2.txt" />
+    <Text Include="Input3.txt" />
+    <Text Include="Input4.txt" />
+    <Text Include="Input5.txt" />
+    <Text Include="Input6.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

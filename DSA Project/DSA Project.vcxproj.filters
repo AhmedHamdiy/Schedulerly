@@ -28,6 +28,9 @@
     <Filter Include="Header Files\System Classes\Processors">
       <UniqueIdentifier>{cc655848-a2e6-494b-bd98-cd0ab012cee8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Input Files">
+      <UniqueIdentifier>{671a75f0-6155-42ef-9dc7-fbbd056943cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DS Implementation\Queue\LinkedQueue.h">
@@ -69,11 +72,11 @@
     <ClInclude Include="DS Implementation\List\PList.h">
       <Filter>Header Files\DS Implementation</Filter>
     </ClInclude>
+    <ClInclude Include="DS Implementation\Priority Queue\My_PriQueue.h">
+      <Filter>Header Files\DS Implementation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="System Classes\Scheduler.cpp">
       <Filter>Source Files\System Classes</Filter>
     </ClCompile>
@@ -92,8 +95,28 @@
     <ClCompile Include="System Classes\Processors\SJF_Processor.cpp">
       <Filter>Source Files\System Classes\Processors</Filter>
     </ClCompile>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Input Sample.txt" />
+    <Text Include="Input6.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input5.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input4.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input3.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input2.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input1.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

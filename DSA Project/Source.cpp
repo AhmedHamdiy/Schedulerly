@@ -3,6 +3,6 @@
 int main()
 {
 	Scheduler* s = new Scheduler;
-	s->simulation();
+	s->Simulation();
 	return 0;
 }
