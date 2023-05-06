@@ -103,7 +103,7 @@ public:
 			cin.get();
 		}
 		else
-			Sleep(10);
+			Sleep(1000);
 		SetConsoleTextAttribute(col, 7); // sets Console color to Grey
 		cout << "------------------------------------------------------------------------------------------------------------------------" << endl << endl;
 	}
