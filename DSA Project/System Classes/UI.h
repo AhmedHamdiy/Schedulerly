@@ -11,29 +11,46 @@ class UI
 public:
 	int chooseMode()
 	{
-		char c;
+		short mode;
 		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(col, 7); // sets Console color 
-		cout << "Please Choose Output Mode ( Enter 's' For Silent,'i' For Interactive,'b' For Stepbystep )" << endl;
-		SetConsoleTextAttribute(col, 1); // sets Console color 
-		cin >> c;
+		SetConsoleTextAttribute(col, 7); // sets Console color to Grey
+		cout << "Please Choose Output Mode :\n";
 
-		if (c == 'b') //stepbystep
-			return 0;
-		else if (c == 'i') //interactive
-			return 1;
-		else if (c == 's') //silent
-			return 2;
-		return -1; //invalid
+		SetConsoleTextAttribute(col, 4); // sets Console color to Red 
+		cout << "[0] -----> Step By Step\n";
+		SetConsoleTextAttribute(col, 6); // sets Console color to Yellow 
+		cout << "[1] -----> Interactive\n";
+		SetConsoleTextAttribute(col, 2); // sets Console color to Green 
+		cout << "[2] -----> Silent\n";
 
+		SetConsoleTextAttribute(col, 1); // sets Console color to Blue 
+		cin >> mode;
+		return mode;
 	}
-	//print output for step by step and interactive 
-	void printOutput(bool mode, int timestep,const LinkedQueue<Process*>& blk,const LinkedQueue<Process*>& trm,Processor* Parr[],int pCount)
-		//works for stepbystep and interactive since they are almost similar
+
+	string Get_FileName(bool flag)
+	{
+		string name;
+		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(col, 15); // sets Console color to White
+
+		if (flag)
+			cout << "Please Enter Input File Name :\n";
+		else
+			cout << "Please Enter Output File Name :\n";
+		cin >> name;
+		return name;
+	}
+
+
+	//Print Output For Step By Step And Interactive 
+	//Works For Step By Step And Interactive Since They Are Almost Similar
+	void printOutput(bool mode, int timestep, const LinkedQueue<Process*>& blk, const LinkedQueue<Process*>& trm, Processor* Parr[], int pCount)
 	{
 		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(col,1); // sets Console color 
+		SetConsoleTextAttribute(col, 1); // sets Console color to Blue
 		cout << "Current Timestep:" << timestep << endl;
+
 		SetConsoleTextAttribute(col, 6); // sets Console color to Yellow
 		cout << "--------------     RDY PROCESSES     --------------" << endl;
 		// loop on list of processors
@@ -41,17 +58,18 @@ public:
 
 		for (int i = 0; i < pCount; i++)
 		{
-			cout << "processor " << i+1  ;
+			cout << "processor " << i + 1;
 			Parr[i]->printInfo();
 			cout << "RDY: ";
 			Parr[i]->printRDY();
 		}
+
 		SetConsoleTextAttribute(col, 4); // sets Console color ro Red
 		cout << "--------------     BLK PROCESSES     --------------" << endl;
 		cout << blk.getcount() << " BLK: ";
 		if (blk.getcount() == 0)
 			cout << endl;
-		else 
+		else
 			blk.print();
 
 		SetConsoleTextAttribute(col, 2); // sets Console color to Green
@@ -67,7 +85,7 @@ public:
 		{
 			if (!Parr[i]->isIdle())
 			{
-				cout << Parr[i]->GetRunProcess() << *Parr[i]<< " ";
+				cout << Parr[i]->GetRunProcess() << *Parr[i] << " ";
 			}
 		}
 
@@ -78,33 +96,35 @@ public:
 		trm.print();
 
 		if (mode)
-		{ 
+		{
 			//interactive
 			SetConsoleTextAttribute(col, 15); // sets Console color to White
 			cout << "\nPRESS ANY KEY TO MOVE TO THE NEXT STEP!" << endl;
 			cin.get();
 		}
 		else
-			Sleep(1000);
+			Sleep(10);
 		SetConsoleTextAttribute(col, 7); // sets Console color to Grey
-		cout << "------------------------------------------------------------------------------------------------------------------------"<<endl<< endl;
+		cout << "------------------------------------------------------------------------------------------------------------------------" << endl << endl;
 	}
-	//called by passing(1) at start of the simulation
-	//called by passing(0) at end of the simulation
+
+	//Called By Passing(1) At Start Of The Simulation
+	//Called By Passing(0) At End Of The Simulation
 	void printSilent(bool start)
 	{
 		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
-		
+
 		if (start)
 		{
-			SetConsoleTextAttribute(col, 6); // sets Console color 
+			SetConsoleTextAttribute(col, 6); // sets Console color to Yellow
 			cout << "Silent Mode......  Simulation Starts..." << endl;
 		}
 		else
 		{
-			SetConsoleTextAttribute(col, 10); // sets Console color 
+			SetConsoleTextAttribute(col, 10); // sets Console color to LightGreen
 			cout << "Similation ends,Output file is created" << endl;
-			SetConsoleTextAttribute(col, 7); // sets Console color 
+
+			SetConsoleTextAttribute(col, 7); // sets Console color to Grey
 
 		}
 

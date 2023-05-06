@@ -6,7 +6,7 @@
 #include"../DS Implementation/Pair/Pair.h"
 
 using namespace std;
-enum state { NEW, READY, BLK, ORPH, TRM,RUNNING };
+enum state { NEW, READY, BLK, ORPH, TRM, RUNNING,Killed };
 class Process
 {
 	//for Bonus Forking In phase 2
@@ -14,10 +14,11 @@ class Process
 	Process* RChild;
 	Process* Parent;
 	
+	int PID;
+	int TS;
 	int AT;
 	int WT;
 	int RT;
-	int PID;
 	int CT;
 	int RemainingCT;
 	int StartC;
@@ -25,55 +26,54 @@ class Process
 	int TT;
 	int IOcount;
 	int KillTime;
-	LinkedQueue<Pair<int,int>> IOList;
-	state State;
-public:
 	int startfirst;
-	Process();
+	state State;
+	LinkedQueue<Pair<int, int>> IOList;
+public:
+	//Constructor:
 	Process(int at, int id, int ct, int n,Process* P=nullptr);
-	~Process();
-	void AddIO(Pair<int, int> p);
-	void SetKillTime(int k);
-	void incrementTT();
-	void decrementCT();
-	bool isFinished();
+	
+	//Data Members Getters: 
+	int getID();
 	int getTRT();
 	int getAT();
 	int getCT();
 	int getRemainingCT();
 	int getRT();
 	int getTT();
-	
-	int getID();
-	void setCT(int t);
+	int getWT();
+	int getTS();
+
+	//Data Members Setters: 
+	void SetKillTime(int k);
 	void setRemainingCT(int t);
 	void setTT(int t);
-	int getWT();
-
-	//I/O
-	bool GetIO(Pair<int, int>& temp);
+	void updateState(state s);
 	void setstart(int t);
+	//I/O Handling:
+	void AddIO(Pair<int, int> p);
+	bool GetIO(Pair<int, int>& temp);
 	int getstart();
 	void inc_blktime();
 	int getblktime();
 	void resetblktime();
 	void deqIO();
 
-	void updateState(state s); //? do we use it
-	void updateWT(); //increments waiting time
-	void setPID(int id); //can we set it in constructor w nsheel dy?
+	//Time Handling:
+	void incrementTT();
+	void decrementCT();
+	void updateWT();
+	bool IncrementTS(int TS);
 
-	//overloading << operator to Print The ID
-	friend ostream& operator << (ostream& out, Process *p);
-
-	//forking
+	
+	//Forking
 	Process*& get_LChild();
 	Process*& get_RChild();
 	Process* getParent(); 
-	bool setForked(Process* forkedP); //assign left or right child
-	bool canFork() const; //has empty slot for a child?
+	bool setForked(Process* forkedP); 
+	bool canFork() const;
 
-	//void setParent(Process* p); //set in constructor 
-
+	//Printing:
+	friend ostream& operator << (ostream& out, Process* p);
 };
 #endif
