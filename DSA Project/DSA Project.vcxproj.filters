@@ -100,22 +100,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Input1.txt">
-      <Filter>Source Files\Input Files</Filter>
-    </Text>
-    <Text Include="Input2.txt">
-      <Filter>Source Files\Input Files</Filter>
-    </Text>
-    <Text Include="Input3.txt">
-      <Filter>Source Files\Input Files</Filter>
-    </Text>
-    <Text Include="Input4.txt">
+    <Text Include="Input6.txt">
       <Filter>Source Files\Input Files</Filter>
     </Text>
     <Text Include="Input5.txt">
       <Filter>Source Files\Input Files</Filter>
     </Text>
-    <Text Include="Input6.txt">
+    <Text Include="Input4.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input3.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input2.txt">
+      <Filter>Source Files\Input Files</Filter>
+    </Text>
+    <Text Include="Input1.txt">
       <Filter>Source Files\Input Files</Filter>
     </Text>
   </ItemGroup>
