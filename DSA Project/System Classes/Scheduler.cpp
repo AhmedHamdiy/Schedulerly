@@ -328,6 +328,7 @@ void Scheduler::RUNtoBLK(Process* p)
 void Scheduler::BLKtoRDY()
 {
 	Process* p = nullptr;
+	Process* p2 = nullptr;
 	Pair<int, int> temp;
 	if (!BLKList.isEmpty())
 	{
@@ -340,8 +341,13 @@ void Scheduler::BLKtoRDY()
 				p->updateState(READY);
 				Get_ShortestRDY(0)->AddProcess(p);
 				p->deqIO();
-				BLKList.dequeue(p);
 				p->resetblktime();
+				BLKList.dequeue(p);
+				if (!BLKList.isEmpty()) 
+				{
+					p2 = BLKList.peekFront();
+					p2->inc_blktime();
+				}
 			}
 			else
 			{

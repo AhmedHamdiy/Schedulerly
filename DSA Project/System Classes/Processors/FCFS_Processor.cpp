@@ -95,6 +95,7 @@ void FCFS_Processor::ScheduleAlgo(int t)
 	if (!isIdle()) {
 		Inc_BusyTime();
 			Dec_RUNCT();
+			IO_Req();
 	}
 	else
 	{
