@@ -67,7 +67,8 @@ inline bool List<ItemType>::remove(int position) {
 				Tail = prevPtr;
 		}
 		curPtr->setNext(nullptr);
-		delete curPtr; curPtr = nullptr;
+		//delete curPtr;
+		//curPtr = nullptr;
 		itemCount--;
 		return true;
 	}
