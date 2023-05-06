@@ -143,11 +143,11 @@ void Scheduler::OutputFile(string FileName)
 		ProcessStatistics(avWT, avRT, avTRT,tct);
 		OutFile << "Processes: " << NumP << endl;
 		OutFile << "Avg WT = " << avWT << ",   Avg RT = " << avRT << ",   Avg TRT = " << avTRT << endl;
-		OutFile << "Migration %:      RTF =" << float(RTF_Mig_Cntr)/NumP << "% ,      MaxW = " << float(MaxW_Mig_Cntr) / NumP << "%"<< endl;
-		OutFile << "Work Steal %: " << float(Stl_Cntr) / NumP << "%" << endl;
-		OutFile << "Forked Process %: " << float(Fork_Cntr)/NumP << "%" << endl;
-		OutFile << "Killed Process %: " << float(Kill_Cntr) /NumP << "%" << endl;
-		OutFile << "OverHeated Process %: " << float(OverHeat_Processes) / NumP << "%" << endl;
+		OutFile << "Migration %:      RTF =" << (float(RTF_Mig_Cntr)/NumP)*100 << "% ,      MaxW = " << float(MaxW_Mig_Cntr) / NumP << "%"<< endl;
+		OutFile << "Work Steal %: " << (float(Stl_Cntr) / NumP)*100 << "%" << endl;
+		OutFile << "Forked Process %: " << (float(Fork_Cntr)/NumP)*100 << "%" << endl;
+		OutFile << "Killed Process %: " << (float(Kill_Cntr) /NumP)*100 << "%" << endl;
+		OutFile << "OverHeated Process %: " << (float(OverHeat_Processes) / NumP)*100 << "%" << endl;
 
 		int totalTRT = avTRT * NumP;
 		double u, totUti(0);
