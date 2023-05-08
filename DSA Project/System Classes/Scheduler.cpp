@@ -3,6 +3,7 @@
 #include"Processors/SJF_Processor.h"
 #include"Processors/RR_Processor.h"
 #include"UI.h"
+#include<iomanip>
 using namespace std;
 
 
@@ -124,13 +125,13 @@ void Scheduler::OutputFile(string FileName)
 		LinkedQueue<Process*> auxilary;
 		Process* p;
 		//Printing The Statistics For Each Process:
-		OutFile << "TT PID AT CT IO_D WT RT TRT" << endl;
+		OutFile << "TT" << setw(7) << "PID"<< setw(6)<< "AT"<< setw(7)<< "CT"<<setw(7)<< "IO_D"<< setw(7)<< "WT"<< setw(7)<< "RT"<< setw(7)<< "TRT" << endl;
 		for (int i = 0; i < NumP; i++)
 		{
 			TRMList.dequeue(p);
 			auxilary.enqueue(p);
-			OutFile << p->getTT() << "  " << p->getID() << "  " << p->getAT() << "  " << p->getCT() << "  ";
-			OutFile << p->getblktime() << "  " << p->getWT() << "  " << p->getRT() << "  " << p->getTRT() << endl;
+			OutFile << p->getTT() << setw(7) << p->getID() << setw(7) << p->getAT() << setw(7) << p->getCT() << setw(7);
+			OutFile << p->getblktime() << setw(7) << p->getWT() << setw(7) << p->getRT() << setw(7) << p->getTRT() << endl;
 		}
 		for (int i = 0; i < NumP; i++)
 		{
