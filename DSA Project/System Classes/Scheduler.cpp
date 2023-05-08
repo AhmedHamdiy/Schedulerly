@@ -448,36 +448,40 @@ double Scheduler::Calc_StealLimit(Processor* longest, Processor* shortest)
 
 void Scheduler::Killing()
 {
-	if (KillList.isEmpty())
-		return;
-	else
+	while (1)
 	{
-		Pair<int, int> killPair = KillList.peekFront();
-		if (killPair.first != timestep)
+		if (KillList.isEmpty())
 			return;
-		else //SIGKILL is now
+		else
 		{
-			KillList.dequeue(killPair);
-			int target_id = killPair.second;
-			Process* targetProcess = nullptr;
-			bool isDone = 0;
-			for (int i = 0; i < NF; i++)
+			Pair<int, int> killPair = KillList.peekFront();
+			if (killPair.first != timestep)
+				return;
+			else //SIGKILL is now
 			{
-				FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
-				if (FPro)
-					//search for process&remove it from rdy/run if exists
-					isDone = FPro->KillProcess(target_id, targetProcess);
-				if (isDone)
+				KillList.dequeue(killPair);
+				int target_id = killPair.second;
+				Process* targetProcess = nullptr;
+				bool isDone = 0;
+				for (int i = 0; i < NF; i++)
 				{
-					Kill_Cntr++;
-					MoveToTRM(targetProcess);
-					targetProcess->updateState(Killed);
-					break;
-				}
-			} //if process not found ignore kill signal
+					FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
+					if (FPro)
+						//search for process&remove it from rdy/run if exists
+						isDone = FPro->KillProcess(target_id, targetProcess);
+					if (isDone)
+					{
+						Kill_Cntr++;
+						MoveToTRM(targetProcess);
+						targetProcess->updateState(Killed);
+						break;
+					}
+				} //if process not found ignore kill signal
+			}
 		}
 
 	}
+
 }
 int Scheduler::getForkP() const
 {
