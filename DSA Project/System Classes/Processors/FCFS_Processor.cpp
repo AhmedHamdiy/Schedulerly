@@ -85,12 +85,19 @@ void FCFS_Processor::ScheduleAlgo(int t)
 		MYSch->MoveToTRM(GetRunProcess());
 		setRUN(nullptr);
 	}
-	IO_Req();
+
+	Process* runP = GetRunProcess();
+	bool v = ForkProcess(runP, MYSch->getForkP());
+	if(v)
+	MYSch->Fork(runP);
+
+	
 	if (!isIdle()) {
 		Inc_BusyTime();
-			Dec_RUNCT();
-	}
+		Dec_RUNCT();
+		IO_Req();
 
+	}
 	else
 	{
 
@@ -178,7 +185,7 @@ void FCFS_Processor::Inc_WT()
 	for (int i = 1; i <= RDY.getcount(); i++)
 	{
 		Process* p = RDY.getEntry(i);
-		p->updateWT();
+		//p->updateWT();
 	}
 }
 

@@ -75,6 +75,9 @@
     <ClInclude Include="DS Implementation\Priority Queue\My_PriQueue.h">
       <Filter>Header Files\DS Implementation</Filter>
     </ClInclude>
+    <ClInclude Include="System Classes\Processors\EDF_Processor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System Classes\Scheduler.cpp">
@@ -96,6 +99,9 @@
       <Filter>Source Files\System Classes\Processors</Filter>
     </ClCompile>
     <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System Classes\Processors\EDF_Processor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,7 +1,9 @@
 #include"Process.h"
 
-Process::Process(int at, int id, int ct, int n,Process* p) :AT(at), PID(id), CT(ct)
+Process::Process(int at, int id, int ct, int dead_line, int n,  Process* P) :AT(at), PID(id), CT(ct)
 {
+	DeadLine = dead_line;
+	IOduration = 0;
 	IOcount = 0;
 	KillTime = 0;
 	State = NEW;
@@ -11,7 +13,7 @@ Process::Process(int at, int id, int ct, int n,Process* p) :AT(at), PID(id), CT(
 	WT = 0;
 	TT = 0;
 	RemainingCT = ct;
-	Parent = p;
+	Parent = P;
 }
 
 
@@ -64,12 +66,11 @@ int Process::getID()
 }
 
 
-int Process::getWT()
+int Process::getWT(int timeStep)
 {
-	if (State == TRM)
-		return getTRT() - CT;
-	else
-		return WT;
+	if (State == TRM|| State==Killed)
+		return TT - AT;
+	return timeStep - AT - (CT - RemainingCT);
 }
 
 int Process::getTS()
@@ -77,8 +78,20 @@ int Process::getTS()
 	return TS;
 }
 
+int Process::get_DeadLine()
+{
+	return DeadLine;
+}
 
+int Process::getIOduration()
+{
+	return IOduration;
+}
 						//-------------------------------------( Setters )------------------------------------------------//
+void Process::Inc_IOduration(int t)
+{
+	IOduration += t;
+}
 
 void Process::setTT(int t)
 {
@@ -119,11 +132,6 @@ void Process::updateState(state s)
 	State = s;
 }
 
-void Process::updateWT()
-{
-	WT++;
-}
-
 bool Process::IncrementTS(int TSlice)
 {
 	if (TS < TSlice)
@@ -150,7 +158,7 @@ Process*& Process::get_RChild()
 {
 	return RChild;
 }
-Process* Process::getParent()
+Process*& Process::getParent()
 {
 	return Parent;
 }
@@ -193,6 +201,7 @@ void Process::deqIO()
 {
 	Pair<int, int> p;
 	IOList.dequeue(p);
+	Inc_IOduration(p.second);
 }
 
 int Process::getblktime()

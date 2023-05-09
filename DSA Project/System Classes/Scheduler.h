@@ -6,9 +6,9 @@
 #include"Processors/FCFS_Processor.h"
 #include"Processors/SJF_Processor.h"
 #include"Processors/RR_Processor.h"
+#include"Processors/EDF_Processor.h"
 #include<fstream>
 using namespace std;
-
 
 
 class Scheduler 
@@ -27,6 +27,7 @@ private:
 	int NF;
 	int NS;
 	int NR;
+	int ND;
 	int ProcessorNUM;
 	int NumP;
 	int TRMcount;
@@ -45,7 +46,9 @@ private:
 	int RTF_Mig_Cntr;
 	int MaxW_Mig_Cntr;
 	int Kill_Cntr;
+	int DeadLine_Cntr;
 	int OverHeat_Processes;
+
 public:
 	//Constructor And Destructor:
 	Scheduler();
@@ -55,11 +58,11 @@ public:
 	void ReadFile(string FileName);
 	void OutputFile(string FileName);
 	void ProcessStatistics(int& avWT, int& avRT, int& avTRT, int& Tct);
-
 	//Data Members Getters:
 	Processor* Get_ShortestRDY(int b);
 	Processor* Get_LongestRDY();
-	
+	void Inc_DeadLineCntr();
+
 	//Moving Between The Lists:
 	void MoveToTRM(Process* p);
 	void NEWtoRDY();
@@ -75,7 +78,9 @@ public:
 
 	//Killing And Forking:
 	void Killing();
-	void Fork();
+	void Fork(Process* runP);
+	int getForkP() const;
+	
 	bool killOrphan(Process* orphan);
 
 	//Simulation

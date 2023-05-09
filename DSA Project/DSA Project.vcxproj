@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="System Classes\Process.cpp" />
+    <ClCompile Include="System Classes\Processors\EDF_Processor.cpp" />
     <ClCompile Include="System Classes\Processors\FCFS_Processor.cpp" />
     <ClCompile Include="System Classes\Processors\Processor.cpp" />
     <ClCompile Include="System Classes\Processors\RR_Processor.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="DS Implementation\Queue\LinkedQueue.h" />
     <ClInclude Include="DS Implementation\Queue\Node.h" />
     <ClInclude Include="System Classes\Process.h" />
+    <ClInclude Include="System Classes\Processors\EDF_Processor.h" />
     <ClInclude Include="System Classes\Processors\FCFS_Processor.h" />
     <ClInclude Include="System Classes\Processors\Processor.h" />
     <ClInclude Include="System Classes\Processors\RR_Processor.h" />

@@ -9,11 +9,12 @@ using namespace std;
 enum state { NEW, READY, BLK, ORPH, TRM, RUNNING,Killed };
 class Process
 {
-	//for Bonus Forking In phase 2
+	//for Bonus In phase 2
 	Process* LChild;
 	Process* RChild;
 	Process* Parent;
-	
+	int DeadLine;
+
 	int PID;
 	int TS;
 	int AT;
@@ -23,6 +24,7 @@ class Process
 	int RemainingCT;
 	int StartC;
 	int BLKduration;
+	int IOduration;
 	int TT;
 	int IOcount;
 	int KillTime;
@@ -31,7 +33,7 @@ class Process
 	LinkedQueue<Pair<int, int>> IOList;
 public:
 	//Constructor:
-	Process(int at, int id, int ct, int n,Process* P=nullptr);
+	Process(int at, int id, int ct, int dead_line,int n, Process* P = nullptr);
 	
 	//Data Members Getters: 
 	int getID();
@@ -41,8 +43,9 @@ public:
 	int getRemainingCT();
 	int getRT();
 	int getTT();
-	int getWT();
+	int getWT(int timeStep);
 	int getTS();
+	int get_DeadLine();
 
 	//Data Members Setters: 
 	void SetKillTime(int k);
@@ -50,7 +53,8 @@ public:
 	void setTT(int t);
 	void updateState(state s);
 	void setstart(int t);
-	//I/O Handling:
+
+	//I_O Handling:
 	void AddIO(Pair<int, int> p);
 	bool GetIO(Pair<int, int>& temp);
 	int getstart();
@@ -58,18 +62,19 @@ public:
 	int getblktime();
 	void resetblktime();
 	void deqIO();
+	void Inc_IOduration(int t);
+	int getIOduration();
 
 	//Time Handling:
 	void incrementTT();
 	void decrementCT();
-	void updateWT();
 	bool IncrementTS(int TS);
 
 	
 	//Forking
 	Process*& get_LChild();
 	Process*& get_RChild();
-	Process* getParent(); 
+	Process*& getParent(); 
 	bool setForked(Process* forkedP); 
 	bool canFork() const;
 

@@ -73,7 +73,6 @@ void RR_Processor::ScheduleAlgo(int t)
 		MYSch->MoveToTRM(GetRunProcess());
 		setRUN(nullptr);
 	}
-	IO_Req();
 	if(!isIdle()){
 		Inc_BusyTime();
 		Process* Rn = GetRunProcess();
@@ -83,8 +82,12 @@ void RR_Processor::ScheduleAlgo(int t)
 			RDY.enqueue(Rn);
 			setRUN(nullptr);
 		}
-	else
-		Dec_RUNCT();
+		else
+		{
+			Dec_RUNCT();
+			IO_Req();
+
+		}
 	}
 	
 	else
