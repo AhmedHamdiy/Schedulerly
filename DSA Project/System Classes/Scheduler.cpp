@@ -2,7 +2,6 @@
 #include"Processors/FCFS_Processor.h"
 #include"Processors/SJF_Processor.h"
 #include"Processors/RR_Processor.h"
-
 #include"UI.h"
 #include<iomanip>
 using namespace std;
@@ -12,6 +11,19 @@ using namespace std;
 
 Scheduler::Scheduler()
 {
+	ND = 0;
+	NF = 0;
+	NS = 0;
+	NR = 0;
+	MaxW = 0;
+	NumP = 0;
+	ProcessorNUM = 0;
+	ProcessorList=nullptr;
+	RRT = 0;
+	RTF = 0;
+	STL = 1;
+	StopTime = 1;
+	ForkP = 0;
 	Overheat_prop = 10;
 	Program_UI = new UI;
 	DeadLine_Cntr = 0;
@@ -96,7 +108,7 @@ void Scheduler::ReadFile(string FileName)
 
 	//Allocating The Processes With:
 	if (inFile >> x) NumP = x;
-	int Arrival_Time, PID, CPU_Time,DeadLine, IO_List;
+	int Arrival_Time(0), PID(0), CPU_Time(0), DeadLine(0), IO_List(0);
 
 	for (int i = 0; i < NumP; i++)
 	{
@@ -159,7 +171,8 @@ void Scheduler::OutputFile(string FileName)
 		}
 
 		//Printing The Statistics For All Processes:
-		int avWT, avRT, avTRT,tct(0);
+		float avWT, avRT, avTRT;
+		int tct(0);
 		ProcessStatistics(avWT, avRT, avTRT,tct);
 		OutFile << "Processes: " << NumP << endl;
 		OutFile << "Avg WT = " << avWT << ",   Avg RT = " << avRT << ",   Avg TRT = " << avTRT << endl;
@@ -169,7 +182,7 @@ void Scheduler::OutputFile(string FileName)
 		OutFile << "Killed Process %: " << 100 * float(Kill_Cntr) /NumP << "%" << endl;
 		OutFile << "Temination Before DeadLine %: " << 100 * float(DeadLine_Cntr) / NumP << "%" << endl;
 
-		int totalTRT = avTRT * NumP;
+		int totalTRT = int(avTRT) * NumP;
 		double u, totUti(0);
 		OutFile << "Processors: " << ProcessorNUM << " [" << NF << " FCFS, " << NS << " SJF, " << NR << " RR, " << ND << " EDF]" << endl;
 
@@ -195,7 +208,7 @@ void Scheduler::OutputFile(string FileName)
 
 }
 
-void Scheduler::ProcessStatistics(int& avWT, int& avRT, int& avTRT,int& TCT)
+void Scheduler::ProcessStatistics(float& avWT, float& avRT, float& avTRT,int& TCT)
 {
 	LinkedQueue<Process*> auxilary;
 	Process* item;

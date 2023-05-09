@@ -59,7 +59,7 @@ public:
 	//File Handling:
 	void ReadFile(string FileName);
 	void OutputFile(string FileName);
-	void ProcessStatistics(int& avWT, int& avRT, int& avTRT, int& Tct);
+	void ProcessStatistics(float& avWT, float& avRT, float& avTRT, int& Tct);
 	//Data Members Getters:
 	Processor* Get_ShortestRDY(int b);
 	Processor* Get_LongestRDY();
