@@ -6,15 +6,15 @@ class FCFS_Processor :public Processor
 {
 private:
 	PList RDY;
+	int Forking_Probability;
 public:
-
 	//Constructor:
-	FCFS_Processor(int Id, Scheduler* sc);
+	FCFS_Processor(int Id, Scheduler* sc,int ForkingP);
 
 	//Processes Handling:
 	void AddProcess(Process* p);
 	virtual Process* remove_Top();
-	virtual int OverHeat(Processor* Shortest, int TimeStep, int TStop) ;
+	virtual void OverHeat(Processor* Shortest, int TimeStep, int TStop) ;
 	bool isRDYempty();
 	virtual void ScheduleAlgo(int t);
 
@@ -24,7 +24,7 @@ public:
 
 	//FCFS Special Functions:
 	void Inc_WT();
-	bool ForkProcess(Process*& runProcess, int forkP);
+	bool ForkProcess(Process*& runProcess);
 	bool KillProcess(int ID,Process* &target);
 };
 

@@ -12,7 +12,7 @@ Processor::Processor(int Id, Scheduler* sc)
 }
 
 
-//-------------------------------------( Getters )------------------------------------------------//
+			//-------------------------------------( Getters )------------------------------------------------//
 
 int Processor::get_Finishtime()
 {
@@ -29,14 +29,18 @@ bool Processor::isIdle()
 	return (RUN == nullptr);
 }
 
+int Processor::get_ID()
+{
+	return ID;
+}
+
 Process* Processor::GetRunProcess()
 {
 	return RUN;
 }
 
 
-
-//-------------------------------------( Setters )------------------------------------------------//
+			//-------------------------------------( Setters )------------------------------------------------//
 
 bool Processor::setRUN(Process* p)
 {
@@ -47,10 +51,12 @@ bool Processor::setRUN(Process* p)
 	}
 	return false;
 }
+
 void Processor::Inc_Finishtime(int T)
 {
 	FinishTime += T;
 }
+
 void Processor::Dec_Finishtime(int T)
 {
 	FinishTime -= T;
@@ -61,19 +67,20 @@ void Processor::Dec_RUNCT()
 	if (RUN)
 		RUN->decrementCT();
 }
+
 void Processor::Inc_BusyTime()
 {
 	if(!isIdle())
 	BusyTime++;
 }
+
 void Processor::UpdateState(PState st)
 {
 	state = st;
 }
 
 
-
-//-------------------------------------( Statistics )------------------------------------------------//
+			//-------------------------------------( Statistics )------------------------------------------------//
 
 int Processor::getBusytime()
 {
@@ -91,8 +98,7 @@ double Processor::processorUtilization(int timeStep)
 }
 
 
-
-//-------------------------------------( Scheduling )------------------------------------------------//
+			//-------------------------------------( Scheduling )------------------------------------------------//
 
 bool Processor::FinishRUN()
 {
@@ -120,7 +126,7 @@ void Processor::IO_Req()
 }
 
 
-//-------------------------------------( Printing )------------------------------------------------//
+			//-------------------------------------( Printing )------------------------------------------------//
 
 ostream& operator<<(std::ostream& os, const Processor& p) {
 	os << "(P" << p.ID << ")";

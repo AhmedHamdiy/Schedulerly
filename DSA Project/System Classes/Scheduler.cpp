@@ -12,6 +12,8 @@ using namespace std;
 
 Scheduler::Scheduler()
 {
+	Overheat_prop = 10;
+	Program_UI = new UI;
 	DeadLine_Cntr = 0;
 	TRMcount = 0;
 	timestep = 0;
@@ -20,17 +22,24 @@ Scheduler::Scheduler()
 	Fork_Cntr = 0;
 	Stl_Cntr = 0;
 	Kill_Cntr = 0;
-	OverHeat_Processes = 0;
 }
+
 Scheduler::~Scheduler()
 {
-	//Deallocate TRMList
+	//Deallocate Processes
 	TRMList.clear();
-	//Deallocate Each Processor In ProcessorLiSt
+
+
+	//Deallocate Processors:
+
+	//First :Deallocate Each Processor In ProcessorLiSt
 	for (int i = 0; i < ProcessorNUM; i++)
 		delete ProcessorList[i];
-	//Deallocate The ProcessorList
+	//Second: Deallocate The ProcessorList
 	delete[] ProcessorList;
+	
+	//Deallocate Program_UI:
+	delete Program_UI;
 }
 
 
@@ -42,9 +51,10 @@ void Scheduler::ReadFile(string FileName)
 	char ch, m;
 	ifstream inFile;
 	inFile.open(FileName+".txt");
-	while (!inFile)
+	if (!inFile)
 	{
-		cout << "Error, Please Enter an existing File Name\n"; 
+		Program_UI->Print_ErrorMSG(1);
+		exit(0);
 	}
 	int x, n, i = 0;
 	if (inFile >> x) NF = x;
@@ -52,12 +62,19 @@ void Scheduler::ReadFile(string FileName)
 	if (inFile >> x) NR = x;
 	if (inFile >> x) ND = x;
 	if (inFile >> x) RRT = x;
+
+	//Getting The Percentages:
+	if (inFile >> x) RTF = x;
+	if (inFile >> x) MaxW = x;
+	if (inFile >> x) STL = x;
+	if (inFile >> x) ForkP = x;
+	if (inFile >> x) StopTime = x;
 	ProcessorNUM = NF + NS + NR + ND;
 	//Allocating The ProcessorList With Unique IDs:
 	ProcessorList = new Processor * [ProcessorNUM];
 	for (; i < NF; i++)
 	{
-		Processor* pro = new FCFS_Processor(i + 1, this);
+		Processor* pro = new FCFS_Processor(i + 1, this,ForkP);
 		ProcessorList[i] = pro;
 	}
 	for (; i < NF + NS; i++)
@@ -76,13 +93,6 @@ void Scheduler::ReadFile(string FileName)
 		Processor* pro = new EDF_Processor(i + 1, this);
 		ProcessorList[i] = pro;
 	}
-
-	//Getting The Percentages:
-	if (inFile >> x) RTF = x;
-	if (inFile >> x) MaxW = x;
-	if (inFile >> x) STL = x;
-	if (inFile >> x) ForkP = x;
-	if (inFile >> x) StopTime = x;
 
 	//Allocating The Processes With:
 	if (inFile >> x) NumP = x;
@@ -121,7 +131,6 @@ void Scheduler::ReadFile(string FileName)
 			KillList.enqueue(kill);
 		}
 	}
-
 	inFile.close();
 }
 
@@ -135,13 +144,13 @@ void Scheduler::OutputFile(string FileName)
 		LinkedQueue<Process*> auxilary;
 		Process* p;
 		//Printing The Statistics For Each Process:
-		OutFile << "TT" << setw(7) << "PID"<< setw(6)<< "AT"<< setw(7)<< "CT"<<setw(7)<< "IO_D"<< setw(7)<< "WT"<< setw(7)<< "RT"<< setw(7)<< "TRT" << endl;
+		OutFile << "TT" << setw(8) << "PID"<< setw(7)<< "AT"<< setw(7)<< "CT"<<setw(8)<< "IO_D "<< setw(7)<< "WT"<< setw(7)<< "RT"<< setw(7)<< "TRT" << endl;
 		for (int i = 0; i < NumP; i++)
 		{
 			TRMList.dequeue(p);
 			auxilary.enqueue(p);
 			OutFile << p->getTT() << setw(7) << p->getID() << setw(7) << p->getAT() << setw(7) << p->getCT() << setw(7);
-			OutFile << p->getblktime() << setw(7) << p->getWT() << setw(7) << p->getRT() << setw(7) << p->getTRT() << endl;
+			OutFile << p->getIOduration() << setw(9) << p->getWT(timestep) << setw(7) << p->getRT() << setw(7) << p->getTRT() << endl;
 		}
 		for (int i = 0; i < NumP; i++)
 		{
@@ -158,12 +167,11 @@ void Scheduler::OutputFile(string FileName)
 		OutFile << "Work Steal %: " << 100 * float(Stl_Cntr) / NumP << "%" << endl;
 		OutFile << "Forked Process %: " << 100 * float(Fork_Cntr)/NumP << "%" << endl;
 		OutFile << "Killed Process %: " << 100 * float(Kill_Cntr) /NumP << "%" << endl;
-		OutFile << "OverHeated Process %: " << 100 * float(OverHeat_Processes) / NumP << "%" << endl;
 		OutFile << "Temination Before DeadLine %: " << 100 * float(DeadLine_Cntr) / NumP << "%" << endl;
 
 		int totalTRT = avTRT * NumP;
 		double u, totUti(0);
-		OutFile << "Processors: " << ProcessorNUM << " [" << NF << " FCFS, " << NS << " SJF, " << NR << " RR," << ND << " EDF]" << endl;
+		OutFile << "Processors: " << ProcessorNUM << " [" << NF << " FCFS, " << NS << " SJF, " << NR << " RR, " << ND << " EDF]" << endl;
 
 		OutFile << "Processors Load" << endl;
 		for (int i = 0; i < ProcessorNUM; i++)
@@ -340,7 +348,6 @@ void Scheduler::RUNtoBLK(Process* p)
 	BLKList.enqueue(p);
 }
 
-
 void Scheduler::BLKtoRDY()
 {
 	Process* p = nullptr;
@@ -402,16 +409,22 @@ bool Scheduler::MigrationFCFStoRR(Process* p)
 
 void Scheduler::TurnON_Off_Processors()
 {
-	for (int i = 0; i < NF; i++)
+	int RandNum = rand() % 100;
+	if(RandNum<Overheat_prop)
 	{
-		//If The Processor is FCFS Then Make Another FCFS Processor Steal It
-		Processor* Shortest = Get_ShortestRDY(1);
-		OverHeat_Processes+=ProcessorList[i]->OverHeat(Shortest, timestep, StopTime);
-	}
-	for (int i = NF; i < ProcessorNUM; i++)
-	{
-		Processor* Shortest = Get_ShortestRDY(0);
-		OverHeat_Processes+=ProcessorList[i]->OverHeat(Shortest, timestep, StopTime);
+		for (int i = 1; i < NF; i++)
+		{
+			//If The Processor is FCFS Then Make Another FCFS Processor Steal It
+			Processor* Shortest = Get_ShortestRDY(1);
+			if (Shortest->get_ID() != ProcessorList[i]->get_ID())
+				ProcessorList[i]->OverHeat(Shortest, timestep, StopTime);
+		}
+		for (int i = NF + 1; i < ProcessorNUM; i++)
+		{
+			Processor* Shortest = Get_ShortestRDY(0);
+			if (Shortest->get_ID() != ProcessorList[i]->get_ID())
+				ProcessorList[i]->OverHeat(Shortest, timestep, StopTime);
+		}
 	}
 }
 
@@ -425,15 +438,18 @@ void Scheduler::Stealing()
 		shortest = Get_ShortestRDY(1);
 	else
 		shortest = Get_ShortestRDY(0);*/
-
-	while (Calc_StealLimit(longest, shortest) > 40 && (!(longest->isRDYempty()))) // Check that the Steal limit is less than 40 
+	bool Steal_Condition = Calc_StealLimit(longest, shortest) > 40;
+	while (Steal_Condition && (!(longest->isRDYempty()))) // Check that the Steal limit is less than 40 
 	{
 		Process* stolen = longest->remove_Top();
-		if(stolen)
+		if (stolen)
 		{
 			shortest->AddProcess(stolen); //add the top process to the shortest 
 			Stl_Cntr++;
+			Steal_Condition = Calc_StealLimit(longest, shortest) > 40;
 		}
+		else
+			return;
 	}
 }
 
@@ -441,7 +457,7 @@ double Scheduler::Calc_StealLimit(Processor* longest, Processor* shortest)
 {
 	if (longest->get_Finishtime() != 0)
 		return 100 * ((longest->get_Finishtime() - shortest->get_Finishtime()) / double(longest->get_Finishtime()));
-	return 100;
+	return 0;
 }
 
 
@@ -484,10 +500,7 @@ void Scheduler::Killing()
 	}
 
 }
-int Scheduler::getForkP() const
-{
-	return ForkP;
-}
+
 void Scheduler::Fork(Process* runP)
 {
 	NumP++;
@@ -523,49 +536,50 @@ bool Scheduler::killOrphan(Process* orphan)
 void Scheduler::Simulation()
 {
 	string FileName;
-	UI* userInterface = new UI;
 	
 	//Get The Input File Name:
-	FileName = userInterface->Get_FileName(1);
+	FileName = Program_UI->Get_FileName(1);
 
 	//Read Input From File
 	ReadFile(FileName);
-	
+
 	//Get The Screen Output Mode:
-	int mode = userInterface->chooseMode();	
+			int mode = Program_UI->chooseMode();	
 	
 	//Get The Output File Name:
-	FileName = userInterface->Get_FileName(0);
-
-	//If The Mode Is Silent: 
+		FileName = Program_UI->Get_FileName(0);
+	
+		//If The Mode Is Silent: 
 	if (mode == 2)
-		userInterface->printSilent(1);
+		Program_UI->printSilent(1);
 
-	while (true)
-	{
-		//If AT Of Peekfront = Timestep , Dequeue And Move
-		NEWtoRDY();
-		//Loop On Processors And Call The Function ScheduleAlgo
-		for (int i = 0; i < ProcessorNUM; i++)
-			ProcessorList[i]->ScheduleAlgo(timestep);	
-		Killing();
-		BLKtoRDY();		
-		 //Processor OverHeat:
-		//TurnON_Off_Processors();
-		/*
-		if (timestep % STL == 0)
-			Stealing();
-		*/
-		if (mode != 2) 
-			userInterface->printOutput(mode, timestep, BLKList, TRMList, ProcessorList, ProcessorNUM);
-		if (NumP == TRMcount)
-		{ 
-			//Create The OutPut File:
-			OutputFile(FileName);
-			if (mode == 2) {userInterface->printSilent(0);}
-			break;
-		}//Break Loop Condition
-		timestep++;
-	}
+		while (true)
+		{
+			//If AT Of Peekfront = Timestep , Dequeue And Move
+			NEWtoRDY();
+			//Loop On Processors And Call The Function ScheduleAlgo
+			for (int i = 0; i < ProcessorNUM; i++)
+				ProcessorList[i]->ScheduleAlgo(timestep);
+			Killing();
+			BLKtoRDY();
+			//Processor OverHeat:
+			TurnON_Off_Processors();
 
+			if (timestep % STL == 0)
+				Stealing();
+
+			if (mode != 2)
+				Program_UI->printOutput(mode, timestep, BLKList, TRMList, ProcessorList, ProcessorNUM);
+			if (NumP == TRMcount)
+			{
+				//Create The OutPut File:
+				OutputFile(FileName);
+				if (mode == 2)
+				{ 
+					Program_UI->printSilent(0);
+				}
+				break;
+			}//Break Loop Condition
+			timestep++;
+		}
 }

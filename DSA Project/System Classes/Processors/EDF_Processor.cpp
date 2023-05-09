@@ -5,45 +5,41 @@
 EDF_Processor::EDF_Processor(int Id,Scheduler* sc):Processor(Id,sc)
 {}
 
-					//-------------------------------------( Scheduling )------------------------------------------------//
 
-int EDF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
+					//---------------------------------------( Scheduling )-------------------------------------------------//
+
+void EDF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	int Travelled_Proces(0);
-	int randNum = rand() % 100;
-	if (TimeStep - StopTime >= TStop)
+	if (TimeStep - StopTime < TStop) //The Processor Will Stop
+	{
+		if (!isIdle())
+		{
+			// Moving The Run Process To Shortest RDY Queue
+			Process* Rn = GetRunProcess();
+			Shortest->AddProcess(Rn);
+			setRUN(nullptr);
+		}
+		if (!isRDYempty())
+		{
+			// Moving The RDY Processes To Shortest RDY Queue
+			for (int i = 0; i < RDY.getCount(); i++)
+			{
+				Process* p = RDY.Peek();
+				RDY.dequeue();
+				Shortest->AddProcess(p);
+				Dec_Finishtime(p->getRemainingCT());
+			}
+		}
+		StopTime = TimeStep;
+		UpdateState(STOP);
+	}
+	else
 	{
 		if (getState() == BUSY)
 			UpdateState(BUSY);
-		if (getState() == IDLE)
+		else
 			UpdateState(IDLE);
 	}
-	else
-		if (randNum < 25)
-		{
-			if (!isIdle())
-			{
-				Process* Rn = GetRunProcess();
-				Shortest->AddProcess(Rn);
-				Rn->updateState(READY);
-				setRUN(nullptr);
-				Travelled_Proces++;
-			}
-			if (!isRDYempty())
-			{
-				for (int i = 0; i < RDY.getCount(); i++)
-				{
-					Process* p = RDY.Peek();
-					RDY.dequeue();
-					Shortest->AddProcess(p);
-					Dec_Finishtime(p->getRemainingCT());
-					Travelled_Proces++;
-				}
-			}
-			StopTime = TimeStep;
-			UpdateState(STOP);
-		}
-	return Travelled_Proces;
 }
 
 Process* EDF_Processor::remove_Top()
@@ -116,7 +112,8 @@ void EDF_Processor::ScheduleAlgo(int t)
 	}
 }
  
-				//-----------------------------------------( Printing )------------------------------------------------//
+
+					//-----------------------------------------( Printing )------------------------------------------------//
 
 void EDF_Processor::printRDY()
 {

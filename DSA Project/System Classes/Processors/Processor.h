@@ -27,6 +27,7 @@ public:
 	PState getState();
 	bool isIdle();
 	virtual bool isRDYempty() = 0;
+	int get_ID();
 
 	//Processor Statistics:
 	int getBusytime();
@@ -39,7 +40,7 @@ public:
 
 	//Processes Handling:
 	virtual void AddProcess(Process* p) = 0;
-	virtual int OverHeat(Processor* Shortest, int TimeStep, int TStop) = 0;
+	virtual void OverHeat(Processor* Shortest, int TimeStep, int TStop) = 0;
 	virtual Process* remove_Top() = 0;
 	virtual void ScheduleAlgo(int t) = 0;
 	bool FinishRUN();

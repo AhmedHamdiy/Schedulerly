@@ -155,11 +155,15 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Input1.txt" />
-    <Text Include="Input2.txt" />
-    <Text Include="Input3.txt" />
-    <Text Include="Input4.txt" />
-    <Text Include="Input5.txt" />
-    <Text Include="Input6.txt" />
+    <Text Include="InputFile1.txt" />
+    <Text Include="InputFile2.txt" />
+    <Text Include="InputFile3.txt" />
+    <Text Include="InputFile4.txt" />
+    <Text Include="InputFile5.txt" />
+    <Text Include="InputFile6.txt" />
+    <Text Include="InputFile7.txt" />
+    <Text Include="InputFile8.txt" />
+    <Text Include="InputFile9.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

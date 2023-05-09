@@ -9,6 +9,18 @@ using namespace std;
 class UI
 {
 public:
+	void Print_ErrorMSG(bool Errorcase)
+	{
+		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(col, 4); // sets Console color to Red
+		if (Errorcase)
+			cout << "Invalid Input File Name. Please Try Again. " << endl;
+		else
+			cout << "Invalid Mode. Please Try Again. " << endl;
+		SetConsoleTextAttribute(col, 7); // sets Console color to White
+
+	}
+
 	int chooseMode()
 	{
 		short mode;
@@ -16,15 +28,20 @@ public:
 		SetConsoleTextAttribute(col, 7); // sets Console color to Grey
 		cout << "Please Choose Output Mode :\n";
 
-		SetConsoleTextAttribute(col, 4); // sets Console color to Red 
+		SetConsoleTextAttribute(col, 11); // sets Console color to LightBlue 
 		cout << "[0] -----> Step By Step\n";
 		SetConsoleTextAttribute(col, 6); // sets Console color to Yellow 
 		cout << "[1] -----> Interactive\n";
 		SetConsoleTextAttribute(col, 2); // sets Console color to Green 
 		cout << "[2] -----> Silent\n";
 
-		SetConsoleTextAttribute(col, 1); // sets Console color to Blue 
+		SetConsoleTextAttribute(col, 15); // sets Console color to White
 		cin >> mode;
+		if (mode>2)
+		{
+			Print_ErrorMSG(0);
+			chooseMode();
+		}
 		return mode;
 	}
 
@@ -103,7 +120,7 @@ public:
 			cin.get();
 		}
 		else
-			Sleep(10);
+			Sleep(1000);
 		SetConsoleTextAttribute(col, 7); // sets Console color to Grey
 		cout << "------------------------------------------------------------------------------------------------------------------------" << endl << endl;
 	}
@@ -123,9 +140,7 @@ public:
 		{
 			SetConsoleTextAttribute(col, 10); // sets Console color to LightGreen
 			cout << "Similation ends,Output file is created" << endl;
-
 			SetConsoleTextAttribute(col, 7); // sets Console color to Grey
-
 		}
 
 	}

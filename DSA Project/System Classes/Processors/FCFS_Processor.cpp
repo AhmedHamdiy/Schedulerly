@@ -1,12 +1,11 @@
 #include "FCFS_Processor.h"
 #include"../Scheduler.h"
 
-FCFS_Processor::FCFS_Processor(int Id, Scheduler* sc) :Processor(Id, sc)
+FCFS_Processor::FCFS_Processor(int Id, Scheduler* sc,int ForkingP) :Processor(Id, sc), Forking_Probability(ForkingP)
 {}
 
 
-
-					//---------------------------------------( Scheduling )------------------------------------------------//
+					//---------------------------------------( Scheduling )--------------------------------------------------//
 	
 void FCFS_Processor::AddProcess(Process* p)
 {
@@ -33,44 +32,39 @@ Process* FCFS_Processor::remove_Top()
 	return p;
 }
 
-int FCFS_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
+void FCFS_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	int Travelled_Proces(0);
-	int randNum = rand() % 100;
-	if (TimeStep - StopTime >= TStop)
+	if (TimeStep - StopTime < TStop) //The Processor Will Stop
+	{
+		if (!isIdle())
+		{
+			// Moving The Run Process To Shortest RDY Queue
+			Process* Rn = GetRunProcess();
+			Shortest->AddProcess(Rn);
+			setRUN(nullptr);
+		}
+		if (!isRDYempty())
+		{
+			// Moving The RDY Processes To Shortest RDY Queue
+			for (int i = 1; i <= RDY.getcount(); i++)
+			{
+				Process* p = RDY.getEntry(i);
+				RDY.remove(i);
+				Shortest->AddProcess(p);
+				Dec_Finishtime(p->getRemainingCT());
+			}
+		}
+		StopTime = TimeStep;
+		UpdateState(STOP);
+	}
+	else
 	{
 		if (getState() == BUSY)
 			UpdateState(BUSY);
-		if (getState() == IDLE)
+		else
 			UpdateState(IDLE);
 	}
-	else
-		if (randNum < 25)
-		{
-			if (!isIdle())
-			{
-				Process* Rn = GetRunProcess();
-				Travelled_Proces++;
-				Shortest->AddProcess(Rn);
-				setRUN(nullptr);
-			}
-			if (!isRDYempty())
-			{
-				for (int i = 1; i <= RDY.getcount(); i++)
-				{
-					Process* p = RDY.getEntry(i);
-					RDY.remove(i);
-					Shortest->AddProcess(p);
-					Dec_Finishtime(p->getRemainingCT());
-					Travelled_Proces++;
-				}
-			}
-			UpdateState(STOP);
-			StopTime = TimeStep;
-		}
-	return Travelled_Proces;
 }
-
 
 bool FCFS_Processor::isRDYempty()
 {
@@ -87,7 +81,7 @@ void FCFS_Processor::ScheduleAlgo(int t)
 	}
 
 	Process* runP = GetRunProcess();
-	bool v = ForkProcess(runP, MYSch->getForkP());
+	bool v = ForkProcess(runP);
 	if(v)
 	MYSch->Fork(runP);
 
@@ -96,7 +90,6 @@ void FCFS_Processor::ScheduleAlgo(int t)
 		Inc_BusyTime();
 		Dec_RUNCT();
 		IO_Req();
-
 	}
 	else
 	{
@@ -133,9 +126,10 @@ void FCFS_Processor::ScheduleAlgo(int t)
 
 }
 
+
 					//---------------------------------------( FCFS Special )------------------------------------------------//
 
-bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
+bool FCFS_Processor::ForkProcess(Process*& runProcess)
 {
 	if (isIdle())
 		return false;
@@ -143,7 +137,7 @@ bool FCFS_Processor::ForkProcess(Process*& runProcess, int forkP)
 	int random;
 	random = (rand() % 100);
 	runProcess = nullptr;
-	if (random < forkP)
+	if (random < Forking_Probability)
 	{
 		runProcess = GetRunProcess();
 		if (runProcess->canFork())
@@ -189,7 +183,8 @@ void FCFS_Processor::Inc_WT()
 	}
 }
 
-				//-----------------------------------------( Printing )------------------------------------------------//
+
+					//-------------------------------------------( Printing )------------------------------------------------//
 
 void FCFS_Processor::printRDY()
 {

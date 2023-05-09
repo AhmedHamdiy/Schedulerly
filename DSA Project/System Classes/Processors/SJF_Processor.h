@@ -13,7 +13,7 @@ public:
 	//Processes Handling:
 	void AddProcess(Process* p);
 	virtual Process* remove_Top();
-	virtual int OverHeat(Processor* Shortest, int TimeStep, int TStop);
+	virtual void OverHeat(Processor* Shortest, int TimeStep, int TStop);
 	bool isRDYempty();
 	virtual void ScheduleAlgo(int t);
 

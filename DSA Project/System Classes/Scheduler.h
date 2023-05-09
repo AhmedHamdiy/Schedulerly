@@ -7,6 +7,7 @@
 #include"Processors/SJF_Processor.h"
 #include"Processors/RR_Processor.h"
 #include"Processors/EDF_Processor.h"
+#include"UI.h"
 #include<fstream>
 using namespace std;
 
@@ -38,7 +39,7 @@ private:
 	int MaxW;
 	int STL;
 	int StopTime;
-
+	int Overheat_prop;
 	//Statistics Data Members:
 	int Stl_Cntr;
 	int ForkP;
@@ -47,8 +48,9 @@ private:
 	int MaxW_Mig_Cntr;
 	int Kill_Cntr;
 	int DeadLine_Cntr;
-	int OverHeat_Processes;
 
+	//UI Pointer:
+	UI* Program_UI;
 public:
 	//Constructor And Destructor:
 	Scheduler();
@@ -79,8 +81,6 @@ public:
 	//Killing And Forking:
 	void Killing();
 	void Fork(Process* runP);
-	int getForkP() const;
-	
 	bool killOrphan(Process* orphan);
 
 	//Simulation

@@ -3,7 +3,7 @@
 RR_Processor::RR_Processor(int Id, Scheduler* sc, int TS):Processor(Id,sc), timeSlice(TS)
 {}
 
-				//-------------------------------------( Scheduling )------------------------------------------------//
+					//---------------------------------------( Scheduling )------------------------------------------------//
 
 void RR_Processor::AddProcess(Process* p)
 {
@@ -22,43 +22,38 @@ Process* RR_Processor::remove_Top()
 	return p;
 }
 
-int RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
+void RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	int Travelled_Proces(0);
-	int randNum = rand() % 100;
-	if (TimeStep - StopTime >= TStop)
-	{
-		if (getState() == BUSY)
-			UpdateState(BUSY);
-		if (getState() == IDLE)
-			UpdateState(IDLE);
-	}
-	else
-	if (randNum < 35)
+	if (TimeStep - StopTime < TStop) //The Processor Will Stop
 	{
 		if (!isIdle())
 		{
+			// Moving The Run Process To Shortest RDY Queue
 			Process* Rn = GetRunProcess();
 			Shortest->AddProcess(Rn);
-			Travelled_Proces++;
 			setRUN(nullptr);
 		}
 		if (!isRDYempty())
 		{
+			// Moving The RDY Processes To Shortest RDY Queue
 			for (int i = 0; i < RDY.getcount(); i++)
 			{
-
 				Process* p = nullptr;
 				RDY.dequeue(p);
 				Shortest->AddProcess(p);
 				Dec_Finishtime(p->getRemainingCT());
-				Travelled_Proces++;
 			}
 		}
 		StopTime = TimeStep;
 		UpdateState(STOP);
 	}
-	return Travelled_Proces;
+	else
+	{
+		if (getState() == BUSY)
+			UpdateState(BUSY);
+		else
+			UpdateState(IDLE);
+	}
 }
 
 bool RR_Processor::isRDYempty()
@@ -125,7 +120,8 @@ void RR_Processor::ScheduleAlgo(int t)
 
 }
 
-			//-----------------------------------------( Printing )------------------------------------------------//
+
+					//-----------------------------------------( Printing )------------------------------------------------//
 
 void RR_Processor::printRDY()
 {

@@ -7,42 +7,38 @@ SJF_Processor::SJF_Processor(int Id,Scheduler* sc):Processor(Id,sc)
 
 					//-------------------------------------( Scheduling )------------------------------------------------//
 
-int SJF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
+void SJF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	int Travelled_Proces(0);
-	int randNum = rand() % 100;
-	if (TimeStep - StopTime >= TStop)
-	{
-		if (getState() == BUSY)
-			UpdateState(BUSY);
-		if (getState() == IDLE)
-			UpdateState(IDLE);
-	}
-	else
-		if (randNum < 25)
+	if (TimeStep - StopTime < TStop) //The Processor Will Stop
 		{
 			if (!isIdle())
 			{
+				// Moving The Run Process To Shortest RDY Queue
 				Process* Rn = GetRunProcess();
 				Shortest->AddProcess(Rn);
 				setRUN(nullptr);
-				Travelled_Proces++;
 			}
 			if (!isRDYempty())
 			{
+				// Moving The RDY Processes To Shortest RDY Queue
 				for (int i = 0; i < RDY.getCount(); i++)
 				{
 					Process* p = RDY.Peek();
 					RDY.dequeue();
 					Shortest->AddProcess(p);
 					Dec_Finishtime(p->getRemainingCT());
-					Travelled_Proces++;
 				}
 			}
 			StopTime = TimeStep;
 			UpdateState(STOP);
 		}
-	return Travelled_Proces;
+		else 
+		{
+			if (getState() == BUSY)
+				UpdateState(BUSY);
+			else
+				UpdateState(IDLE);
+		}
 }
 
 Process* SJF_Processor::remove_Top()
@@ -98,7 +94,8 @@ void SJF_Processor::ScheduleAlgo(int t)
 
 }
  
-			//-----------------------------------------( Printing )------------------------------------------------//
+
+					//-----------------------------------------( Printing )------------------------------------------------//
 
 void SJF_Processor::printRDY()
 {
