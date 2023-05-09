@@ -106,7 +106,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Input1.txt" />
     <Text Include="InputFile1.txt" />
     <Text Include="InputFile2.txt" />
     <Text Include="InputFile3.txt" />

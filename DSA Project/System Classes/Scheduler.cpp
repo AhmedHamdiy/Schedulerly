@@ -40,7 +40,7 @@ Scheduler::~Scheduler()
 {
 	//Deallocate Processes
 	TRMList.clear();
-
+	KillList.clear();
 
 	//Deallocate Processors:
 
