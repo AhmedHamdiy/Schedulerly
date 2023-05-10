@@ -69,6 +69,7 @@ public:
 	void incrementTT();
 	void decrementCT();
 	bool IncrementTS(int TS);
+	void reset_TS();
 
 	
 	//Forking

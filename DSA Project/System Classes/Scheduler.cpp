@@ -401,7 +401,7 @@ bool Scheduler::MigrationRRtoSJF(Process* p)
 	if (p != nullptr && p->getRemainingCT() < RTF && NS != 0 && p->getParent() == nullptr)
 	{
 		Get_ShortestRDY(2)->AddProcess(p);
-		p->updateState(READY);
+		p->reset_TS(); //Reset The TimeSlice of The Process to zero
 		RTF_Mig_Cntr++;
 		return true;
 	}

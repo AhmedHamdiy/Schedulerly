@@ -17,19 +17,20 @@ Process::Process(int at, int id, int ct, int dead_line, int n,  Process* P) :AT(
 }
 
 
-
 						//-------------------------------------( Getters )------------------------------------------------//
 
 bool Process::canFork() const
 {
 	return (!RChild || !LChild);
 }
+
 int Process::getRT()
 {
 	if (State==Killed)
 		return 0;
 	return startfirst - AT;
 }
+
 int Process::getTT()
 {
 	return TT + 1;
@@ -39,6 +40,7 @@ int Process::getstart()
 {
 	return StartC;
 }
+
 int Process::getTRT()
 {
 	return TT - AT;
@@ -65,7 +67,6 @@ int Process::getID()
 	return PID;
 }
 
-
 int Process::getWT(int timeStep)
 {
 	if (State == TRM|| State==Killed)
@@ -87,6 +88,8 @@ int Process::getIOduration()
 {
 	return IOduration;
 }
+
+
 						//-------------------------------------( Setters )------------------------------------------------//
 void Process::Inc_IOduration(int t)
 {
@@ -105,11 +108,16 @@ void Process::setstart(int t)
 	StartC = t;
 }
 
+void Process::reset_TS()
+{
+	TS = 0;
+	updateState(READY);
+}
+
 void Process::SetKillTime(int k)
 {
 	KillTime = k;
 }
-
 
 void Process::incrementTT()
 {
@@ -126,7 +134,6 @@ void Process::setRemainingCT(int T)
 	RemainingCT = T;
 }
 
-
 void Process::updateState(state s)
 {
 	State = s;
@@ -141,7 +148,7 @@ bool Process::IncrementTS(int TSlice)
 	}
 	else
 	{
-		TS = 0;
+		reset_TS();
 		return true;
 	}
 }
@@ -158,6 +165,7 @@ Process*& Process::get_RChild()
 {
 	return RChild;
 }
+
 Process*& Process::getParent()
 {
 	return Parent;
@@ -208,7 +216,6 @@ int Process::getblktime()
 {
 	return BLKduration;
 }
-
 
 bool Process::GetIO(Pair<int, int>& temp)
 {
