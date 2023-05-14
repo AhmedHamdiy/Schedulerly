@@ -35,7 +35,7 @@ public:
 		SetConsoleTextAttribute(col, 2); // sets Console color to Green 
 		cout << "[2] -----> Silent\n";
 
-		SetConsoleTextAttribute(col, 15); // sets Console color to White
+		SetConsoleTextAttribute(col, 1); // sets Console color to White
 		cin >> mode;
 		if (mode>2)
 		{
@@ -55,6 +55,8 @@ public:
 			cout << "Please Enter Input File Name :\n";
 		else
 			cout << "Please Enter Output File Name :\n";
+
+		SetConsoleTextAttribute(col, 1); // sets Console color to Blue
 		cin >> name;
 		return name;
 	}
@@ -80,7 +82,10 @@ public:
 			cout << "RDY: ";
 			if (Parr[i]->getState() != STOP)
 			{
-				Parr[i]->printRDY();
+				if (Parr[i]->isRDYempty())
+					cout << "EMPTY" << endl;
+				else
+					Parr[i]->printRDY();
 			}
 			else cout << "OVERHEATED FOR "<<Parr[i]->get_remainingOverHeat(timestep)<< " TIME STEPS!" << endl;
 		}

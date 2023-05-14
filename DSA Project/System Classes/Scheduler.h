@@ -76,15 +76,16 @@ public:
 	double Calc_StealLimit(Processor* longest, Processor* shortest);
 	bool MigrationRRtoSJF(Process* p);
 	bool MigrationFCFStoRR(Process* p);
-	void TurnON_Off_Processors();
-
+	void Over_Heating();
+	
 	//Killing And Forking:
 	void Killing();
 	void Fork(Process* runP);
 	bool killOrphan(Process* orphan);
-
+	
 	//Simulation
 	void Simulation();
+	void Scheduling();
 };
 
 

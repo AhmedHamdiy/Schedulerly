@@ -24,7 +24,7 @@ Scheduler::Scheduler()
 	STL = 1;
 	StopTime = 0;
 	ForkP = 0;
-	Overheat_prop = 10;
+	Overheat_prop = 3;
 	Program_UI = new UI;
 	DeadLine_Cntr = 0;
 	TRMcount = 0;
@@ -320,6 +320,7 @@ void Scheduler::MoveToTRM(Process* p)
 	if (p) {
 		TRMList.enqueue(p);
 		p->updateState(TRM);
+		p->clear_IOList();
 		p->setTT(timestep);
 		TRMcount++;
 		Process* leftChild = p->get_LChild();
@@ -429,20 +430,20 @@ bool Scheduler::MigrationFCFStoRR(Process* p)
 	return false;
 }
 
-void Scheduler::TurnON_Off_Processors()
+void Scheduler::Over_Heating()
 {
 	int RandNum = rand() % 100;
-	int randProcessor = 1 + rand() % ProcessorNUM;
+	int randProcessor = rand() % ProcessorNUM;
 	if(RandNum<Overheat_prop)
 	{
-		if(randProcessor<NF)
+		if(randProcessor<NF&& randProcessor!=0)
 		{
 			//If The Processor is FCFS Then Make Another FCFS Processor Steal It
 			Processor* Shortest = Get_ShortestRDY(1);
 			if (Shortest->get_ID() != ProcessorList[randProcessor]->get_ID()&& Shortest->getState()!=STOP)
 				ProcessorList[randProcessor]->OverHeat(Shortest, timestep, StopTime);
 		}
-		else if(randProcessor < ProcessorNUM)
+		else if(randProcessor < ProcessorNUM&& randProcessor != NF&& randProcessor != NR&& randProcessor != NS)
 		{
 			Processor* Shortest = Get_ShortestRDY(0);
 			if (Shortest->get_ID() != ProcessorList[randProcessor]->get_ID()&&Shortest->getState() != STOP)
@@ -514,16 +515,14 @@ void Scheduler::Killing()
 				} //if process not found ignore kill signal
 			}
 		}
-
 	}
-
 }
 
 void Scheduler::Fork(Process* runP)
 {
 	NumP++;
 	Fork_Cntr++;
-	Process* forkedProcess = new Process(timestep, (1000*runP->getID()) + NumP, runP->getRemainingCT(), 0, 0, runP);
+	Process* forkedProcess = new Process(timestep, NumP, runP->getRemainingCT(), 0, 0, runP);
 	runP->setForked(forkedProcess);
 	//create a process forkedProcess
 	//add to shortest FCFS
@@ -548,57 +547,70 @@ bool Scheduler::killOrphan(Process* orphan)
 	return false;
 }
 
-
+	
 						//-----------------------------------( Simulation )----------------------------------------//
+
+void Scheduler::Scheduling()
+{
+	//Loop On Processors And Call The Function ScheduleAlgo
+	for (int i = 0; i < ProcessorNUM; i++)
+		ProcessorList[i]->ScheduleAlgo(timestep);
+}
 
 void Scheduler::Simulation()
 {
 	string FileName;
-	
+
 	//Get The Input File Name:
 	FileName = Program_UI->Get_FileName(1);
-
 	//Read Input From File
 	ReadFile(FileName);
 
 	//Get The Screen Output Mode:
-			int mode = Program_UI->chooseMode();	
-	
+	int mode = Program_UI->chooseMode();	
+	 
 	//Get The Output File Name:
-		FileName = Program_UI->Get_FileName(0);
+	FileName = Program_UI->Get_FileName(0);
 	
-		//If The Mode Is Silent: 
+	//If The Mode Is Silent: 
 	if (mode == 2)
 		Program_UI->printSilent(1);
 
-		while (true)
+	while (true)
+	{
+		//If AT Of Peekfront = Timestep , Dequeue And Move
+		NEWtoRDY();
+
+		//If BlkDuration Of Peekfront =IO Duration Request , Dequeue And Move
+
+		BLKtoRDY();
+
+		//If KillSIG Of Peekfront =Timestep , Dequeue And Move
+		Killing();
+		
+		//Loop And Call SchedulingAlgo
+		Scheduling();
+	
+		//Processor OverHeat:
+		Over_Heating();
+
+		if (timestep % STL == 0)
+			Stealing();
+
+		if (mode != 2)
+			Program_UI->printOutput(mode, timestep, BLKList, TRMList, ProcessorList, ProcessorNUM);
+		if (NumP == TRMcount)
 		{
-			//If AT Of Peekfront = Timestep , Dequeue And Move
-			NEWtoRDY();
-			BLKtoRDY();
-			Killing();
-			
-			//Loop On Processors And Call The Function ScheduleAlgo
-			for (int i = 0; i < ProcessorNUM; i++)
-				ProcessorList[i]->ScheduleAlgo(timestep);
-			//Processor OverHeat:
-			//TurnON_Off_Processors();
-
-			if (timestep % STL == 0)
-				Stealing();
-
-			if (mode != 2)
-				Program_UI->printOutput(mode, timestep, BLKList, TRMList, ProcessorList, ProcessorNUM);
-			if (NumP == TRMcount)
+			//Create The OutPut File:
+			OutputFile(FileName);
+			if (mode == 2)
 			{
-				//Create The OutPut File:
-				OutputFile(FileName);
-				if (mode == 2)
-				{ 
-					Program_UI->printSilent(0);
-				}
-				break;
-			}//Break Loop Condition
-			timestep++;
-		}
+				Program_UI->printSilent(0);
+			}
+			break;
+		}//Break Loop Condition
+		timestep++;
+	}
 }
+
+
