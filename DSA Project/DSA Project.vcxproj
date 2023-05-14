@@ -154,6 +154,7 @@
     <ClInclude Include="System Classes\UI.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="D:\Study\2nd Term\Data Structure &amp; Algorithms\Project\Phase 2\InputFiles\TestCaseG.txt" />
     <Text Include="InputFile1.txt" />
     <Text Include="InputFile2.txt" />
     <Text Include="InputFile3.txt" />

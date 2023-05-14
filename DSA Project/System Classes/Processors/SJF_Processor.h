@@ -8,7 +8,7 @@ private:
 public:
 
 	//Constructor:
-	SJF_Processor(int Id, Scheduler* sc);
+	SJF_Processor(int Id, Scheduler* sc, int OVT);
 
 	//Processes Handling:
 	void AddProcess(Process* p);

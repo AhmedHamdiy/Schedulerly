@@ -58,6 +58,8 @@ inline bool List<ItemType>::remove(int position) {
 		if (position == 1) {
 			curPtr = Head;
 			Head = Head->getNext();
+			if (!Head) 
+				Tail = Head;
 		}
 		else {
 			Node<ItemType>* prevPtr = getNodeAt(position - 1);

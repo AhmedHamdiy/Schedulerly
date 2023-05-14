@@ -64,6 +64,7 @@ public:
 	void deqIO();
 	void Inc_IOduration(int t);
 	int getIOduration();
+	void clear_IOList();
 
 	//Time Handling:
 	void incrementTT();

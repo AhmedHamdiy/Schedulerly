@@ -115,5 +115,6 @@
     <Text Include="InputFile7.txt" />
     <Text Include="InputFile8.txt" />
     <Text Include="InputFile9.txt" />
+    <Text Include="D:\Study\2nd Term\Data Structure &amp; Algorithms\Project\Phase 2\InputFiles\TestCaseG.txt" />
   </ItemGroup>
 </Project>

@@ -2,43 +2,44 @@
 #include"../Scheduler.h"
 
 
-SJF_Processor::SJF_Processor(int Id,Scheduler* sc):Processor(Id,sc)
+SJF_Processor::SJF_Processor(int Id, Scheduler* sc, int OVT):Processor(Id,sc,OVT)
 {}
 
 					//-------------------------------------( Scheduling )------------------------------------------------//
 
 void SJF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	if (TimeStep - StopTime < TStop) //The Processor Will Stop
+	if (!StopTime) //The Processor Isn't OverHeated 
+	{
+		if (!isIdle())
 		{
-			if (!isIdle())
-			{
-				// Moving The Run Process To Shortest RDY Queue
-				Process* Rn = GetRunProcess();
-				Shortest->AddProcess(Rn);
-				setRUN(nullptr);
-			}
-			if (!isRDYempty())
-			{
-				// Moving The RDY Processes To Shortest RDY Queue
-				for (int i = 0; i < RDY.getCount(); i++)
-				{
-					Process* p = RDY.Peek();
-					RDY.dequeue();
-					Shortest->AddProcess(p);
-					Dec_Finishtime(p->getRemainingCT());
-				}
-			}
-			StopTime = TimeStep;
-			UpdateState(STOP);
+			// Moving The Run Process To Shortest RDY Queue
+			Process* Rn = GetRunProcess();
+			Shortest->AddProcess(Rn);
+			setRUN(nullptr);
 		}
-		else 
+		if (!isRDYempty())
 		{
-			if (getState() == BUSY)
-				UpdateState(BUSY);
-			else
-				UpdateState(IDLE);
+			// Moving The RDY Processes To Shortest RDY Queue
+			for (int i = 0; i < RDY.getCount(); i++)
+			{
+				Process* p = RDY.Peek();
+				RDY.dequeue();
+				Shortest->AddProcess(p);
+				Dec_Finishtime(p->getRemainingCT());
+			}
 		}
+		StopTime = TimeStep;
+		UpdateState(STOP);
+	}
+	else if (get_remainingOverHeat(TimeStep) <= 0)
+	{
+		if (getState() == BUSY)
+			UpdateState(BUSY);
+		else
+			UpdateState(IDLE);
+		StopTime = 0;
+	}
 }
 
 Process* SJF_Processor::remove_Top()
@@ -55,6 +56,7 @@ Process* SJF_Processor::remove_Top()
 
 void SJF_Processor::AddProcess(Process* p)
 {
+	p->updateState(READY);
 	RDY.enqueue(p,p->getCT());	
 	Inc_Finishtime(p->getRemainingCT());
 }

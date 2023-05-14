@@ -9,7 +9,7 @@ private:
 	int Forking_Probability;
 public:
 	//Constructor:
-	FCFS_Processor(int Id, Scheduler* sc,int ForkingP);
+	FCFS_Processor(int Id, Scheduler* sc, int OVT,int ForkingP);
 
 	//Processes Handling:
 	void AddProcess(Process* p);
@@ -23,7 +23,6 @@ public:
 	virtual void printInfo();
 
 	//FCFS Special Functions:
-	void Inc_WT();
 	bool ForkProcess(Process*& runProcess);
 	bool KillProcess(int ID,Process* &target);
 };

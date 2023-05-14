@@ -1,7 +1,8 @@
 #include"Processor.h"
 #include "../Scheduler.h"
-Processor::Processor(int Id, Scheduler* sc)
+Processor::Processor(int Id, Scheduler* sc,int OVT)
 {
+	OverHeat_time = OVT;
 	ID = Id;
 	MYSch = sc;
 	RUN = nullptr;
@@ -66,6 +67,11 @@ void Processor::Dec_RUNCT()
 {
 	if (RUN)
 		RUN->decrementCT();
+}
+
+int Processor::get_remainingOverHeat(int TimeStep)
+{
+		return OverHeat_time + StopTime - TimeStep;
 }
 
 void Processor::Inc_BusyTime()

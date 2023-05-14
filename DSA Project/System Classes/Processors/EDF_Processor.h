@@ -8,7 +8,7 @@ private:
 public:
 
 	//Constructor:
-	EDF_Processor(int Id, Scheduler* sc);
+	EDF_Processor(int Id, Scheduler* sc, int OVT);
 
 	//Processes Handling:
 	void AddProcess(Process* p);

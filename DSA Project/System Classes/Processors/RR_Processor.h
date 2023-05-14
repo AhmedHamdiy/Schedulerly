@@ -10,7 +10,7 @@ private:
 public:
 
 	//Constructor:
-	RR_Processor(int Id, Scheduler* sc, int TS);
+	RR_Processor(int Id, Scheduler* sc,int OVT, int TS);
 
 	//Processes Handling:
 	void AddProcess(Process* p);

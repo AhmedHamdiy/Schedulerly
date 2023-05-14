@@ -1,7 +1,7 @@
 #include "FCFS_Processor.h"
 #include"../Scheduler.h"
 
-FCFS_Processor::FCFS_Processor(int Id, Scheduler* sc,int ForkingP) :Processor(Id, sc), Forking_Probability(ForkingP)
+FCFS_Processor::FCFS_Processor(int Id, Scheduler* sc, int OVT,int ForkingP) :Processor(Id, sc,OVT), Forking_Probability(ForkingP)
 {}
 
 
@@ -9,6 +9,7 @@ FCFS_Processor::FCFS_Processor(int Id, Scheduler* sc,int ForkingP) :Processor(Id
 	
 void FCFS_Processor::AddProcess(Process* p)
 {
+	p->updateState(READY);
 	RDY.insertEnd(p);
 	Inc_Finishtime(p->getRemainingCT());
 }
@@ -34,7 +35,7 @@ Process* FCFS_Processor::remove_Top()
 
 void FCFS_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	if (TimeStep - StopTime < TStop) //The Processor Will Stop
+	if (!StopTime) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -48,8 +49,8 @@ void FCFS_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 			// Moving The RDY Processes To Shortest RDY Queue
 			for (int i = 1; i <= RDY.getcount(); i++)
 			{
-				Process* p = RDY.getEntry(i);
-				RDY.remove(i);
+				Process* p = RDY.getEntry(1);
+				RDY.remove(1);
 				Shortest->AddProcess(p);
 				Dec_Finishtime(p->getRemainingCT());
 			}
@@ -57,12 +58,13 @@ void FCFS_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 		StopTime = TimeStep;
 		UpdateState(STOP);
 	}
-	else
+	else if (get_remainingOverHeat(TimeStep)<=0)
 	{
 		if (getState() == BUSY)
 			UpdateState(BUSY);
 		else
 			UpdateState(IDLE);
+		StopTime = 0;
 	}
 }
 
@@ -73,23 +75,22 @@ bool FCFS_Processor::isRDYempty()
 
 void FCFS_Processor::ScheduleAlgo(int t)
 {
-	Inc_WT();
 	if (FinishRUN()) //The Run Prcocess has Finished
 	{
 		MYSch->MoveToTRM(GetRunProcess());
 		setRUN(nullptr);
 	}
 
-	Process* runP = GetRunProcess();
-	bool v = ForkProcess(runP);
-	if(v)
-	MYSch->Fork(runP);
-
+	
 	
 	if (!isIdle()) {
 		Inc_BusyTime();
 		Dec_RUNCT();
 		IO_Req();
+		Process* runP = GetRunProcess();
+		bool v = ForkProcess(runP);
+		if (v)
+			MYSch->Fork(runP);
 	}
 	else
 	{
@@ -100,11 +101,13 @@ void FCFS_Processor::ScheduleAlgo(int t)
 		//Choose The Next Run Process 
 		Process* RDYprocess = RDY.getEntry(1);
 		RDY.remove(1);
+		Dec_Finishtime(RDYprocess->getRemainingCT());
 
 		//The Migration part:
 		bool migrated = MYSch->MigrationFCFStoRR(RDYprocess);
 		while (migrated && RDY.getcount() != 0)
 		{
+			RDYprocess = RDY.getEntry(1);
 			RDY.remove(1);
 			Dec_Finishtime(RDYprocess->getRemainingCT());
 			migrated = MYSch->MigrationFCFStoRR(RDYprocess);
@@ -172,15 +175,6 @@ bool FCFS_Processor::KillProcess(int ID, Process*& target)
 		return true;
 	}
 	return false;
-}
-
-void FCFS_Processor::Inc_WT()
-{
-	for (int i = 1; i <= RDY.getcount(); i++)
-	{
-		Process* p = RDY.getEntry(i);
-		//p->updateWT();
-	}
 }
 
 

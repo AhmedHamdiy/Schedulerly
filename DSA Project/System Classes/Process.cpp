@@ -89,6 +89,11 @@ int Process::getIOduration()
 	return IOduration;
 }
 
+void Process::clear_IOList()
+{
+	IOList.clear();
+}
+
 
 						//-------------------------------------( Setters )------------------------------------------------//
 void Process::Inc_IOduration(int t)

@@ -2,7 +2,7 @@
 #include"../Scheduler.h"
 
 
-EDF_Processor::EDF_Processor(int Id,Scheduler* sc):Processor(Id,sc)
+EDF_Processor::EDF_Processor(int Id, Scheduler* sc, int OVT):Processor(Id,sc,OVT)
 {}
 
 
@@ -10,7 +10,7 @@ EDF_Processor::EDF_Processor(int Id,Scheduler* sc):Processor(Id,sc)
 
 void EDF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	if (TimeStep - StopTime < TStop) //The Processor Will Stop
+	if (!StopTime) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -33,12 +33,13 @@ void EDF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 		StopTime = TimeStep;
 		UpdateState(STOP);
 	}
-	else
+	else if (get_remainingOverHeat(TimeStep) <= 0)
 	{
 		if (getState() == BUSY)
 			UpdateState(BUSY);
 		else
 			UpdateState(IDLE);
+		StopTime = 0;
 	}
 }
 
@@ -56,6 +57,7 @@ Process* EDF_Processor::remove_Top()
 
 void EDF_Processor::AddProcess(Process* p)
 {
+	p->updateState(READY);
 	RDY.enqueue(p,p->get_DeadLine());	
 	Inc_Finishtime(p->getRemainingCT());
 }

@@ -1,12 +1,13 @@
 #include "RR_Processor.h"
 #include"../Scheduler.h"
-RR_Processor::RR_Processor(int Id, Scheduler* sc, int TS):Processor(Id,sc), timeSlice(TS)
+RR_Processor::RR_Processor(int Id, Scheduler* sc, int OVT, int TS):Processor(Id,sc,OVT), timeSlice(TS)
 {}
 
 					//---------------------------------------( Scheduling )------------------------------------------------//
 
 void RR_Processor::AddProcess(Process* p)
 {
+	p->updateState(READY);
 	RDY.enqueue(p);
 	Inc_Finishtime(p->getRemainingCT());
 }
@@ -24,7 +25,8 @@ Process* RR_Processor::remove_Top()
 
 void RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	if (TimeStep - StopTime < TStop) //The Processor Will Stop
+	
+	if (!StopTime) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -47,12 +49,13 @@ void RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 		StopTime = TimeStep;
 		UpdateState(STOP);
 	}
-	else
+	else if (get_remainingOverHeat(TimeStep) <= 0)
 	{
 		if (getState() == BUSY)
 			UpdateState(BUSY);
 		else
 			UpdateState(IDLE);
+		StopTime = 0;
 	}
 }
 
@@ -71,7 +74,7 @@ void RR_Processor::ScheduleAlgo(int t)
 	if(!isIdle()){
 		Inc_BusyTime();
 		Process* Rn = GetRunProcess();
-		if (Rn->IncrementTS(timeSlice))
+		if (Rn->IncrementTS(timeSlice-1))
 		{
 			Inc_Finishtime(Rn->getRemainingCT());
 			RDY.enqueue(Rn);
@@ -81,11 +84,10 @@ void RR_Processor::ScheduleAlgo(int t)
 		{
 			Dec_RUNCT();
 			IO_Req();
+			return;
 		}
 	}
 	
-	else
-	{
 
 		if (isRDYempty())
 			return;
@@ -93,7 +95,8 @@ void RR_Processor::ScheduleAlgo(int t)
 		//Choose The Next Run Process 
 		Process* RDYprocess;
 		RDY.dequeue(RDYprocess);
-		
+		Dec_Finishtime(RDYprocess->getRemainingCT());
+
 		//The Migration part:
 		 bool migrated = MYSch->MigrationRRtoSJF(RDYprocess);
 		 while (migrated && RDY.getcount() != 0)
@@ -115,8 +118,6 @@ void RR_Processor::ScheduleAlgo(int t)
 			 setRUN(RDYprocess);
 			RDYprocess->updateState(RUNNING);
 		 }  
-	}
-
 }
 
 

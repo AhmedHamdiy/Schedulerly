@@ -78,7 +78,11 @@ public:
 			cout << "processor " << i + 1;
 			Parr[i]->printInfo();
 			cout << "RDY: ";
-			Parr[i]->printRDY();
+			if (Parr[i]->getState() != STOP)
+			{
+				Parr[i]->printRDY();
+			}
+			else cout << "OVERHEATED FOR "<<Parr[i]->get_remainingOverHeat(timestep)<< " TIME STEPS!" << endl;
 		}
 
 		SetConsoleTextAttribute(col, 4); // sets Console color ro Red

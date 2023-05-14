@@ -11,6 +11,8 @@ class Processor
 protected:
 	Scheduler* MYSch;
 	int StopTime;
+	int OverHeat_time;
+
 private:
 	int ID;
 	Process* RUN;
@@ -19,7 +21,7 @@ private:
 	PState state;
 public:
 	//Constructor:
-	Processor(int Id, Scheduler* sc);
+	Processor(int Id, Scheduler* sc, int OVT);
 	
 	//Data Members Getters:
 	Process* GetRunProcess();
@@ -51,7 +53,8 @@ public:
 	void Dec_Finishtime(int T);
 	void Inc_BusyTime();
 	void Dec_RUNCT();
-	
+	int get_remainingOverHeat(int TimeStep);
+
 	//Printing:
 	virtual void printRDY() = 0;
 	virtual void printInfo() = 0;

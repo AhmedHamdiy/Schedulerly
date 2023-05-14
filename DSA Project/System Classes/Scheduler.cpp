@@ -22,7 +22,7 @@ Scheduler::Scheduler()
 	RRT = 0;
 	RTF = 0;
 	STL = 1;
-	StopTime = 1;
+	StopTime = 0;
 	ForkP = 0;
 	Overheat_prop = 10;
 	Program_UI = new UI;
@@ -86,26 +86,25 @@ void Scheduler::ReadFile(string FileName)
 	ProcessorList = new Processor * [ProcessorNUM];
 	for (; i < NF; i++)
 	{
-		Processor* pro = new FCFS_Processor(i + 1, this,ForkP);
+		Processor* pro = new FCFS_Processor(i + 1, this, StopTime,ForkP);
 		ProcessorList[i] = pro;
 	}
 	for (; i < NF + NS; i++)
 	{
-		Processor* pro = new SJF_Processor(i + 1,this);
+		Processor* pro = new SJF_Processor(i + 1,this, StopTime);
 		ProcessorList[i] = pro;
 	}
 	for (; i < NF + NS + NR; i++)
 	{
-		Processor* pro = new RR_Processor(i + 1, this, RRT);
+		Processor* pro = new RR_Processor(i + 1, this, StopTime, RRT);
 		ProcessorList[i] = pro;
 	}
 
 	for (; i < ProcessorNUM; i++)
 	{
-		Processor* pro = new EDF_Processor(i + 1, this);
+		Processor* pro = new EDF_Processor(i + 1, this, StopTime);
 		ProcessorList[i] = pro;
 	}
-
 	//Allocating The Processes With:
 	if (inFile >> x) NumP = x;
 	int Arrival_Time(0), PID(0), CPU_Time(0), DeadLine(0), IO_List(0);
@@ -237,7 +236,7 @@ void Scheduler::ProcessStatistics(float& avWT, float& avRT, float& avTRT,int& TC
 Processor* Scheduler::Get_LongestRDY()
 {
 	Processor* Longest = ProcessorList[0];
-	for (int i = 1; i < NF + NR + NS; i++)
+	for (int i = 1; i < ProcessorNUM; i++)
 	{
 		if (ProcessorList[i]->get_Finishtime() > Longest->get_Finishtime())
 		{
@@ -258,7 +257,7 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 	if (Processors_Type == 1)  //looking for shortest RDY in FCFS Processors only
 	{
 		shortest = ProcessorList[0];
-		for (int i = 0; i < NF; i++)
+		for (int i = 1; i < NF; i++)
 		{
 			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
 			{
@@ -269,7 +268,7 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 	else if (Processors_Type == 2)  //looking for shortest RDY in SJF Processors only
 	{
 		shortest = ProcessorList[NF];
-		for (int i = NF; i < NF + NS; i++)
+		for (int i = NF+1; i < NF + NS; i++)
 		{
 			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
 			{
@@ -280,7 +279,18 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 	else if (Processors_Type == 3)   //looking for shortest RDY in RR Processors
 	{
 		shortest = ProcessorList[NF + NS];
-		for (int i = NF + NS; i < ProcessorNUM; i++)
+		for (int i = NF + NS + 1; i < NF + NS + NR; i++)
+		{
+			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
+			{
+				shortest = ProcessorList[i];
+			}
+		}
+	}
+	else if (Processors_Type == 3)   //looking for shortest RDY in EDF Processors
+	{
+		shortest = ProcessorList[NF + NS + NR];
+		for (int i = NF + NS + NR + 1; i < ProcessorNUM; i++)
 		{
 			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
 			{
@@ -291,7 +301,7 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 	else if (Processors_Type == 0) //looking for shortest RDY in All Processors
 	{
 		shortest = ProcessorList[0];
-		for (int i = 0; i < ProcessorNUM; i++)
+		for (int i = 1; i < ProcessorNUM; i++)
 		{
 			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
 			{
@@ -413,7 +423,6 @@ bool Scheduler::MigrationFCFStoRR(Process* p)
 	if (p != nullptr && p->getWT(timestep) > MaxW && NR != 0 && p->getParent() == nullptr)
 	{
 		Get_ShortestRDY(3)->AddProcess(p);
-		p->updateState(READY);
 		MaxW_Mig_Cntr++;
 		return true;
 	}
@@ -423,20 +432,21 @@ bool Scheduler::MigrationFCFStoRR(Process* p)
 void Scheduler::TurnON_Off_Processors()
 {
 	int RandNum = rand() % 100;
+	int randProcessor = 1 + rand() % ProcessorNUM;
 	if(RandNum<Overheat_prop)
 	{
-		for (int i = 1; i < NF; i++)
+		if(randProcessor<NF)
 		{
 			//If The Processor is FCFS Then Make Another FCFS Processor Steal It
 			Processor* Shortest = Get_ShortestRDY(1);
-			if (Shortest->get_ID() != ProcessorList[i]->get_ID())
-				ProcessorList[i]->OverHeat(Shortest, timestep, StopTime);
+			if (Shortest->get_ID() != ProcessorList[randProcessor]->get_ID()&& Shortest->getState()!=STOP)
+				ProcessorList[randProcessor]->OverHeat(Shortest, timestep, StopTime);
 		}
-		for (int i = NF + 1; i < ProcessorNUM; i++)
+		else if(randProcessor < ProcessorNUM)
 		{
 			Processor* Shortest = Get_ShortestRDY(0);
-			if (Shortest->get_ID() != ProcessorList[i]->get_ID())
-				ProcessorList[i]->OverHeat(Shortest, timestep, StopTime);
+			if (Shortest->get_ID() != ProcessorList[randProcessor]->get_ID()&&Shortest->getState() != STOP)
+				ProcessorList[randProcessor]->OverHeat(Shortest, timestep, StopTime);
 		}
 	}
 }
@@ -445,12 +455,7 @@ void Scheduler::Stealing()
 {
 	Processor* shortest = Get_ShortestRDY(0);
 	Processor* longest = Get_LongestRDY();
-	/*FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(longest);
-	//If The Processor is FCFS Then Make Another FCFS Processor Steal It
-	if (FPro)
-		shortest = Get_ShortestRDY(1);
-	else
-		shortest = Get_ShortestRDY(0);*/
+	if (longest->isRDYempty())return;
 	bool Steal_Condition = Calc_StealLimit(longest, shortest) > 40;
 	while (Steal_Condition && (!(longest->isRDYempty()))) // Check that the Steal limit is less than 40 
 	{
@@ -518,7 +523,7 @@ void Scheduler::Fork(Process* runP)
 {
 	NumP++;
 	Fork_Cntr++;
-	Process* forkedProcess = new Process(timestep, NumP, runP->getRemainingCT(), 0,0, runP);
+	Process* forkedProcess = new Process(timestep, (1000*runP->getID()) + NumP, runP->getRemainingCT(), 0, 0, runP);
 	runP->setForked(forkedProcess);
 	//create a process forkedProcess
 	//add to shortest FCFS
@@ -570,13 +575,14 @@ void Scheduler::Simulation()
 		{
 			//If AT Of Peekfront = Timestep , Dequeue And Move
 			NEWtoRDY();
+			BLKtoRDY();
+			Killing();
+			
 			//Loop On Processors And Call The Function ScheduleAlgo
 			for (int i = 0; i < ProcessorNUM; i++)
 				ProcessorList[i]->ScheduleAlgo(timestep);
-			Killing();
-			BLKtoRDY();
 			//Processor OverHeat:
-			TurnON_Off_Processors();
+			//TurnON_Off_Processors();
 
 			if (timestep % STL == 0)
 				Stealing();
