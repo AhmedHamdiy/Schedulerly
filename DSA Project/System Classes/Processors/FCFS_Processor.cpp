@@ -30,12 +30,12 @@ Process* FCFS_Processor::remove_Top()
 		else 
 			i++;
 	}
-	return p;
+	return nullptr;
 }
 
 void FCFS_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	if (!StopTime) //The Processor Isn't OverHeated 
+	if (!StopTime&&get_remainingOverHeat(TimeStep) > 0) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -58,14 +58,6 @@ void FCFS_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 		StopTime = TimeStep;
 		UpdateState(STOP);
 	}
-	else if (get_remainingOverHeat(TimeStep)<=0)
-	{
-		if (getState() == BUSY)
-			UpdateState(BUSY);
-		else
-			UpdateState(IDLE);
-		StopTime = 0;
-	}
 }
 
 bool FCFS_Processor::isRDYempty()
@@ -81,7 +73,7 @@ void FCFS_Processor::ScheduleAlgo(int t)
 		setRUN(nullptr);
 	}
 
-	
+	TurnON(t);
 	
 	if (!isIdle()) {
 		Inc_BusyTime();

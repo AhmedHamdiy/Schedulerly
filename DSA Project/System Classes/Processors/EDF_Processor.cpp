@@ -10,7 +10,7 @@ EDF_Processor::EDF_Processor(int Id, Scheduler* sc, int OVT):Processor(Id,sc,OVT
 
 void EDF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
-	if (!StopTime) //The Processor Isn't OverHeated 
+	if (!StopTime&&get_remainingOverHeat(TimeStep) > 0) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -32,14 +32,6 @@ void EDF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 		}
 		StopTime = TimeStep;
 		UpdateState(STOP);
-	}
-	else if (get_remainingOverHeat(TimeStep) <= 0)
-	{
-		if (getState() == BUSY)
-			UpdateState(BUSY);
-		else
-			UpdateState(IDLE);
-		StopTime = 0;
 	}
 }
 
@@ -70,6 +62,7 @@ bool EDF_Processor::isRDYempty()
 void EDF_Processor::ScheduleAlgo(int t)
 {
 	Process* RunP = GetRunProcess();
+	TurnON(t);
 	if (!isIdle())
 	{
 		if (FinishRUN()) //The  Run Prcocess has Finished

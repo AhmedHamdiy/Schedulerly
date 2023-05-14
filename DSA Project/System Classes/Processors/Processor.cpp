@@ -74,6 +74,18 @@ int Processor::get_remainingOverHeat(int TimeStep)
 		return OverHeat_time + StopTime - TimeStep;
 }
 
+void Processor::TurnON(int timestep)
+{
+	if (get_remainingOverHeat(timestep) <= 0)
+	{
+		if (getState() == BUSY)
+			UpdateState(BUSY);
+		else
+			UpdateState(IDLE);
+		StopTime = 0;
+	}
+}
+
 void Processor::Inc_BusyTime()
 {
 	if(!isIdle())

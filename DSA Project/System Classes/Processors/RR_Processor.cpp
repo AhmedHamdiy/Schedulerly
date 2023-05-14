@@ -26,7 +26,7 @@ Process* RR_Processor::remove_Top()
 void RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 {
 	
-	if (!StopTime) //The Processor Isn't OverHeated 
+	if (!StopTime && get_remainingOverHeat(TimeStep) > 0) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -49,14 +49,6 @@ void RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
 		StopTime = TimeStep;
 		UpdateState(STOP);
 	}
-	else if (get_remainingOverHeat(TimeStep) <= 0)
-	{
-		if (getState() == BUSY)
-			UpdateState(BUSY);
-		else
-			UpdateState(IDLE);
-		StopTime = 0;
-	}
 }
 
 bool RR_Processor::isRDYempty()
@@ -71,6 +63,7 @@ void RR_Processor::ScheduleAlgo(int t)
 		MYSch->MoveToTRM(GetRunProcess());
 		setRUN(nullptr);
 	}
+	TurnON(t);
 	if(!isIdle()){
 		Inc_BusyTime();
 		Process* Rn = GetRunProcess();

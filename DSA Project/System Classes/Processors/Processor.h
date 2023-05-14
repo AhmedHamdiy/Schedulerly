@@ -54,6 +54,7 @@ public:
 	void Inc_BusyTime();
 	void Dec_RUNCT();
 	int get_remainingOverHeat(int TimeStep);
+	void TurnON(int timestep);
 
 	//Printing:
 	virtual void printRDY() = 0;
