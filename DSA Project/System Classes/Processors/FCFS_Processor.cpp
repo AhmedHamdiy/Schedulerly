@@ -105,15 +105,14 @@ void FCFS_Processor::scheduleAlgo(int timeStep)
 		//Choose The Next Run Process 
 		Process* RDYprocess = FCFS_RDY.getEntry(1);
 		FCFS_RDY.remove(1);
-		decreaseFinishTime(RDYprocess->getRemainingCT());
 
 		//The Migration part:
 		bool migrated = schedulerPtr->migrationFCFStoRR(RDYprocess);
 		while (migrated && FCFS_RDY.getcount() != 0)
 		{
+			decreaseFinishTime(RDYprocess->getRemainingCT());
 			RDYprocess = FCFS_RDY.getEntry(1);
 			FCFS_RDY.remove(1);
-			decreaseFinishTime(RDYprocess->getRemainingCT());
 			migrated = schedulerPtr->migrationFCFStoRR(RDYprocess);
 		}
 		if (migrated && FCFS_RDY.getcount() == 0)
