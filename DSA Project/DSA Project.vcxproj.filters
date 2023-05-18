@@ -72,9 +72,6 @@
     <ClInclude Include="DS Implementation\List\PList.h">
       <Filter>Header Files\DS Implementation</Filter>
     </ClInclude>
-    <ClInclude Include="DS Implementation\Priority Queue\My_PriQueue.h">
-      <Filter>Header Files\DS Implementation</Filter>
-    </ClInclude>
     <ClInclude Include="System Classes\Processors\EDF_Processor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -106,15 +103,24 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="InputFile1.txt" />
-    <Text Include="InputFile2.txt" />
-    <Text Include="InputFile3.txt" />
-    <Text Include="InputFile4.txt" />
-    <Text Include="InputFile5.txt" />
-    <Text Include="InputFile6.txt" />
-    <Text Include="InputFile7.txt" />
-    <Text Include="InputFile8.txt" />
-    <Text Include="InputFile9.txt" />
-    <Text Include="D:\Study\2nd Term\Data Structure &amp; Algorithms\Project\Phase 2\InputFiles\TestCaseG.txt" />
+    <Text Include="TestCase1.txt" />
+    <Text Include="TestCase2.txt" />
+    <Text Include="TestCase3.txt" />
+    <Text Include="TestCase4.txt" />
+    <Text Include="TestCase5.txt" />
+    <Text Include="TestCase6.txt" />
+    <Text Include="Out6.txt" />
+    <Text Include="Out5.txt" />
+    <Text Include="Out4.txt" />
+    <Text Include="Out3.txt" />
+    <Text Include="Out2.txt" />
+    <Text Include="Out1.txt" />
+    <Text Include="CRAZY_In1.txt" />
+    <Text Include="CRAZY_In2.txt" />
+    <Text Include="CRAZY_In3.txt" />
+    <Text Include="CRAZY_Out1.txt" />
+    <Text Include="CRAZY_Out2.txt" />
+    <Text Include="CRAZY_Out3.txt" />
+    <Text Include="CRAZY_In4.txt" />
   </ItemGroup>
 </Project>
