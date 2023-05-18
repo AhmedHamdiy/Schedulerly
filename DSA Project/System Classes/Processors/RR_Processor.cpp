@@ -92,14 +92,13 @@ void RR_Processor::scheduleAlgo(int timeStep)
 		//Choose The Next Run Process 
 		Process* RDYprocess;
 		RR_RDY.dequeue(RDYprocess);
-		decreaseFinishTime(RDYprocess->getRemainingCT());
 
 		//The Migration part:
 		 bool migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
 		 while (migrated && RR_RDY.getcount() != 0)
 		 {
-			 RR_RDY.dequeue(RDYprocess);
 			 decreaseFinishTime(RDYprocess->getRemainingCT());
+			 RR_RDY.dequeue(RDYprocess);
 			 migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
 		 }
 		 if (migrated && RR_RDY.getcount() == 0)
