@@ -9,7 +9,7 @@ using namespace std;
 class UI
 {
 public:
-	void Print_ErrorMSG(bool Errorcase)
+	void printErrorMessage(bool Errorcase)
 	{
 		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(col, 4); // sets Console color to Red
@@ -39,13 +39,13 @@ public:
 		cin >> mode;
 		if (mode>2)
 		{
-			Print_ErrorMSG(0);
+			printErrorMessage(0);
 			chooseMode();
 		}
 		return mode;
 	}
 
-	string Get_FileName(bool flag)
+	string getFileName(bool flag)
 	{
 		string name;
 		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -82,15 +82,15 @@ public:
 			cout << "RDY: ";
 			if (Parr[i]->getState() != STOP)
 			{
-				if (Parr[i]->isRDYempty())
+				if (Parr[i]->isRDYEmpty())
 					cout << "EMPTY" << endl;
 				else
 					Parr[i]->printRDY();
 			}
-			else cout << "OVERHEATED FOR "<<Parr[i]->get_remainingOverHeat(timestep)<< " TIME STEPS!" << endl;
+			else cout << "OVERHEATED FOR "<<Parr[i]->getHealingSteps(timestep)<< " TIME STEPS!" << endl;
 		}
 
-		SetConsoleTextAttribute(col, 4); // sets Console color ro Red
+		SetConsoleTextAttribute(col, 4); // sets Console color to Red
 		cout << "--------------     BLK PROCESSES     --------------" << endl;
 		cout << blk.getcount() << " BLK: ";
 		if (blk.getcount() == 0)
@@ -111,7 +111,7 @@ public:
 		{
 			if (!Parr[i]->isIdle())
 			{
-				cout << Parr[i]->GetRunProcess() << *Parr[i] << " ";
+				cout << Parr[i]->getRunProcess() << *Parr[i] << " ";
 			}
 		}
 
@@ -125,7 +125,7 @@ public:
 		{
 			//interactive
 			SetConsoleTextAttribute(col, 15); // sets Console color to White
-			cout << "\nPRESS ANY KEY TO MOVE TO THE NEXT STEP!" << endl;
+			cout << "\nPRESS ENTER TO MOVE TO THE NEXT STEP!" << endl;
 			cin.get();
 		}
 		else

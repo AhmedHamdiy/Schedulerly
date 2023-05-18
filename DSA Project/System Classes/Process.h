@@ -6,14 +6,14 @@
 #include"../DS Implementation/Pair/Pair.h"
 
 using namespace std;
-enum state { NEW, READY, BLK, ORPH, TRM, RUNNING,Killed };
+enum processState { NEW, READY, BLK, ORPH, TRM, RUNNING,Killed };
 class Process
 {
 	//for Bonus In phase 2
-	Process* LChild;
-	Process* RChild;
+	Process* leftChild;
+	Process* rightChild;
 	Process* Parent;
-	int DeadLine;
+	int Deadline;
 
 	int PID;
 	int TS;
@@ -21,15 +21,15 @@ class Process
 	int WT;
 	int RT;
 	int CT;
-	int RemainingCT;
-	int StartC;
+	int remainingCT;
+	int startProcessing;
 	int BLKduration;
 	int IOduration;
 	int TT;
-	int IOcount;
-	int KillTime;
-	int startfirst;
-	state State;
+	int IOCount;
+	int killTime;
+	int startFirst;
+	processState State;
 	LinkedQueue<Pair<int, int>> IOList;
 public:
 	//Constructor:
@@ -45,13 +45,13 @@ public:
 	int getTT();
 	int getWT(int timeStep);
 	int getTS();
-	int get_DeadLine();
+	int getDeadline();
 
 	//Data Members Setters: 
-	void SetKillTime(int k);
+	void setKillTime(int k);
 	void setRemainingCT(int t);
 	void setTT(int t);
-	void updateState(state s);
+	void updateState(processState s);
 	void setstart(int t);
 
 	//I_O Handling:

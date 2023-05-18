@@ -2,17 +2,17 @@
 
 Process::Process(int at, int id, int ct, int dead_line, int n,  Process* P) :AT(at), PID(id), CT(ct)
 {
-	DeadLine = dead_line;
+	Deadline = dead_line;
 	IOduration = 0;
-	IOcount = 0;
-	KillTime = 0;
+	IOCount = 0;
+	killTime = 0;
 	State = NEW;
-	RChild = nullptr;
-	LChild = nullptr;
+	rightChild = nullptr;
+	leftChild = nullptr;
 	TS = 0;
 	WT = 0;
 	TT = 0;
-	RemainingCT = ct;
+	remainingCT = ct;
 	Parent = P;
 }
 
@@ -21,14 +21,14 @@ Process::Process(int at, int id, int ct, int dead_line, int n,  Process* P) :AT(
 
 bool Process::canFork() const
 {
-	return (!RChild || !LChild);
+	return (!rightChild || !leftChild);
 }
 
 int Process::getRT()
 {
 	if (State==Killed)
 		return 0;
-	return startfirst - AT;
+	return startFirst - AT;
 }
 
 int Process::getTT()
@@ -38,7 +38,7 @@ int Process::getTT()
 
 int Process::getstart()
 {
-	return StartC;
+	return startProcessing;
 }
 
 int Process::getTRT()
@@ -54,7 +54,7 @@ int Process::getAT()
 int Process::getRemainingCT()
 {
 
-	return RemainingCT;
+	return remainingCT;
 }
 
 int Process::getCT()
@@ -71,7 +71,7 @@ int Process::getWT(int timeStep)
 {
 	if (State == TRM|| State==Killed)
 		return TT - AT;
-	return timeStep - AT - (CT - RemainingCT);
+	return timeStep - AT - (CT - remainingCT);
 }
 
 int Process::getTS()
@@ -79,9 +79,9 @@ int Process::getTS()
 	return TS;
 }
 
-int Process::get_DeadLine()
+int Process::getDeadline()
 {
-	return DeadLine;
+	return Deadline;
 }
 
 int Process::getIOduration()
@@ -108,9 +108,9 @@ void Process::setTT(int t)
 
 void Process::setstart(int t)
 {
-	if (CT == RemainingCT)
-		startfirst = t;
-	StartC = t;
+	if (CT == remainingCT)
+		startFirst = t;
+	startProcessing = t;
 }
 
 void Process::reset_TS()
@@ -119,9 +119,9 @@ void Process::reset_TS()
 	updateState(READY);
 }
 
-void Process::SetKillTime(int k)
+void Process::setKillTime(int k)
 {
-	KillTime = k;
+	killTime = k;
 }
 
 void Process::incrementTT()
@@ -131,15 +131,15 @@ void Process::incrementTT()
 
 void Process::decrementCT()
 {
-	RemainingCT--;
+	remainingCT--;
 }
 
 void Process::setRemainingCT(int T)
 {
-	RemainingCT = T;
+	remainingCT = T;
 }
 
-void Process::updateState(state s)
+void Process::updateState(processState s)
 {
 	State = s;
 }
@@ -163,12 +163,12 @@ bool Process::IncrementTS(int TSlice)
 
 Process*& Process::get_LChild()
 {
-	return LChild;
+	return leftChild;
 }
 
 Process*& Process::get_RChild()
 {
-	return RChild;
+	return rightChild;
 }
 
 Process*& Process::getParent()
@@ -178,14 +178,14 @@ Process*& Process::getParent()
 
 bool Process::setForked(Process* forkedP)
 {
-	if (!LChild)
+	if (!leftChild)
 	{
-		LChild = forkedP;
+		leftChild = forkedP;
 		return true;
 	}
-	else if (!RChild)
+	else if (!rightChild)
 	{
-		RChild = forkedP;
+		rightChild = forkedP;
 		return true;
 	}
 	else

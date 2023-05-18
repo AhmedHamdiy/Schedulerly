@@ -19,64 +19,66 @@ private:
 
 	//Scheduler Lists:
 	Processor** ProcessorList;
-	LinkedQueue<Process*> NewList;
+	PriorityQueue<Process*> NewList;
 	LinkedQueue<Process*> BLKList;
 	LinkedQueue<Process*> TRMList;
 	LinkedQueue<Pair<int, int>> KillList;
-
+	
 	//Counters Data Members:
 	int NF;
 	int NS;
 	int NR;
 	int ND;
-	int ProcessorNUM;
-	int NumP;
-	int TRMcount;
+	int processorCount;
+	int processCount;
+	int terminatedCount;
 
 	//Special Boundaries Data Members:
 	int RRT;
 	int RTF;
 	int MaxW;
 	int STL;
-	int StopTime;
-	int Overheat_prop;
+	int stopTime;
+	
 	//Statistics Data Members:
-	int Stl_Cntr;
-	int ForkP;
-	int Fork_Cntr;
-	int RTF_Mig_Cntr;
-	int MaxW_Mig_Cntr;
-	int Kill_Cntr;
-	int DeadLine_Cntr;
-
+	int stealCounter;
+	int forkingProbability;
+	int forkingCounter;
+	int RTFCounter;
+	int MaxWCounter;
+	int killCounter;
+	int deadlineCounter;
+	
 	//UI Pointer:
-	UI* Program_UI;
+	UI* programUI;
+
 public:
 	//Constructor And Destructor:
 	Scheduler();
 	~Scheduler();
 
 	//File Handling:
-	void ReadFile(string FileName);
-	void OutputFile(string FileName);
-	void ProcessStatistics(float& avWT, float& avRT, float& avTRT, int& Tct);
+	void readFile(string FileName);
+	void outputFile(string FileName);
+	void processStatistics(float& avWT, float& avRT, float& avTRT, int& Tct);
+	
 	//Data Members Getters:
-	Processor* Get_ShortestRDY(int b);
-	Processor* Get_LongestRDY();
-	void Inc_DeadLineCntr();
-
+	Processor* getShortestRDY(int b);
+	Processor* getLongestRDY();
+	void increaseDeadLineCounter();
+	
 	//Moving Between The Lists:
-	void MoveToTRM(Process* p);
-	void NEWtoRDY();
-	void RUNtoBLK(Process* p);
-	void BLKtoRDY();
+	void moveToTRM(Process* p);
+	void moveFromNew();
+	void moveToBLK(Process* p);
+	void moveFromBLK();
+	void moveToNew(Process* p);
 
 	//Stealing And Migration:
 	void Stealing();
-	double Calc_StealLimit(Processor* longest, Processor* shortest);
-	bool MigrationRRtoSJF(Process* p);
-	bool MigrationFCFStoRR(Process* p);
-	void Over_Heating();
+	double calculateStealLimit(Processor* longest, Processor* shortest);
+	bool migrationRRtoSJF(Process* p);
+	bool migrationFCFStoRR(Process* p);
 	
 	//Killing And Forking:
 	void Killing();

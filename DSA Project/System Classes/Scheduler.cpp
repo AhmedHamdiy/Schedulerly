@@ -16,24 +16,23 @@ Scheduler::Scheduler()
 	NS = 0;
 	NR = 0;
 	MaxW = 0;
-	NumP = 0;
-	ProcessorNUM = 0;
+	processCount = 0;
+	processorCount = 0;
 	ProcessorList=nullptr;
 	RRT = 0;
 	RTF = 0;
 	STL = 1;
-	StopTime = 0;
-	ForkP = 0;
-	Overheat_prop = 3;
-	Program_UI = new UI;
-	DeadLine_Cntr = 0;
-	TRMcount = 0;
+	stopTime = 0;
+	forkingProbability = 0;
+	programUI = new UI;
+	deadlineCounter = 0;
+	terminatedCount = 0;
 	timestep = 0;
-	MaxW_Mig_Cntr = 0;
-	RTF_Mig_Cntr = 0;
-	Fork_Cntr = 0;
-	Stl_Cntr = 0;
-	Kill_Cntr = 0;
+	MaxWCounter = 0;
+	RTFCounter = 0;
+	forkingCounter = 0;
+	stealCounter = 0;
+	killCounter = 0;
 }
 
 Scheduler::~Scheduler()
@@ -45,19 +44,19 @@ Scheduler::~Scheduler()
 	//Deallocate Processors:
 
 	//First :Deallocate Each Processor In ProcessorLiSt
-	for (int i = 0; i < ProcessorNUM; i++)
+	for (int i = 0; i < processorCount; i++)
 		delete ProcessorList[i];
 	//Second: Deallocate The ProcessorList
 	delete[] ProcessorList;
 	
-	//Deallocate Program_UI:
-	delete Program_UI;
+	//Deallocate programUI:
+	delete programUI;
 }
 
 
 				//----------------------------------( Input & Output Files )-------------------------------------------//
 
-void Scheduler::ReadFile(string FileName)
+void Scheduler::readFile(string FileName)
 {
 	Pair<int, int> IO_Piar;
 	char ch, m;
@@ -65,7 +64,7 @@ void Scheduler::ReadFile(string FileName)
 	inFile.open(FileName+".txt");
 	if (!inFile)
 	{
-		Program_UI->Print_ErrorMSG(1);
+		programUI->printErrorMessage(1);
 		exit(0);
 	}
 	int x, n, i = 0;
@@ -79,37 +78,37 @@ void Scheduler::ReadFile(string FileName)
 	if (inFile >> x) RTF = x;
 	if (inFile >> x) MaxW = x;
 	if (inFile >> x) STL = x;
-	if (inFile >> x) ForkP = x;
-	if (inFile >> x) StopTime = x;
-	ProcessorNUM = NF + NS + NR + ND;
+	if (inFile >> x) forkingProbability = x;
+	if (inFile >> x) stopTime = x;
+	processorCount = NF + NS + NR + ND;
 	//Allocating The ProcessorList With Unique IDs:
-	ProcessorList = new Processor * [ProcessorNUM];
+	ProcessorList = new Processor * [processorCount];
 	for (; i < NF; i++)
 	{
-		Processor* pro = new FCFS_Processor(i + 1, this, StopTime,ForkP);
+		Processor* pro = new FCFS_Processor(i + 1, this, stopTime,forkingProbability);
 		ProcessorList[i] = pro;
 	}
 	for (; i < NF + NS; i++)
 	{
-		Processor* pro = new SJF_Processor(i + 1,this, StopTime);
+		Processor* pro = new SJF_Processor(i + 1,this, stopTime);
 		ProcessorList[i] = pro;
 	}
 	for (; i < NF + NS + NR; i++)
 	{
-		Processor* pro = new RR_Processor(i + 1, this, StopTime, RRT);
+		Processor* pro = new RR_Processor(i + 1, this, stopTime, RRT);
 		ProcessorList[i] = pro;
 	}
 
-	for (; i < ProcessorNUM; i++)
+	for (; i < processorCount; i++)
 	{
-		Processor* pro = new EDF_Processor(i + 1, this, StopTime);
+		Processor* pro = new EDF_Processor(i + 1, this, stopTime);
 		ProcessorList[i] = pro;
 	}
 	//Allocating The Processes With:
-	if (inFile >> x) NumP = x;
+	if (inFile >> x) processCount = x;
 	int Arrival_Time(0), PID(0), CPU_Time(0), DeadLine(0), IO_List(0);
 
-	for (int i = 0; i < NumP; i++)
+	for (int i = 0; i < processCount; i++)
 	{
 		if (inFile >> x) Arrival_Time = x;
 		if (inFile >> x) PID = x;
@@ -130,7 +129,7 @@ void Scheduler::ReadFile(string FileName)
 			if (inFile >> ch) m = ch;
 			p->AddIO(IO_Piar);
 		}
-		NewList.enqueue(p);
+		NewList.enqueue(p,Arrival_Time);
 	}
 
 	//Allocating KILLSIG:
@@ -145,7 +144,7 @@ void Scheduler::ReadFile(string FileName)
 	inFile.close();
 }
 
-void Scheduler::OutputFile(string FileName)
+void Scheduler::outputFile(string FileName)
 {
 	ofstream OutFile(FileName + ".txt");
 	if (!OutFile.is_open())
@@ -156,14 +155,14 @@ void Scheduler::OutputFile(string FileName)
 		Process* p;
 		//Printing The Statistics For Each Process:
 		OutFile << "TT" << setw(8) << "PID"<< setw(7)<< "AT"<< setw(7)<< "CT"<<setw(8)<< "IO_D "<< setw(7)<< "WT"<< setw(7)<< "RT"<< setw(7)<< "TRT" << endl;
-		for (int i = 0; i < NumP; i++)
+		for (int i = 0; i < processCount; i++)
 		{
 			TRMList.dequeue(p);
 			auxilary.enqueue(p);
 			OutFile << p->getTT() << setw(7) << p->getID() << setw(7) << p->getAT() << setw(7) << p->getCT() << setw(7);
 			OutFile << p->getIOduration() << setw(9) << p->getWT(timestep) << setw(7) << p->getRT() << setw(7) << p->getTRT() << endl;
 		}
-		for (int i = 0; i < NumP; i++)
+		for (int i = 0; i < processCount; i++)
 		{
 			auxilary.dequeue(p);
 			TRMList.enqueue(p);
@@ -172,47 +171,47 @@ void Scheduler::OutputFile(string FileName)
 		//Printing The Statistics For All Processes:
 		float avWT, avRT, avTRT;
 		int tct(0);
-		ProcessStatistics(avWT, avRT, avTRT,tct);
-		OutFile << "Processes: " << NumP << endl;
+		processStatistics(avWT, avRT, avTRT,tct);
+		OutFile << "Processes: " << processCount << endl;
 		OutFile << "Avg WT = " << avWT << ",   Avg RT = " << avRT << ",   Avg TRT = " << avTRT << endl;
-		OutFile << "Migration %:      RTF =" << 100 * float(RTF_Mig_Cntr)/NumP << "% ,      MaxW = " << 100 * float(MaxW_Mig_Cntr) / NumP << "%"<< endl;
-		OutFile << "Work Steal %: " << 100 * float(Stl_Cntr) / NumP << "%" << endl;
-		OutFile << "Forked Process %: " << 100 * float(Fork_Cntr)/NumP << "%" << endl;
-		OutFile << "Killed Process %: " << 100 * float(Kill_Cntr) /NumP << "%" << endl;
-		OutFile << "Temination Before DeadLine %: " << 100 * float(DeadLine_Cntr) / NumP << "%" << endl;
+		OutFile << "Migration %:      RTF =" << 100 * float(RTFCounter)/processCount << "% ,      MaxW = " << 100 * float(MaxWCounter) / processCount << "%"<< endl;
+		OutFile << "Work Steal %: " << 100 * float(stealCounter) / processCount << "%" << endl;
+		OutFile << "Forked Process %: " << 100 * float(forkingCounter)/processCount << "%" << endl;
+		OutFile << "Killed Process %: " << 100 * float(killCounter) /processCount << "%" << endl;
+		OutFile << "Temination Before DeadLine %: " << 100 * float(deadlineCounter) / processCount << "%" << endl;
 
-		int totalTRT = int(avTRT) * NumP;
+		int totalTRT = int(avTRT) * processCount;
 		double u, totUti(0);
-		OutFile << "Processors: " << ProcessorNUM << " [" << NF << " FCFS, " << NS << " SJF, " << NR << " RR, " << ND << " EDF]" << endl;
+		OutFile << "Processors: " << processorCount << " [" << NF << " FCFS, " << NS << " SJF, " << NR << " RR, " << ND << " EDF]" << endl;
 
 		OutFile << "Processors Load" << endl;
-		for (int i = 0; i < ProcessorNUM; i++)
+		for (int i = 0; i < processorCount; i++)
 		{
 			OutFile << "p" << i+1 << "=" << ProcessorList[i]->processorLoad(totalTRT) << "%";
-			if (i != ProcessorNUM - 1)
+			if (i != processorCount - 1)
 				OutFile << ",  ";
 		}
 		OutFile << endl << "Processor Utiliz" << endl;
-		for (int i = 0; i < ProcessorNUM; i++)
+		for (int i = 0; i < processorCount; i++)
 		{
 			u = ProcessorList[i]->processorUtilization(timestep);
 			OutFile << "p" << i+1 << "=" << u << "%";
-			if (i != ProcessorNUM)
+			if (i != processorCount)
 				OutFile << ",  ";
 			totUti += u;
 		}
-		OutFile << endl << "Avg utilization = " << totUti / (ProcessorNUM) << "%";
+		OutFile << endl << "Avg utilization = " << totUti / (processorCount) << "%";
 		OutFile.close();
 	}
 
 }
 
-void Scheduler::ProcessStatistics(float& avWT, float& avRT, float& avTRT,int& TCT)
+void Scheduler::processStatistics(float& avWT, float& avRT, float& avTRT,int& TCT)
 {
 	LinkedQueue<Process*> auxilary;
 	Process* item;
 	int totalWT = 0, totalRT = 0, totalTRT = 0;
-	for (int i = 0; i < NumP; i++)
+	for (int i = 0; i < processCount; i++)
 	{
 		if (!TRMList.isEmpty())
 		{
@@ -225,20 +224,20 @@ void Scheduler::ProcessStatistics(float& avWT, float& avRT, float& avTRT,int& TC
 		}
 	}
 	TRMList = auxilary;
-	avWT = totalWT / (float)NumP;
-	avRT = totalRT / (float)NumP;
-	avTRT = totalTRT / (float)NumP;
+	avWT = totalWT / (float)processCount;
+	avRT = totalRT / (float)processCount;
+	avTRT = totalTRT / (float)processCount;
 }
 
 
 			//-----------------------------------------( Data Members Getters )------------------------------------------------//
 
-Processor* Scheduler::Get_LongestRDY()
+Processor* Scheduler::getLongestRDY()
 {
 	Processor* Longest = ProcessorList[0];
-	for (int i = 1; i < ProcessorNUM; i++)
+	for (int i = 1; i < processorCount; i++)
 	{
-		if (ProcessorList[i]->get_Finishtime() > Longest->get_Finishtime())
+		if (ProcessorList[i]->getFinishTime() > Longest->getFinishTime())
 		{
 			Longest = ProcessorList[i];
 		}
@@ -246,12 +245,12 @@ Processor* Scheduler::Get_LongestRDY()
 	return Longest;
 }
 
-void Scheduler::Inc_DeadLineCntr()
+void Scheduler::increaseDeadLineCounter()
 {
-	DeadLine_Cntr++;
+	deadlineCounter++;
 }
 
-Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
+Processor* Scheduler::getShortestRDY(int Processors_Type)
 {
 	Processor* shortest = nullptr;
 	if (Processors_Type == 1)  //looking for shortest RDY in FCFS Processors only
@@ -259,7 +258,7 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 		shortest = ProcessorList[0];
 		for (int i = 1; i < NF; i++)
 		{
-			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
+			if (ProcessorList[i]->getFinishTime() < shortest->getFinishTime() && ProcessorList[i]->getState() != STOP)
 			{
 				shortest = ProcessorList[i];
 			}
@@ -270,7 +269,7 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 		shortest = ProcessorList[NF];
 		for (int i = NF+1; i < NF + NS; i++)
 		{
-			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
+			if (ProcessorList[i]->getFinishTime() < shortest->getFinishTime() && ProcessorList[i]->getState() != STOP)
 			{
 				shortest = ProcessorList[i];
 			}
@@ -281,7 +280,7 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 		shortest = ProcessorList[NF + NS];
 		for (int i = NF + NS + 1; i < NF + NS + NR; i++)
 		{
-			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
+			if (ProcessorList[i]->getFinishTime() < shortest->getFinishTime() && ProcessorList[i]->getState() != STOP)
 			{
 				shortest = ProcessorList[i];
 			}
@@ -290,9 +289,9 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 	else if (Processors_Type == 3)   //looking for shortest RDY in EDF Processors
 	{
 		shortest = ProcessorList[NF + NS + NR];
-		for (int i = NF + NS + NR + 1; i < ProcessorNUM; i++)
+		for (int i = NF + NS + NR + 1; i < processorCount; i++)
 		{
-			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
+			if (ProcessorList[i]->getFinishTime() < shortest->getFinishTime() && ProcessorList[i]->getState() != STOP)
 			{
 				shortest = ProcessorList[i];
 			}
@@ -301,28 +300,31 @@ Processor* Scheduler::Get_ShortestRDY(int Processors_Type)
 	else if (Processors_Type == 0) //looking for shortest RDY in All Processors
 	{
 		shortest = ProcessorList[0];
-		for (int i = 1; i < ProcessorNUM; i++)
+		for (int i = 1; i < processorCount; i++)
 		{
-			if (ProcessorList[i]->get_Finishtime() < shortest->get_Finishtime() && ProcessorList[i]->getState() != STOP)
+			if (ProcessorList[i]->getFinishTime() < shortest->getFinishTime() && ProcessorList[i]->getState() != STOP)
 			{
 				shortest = ProcessorList[i];
 			}
 		}
 	}
-	return shortest;
+	if (shortest->getState() != STOP)
+		return shortest;
+	else
+		return nullptr;
 }
 
 
 			//-----------------------------------------( Moving Between Lists )------------------------------------------------//
 
-void Scheduler::MoveToTRM(Process* p)
+void Scheduler::moveToTRM(Process* p)
 {
 	if (p) {
 		TRMList.enqueue(p);
 		p->updateState(TRM);
 		p->clear_IOList();
 		p->setTT(timestep);
-		TRMcount++;
+		terminatedCount++;
 		Process* leftChild = p->get_LChild();
 		Process* rightChild = p->get_RChild();
 		bool orphanKilled;
@@ -333,9 +335,9 @@ void Scheduler::MoveToTRM(Process* p)
 			//killOrphan calls killProcess=>search for process and remove from run or ready
 			if (orphanKilled)
 			{
-				MoveToTRM(leftChild);
+				moveToTRM(leftChild);
 				leftChild->updateState(Killed);
-				Kill_Cntr++;
+				killCounter++;
 			}
 			//otherwise the orphan has already terminated before its Parent
 		}
@@ -345,34 +347,40 @@ void Scheduler::MoveToTRM(Process* p)
 			orphanKilled = killOrphan(rightChild);
 			if (orphanKilled)
 			{
-				MoveToTRM(rightChild);
+				moveToTRM(rightChild);
 				rightChild->updateState(Killed);
-				Kill_Cntr++;
+				killCounter++;
 			}
 		}
 	}
 	//kill orphans(remove from ready or run of fcfs before moving to trm)
 }
 
-void Scheduler::NEWtoRDY()
+void Scheduler::moveFromNew()
 {
 	//Moving Process from NEW to RDY at AT
-	while (!(NewList.isEmpty()) && timestep == NewList.peekFront()->getAT())
+	while (!(NewList.isEmpty()) && timestep >= NewList.Peek()->getAT())
 	{
-		Process* p;
-		NewList.dequeue(p);
-		Get_ShortestRDY(0)->AddProcess(p);
-		p->updateState(READY);
+		Process* p= NewList.Peek();
+		Processor* Shortest = getShortestRDY(0);
+		if (Shortest)
+		{
+			NewList.dequeue();
+			Shortest->addProcess(p);
+			p->updateState(READY);
+		}
+		else
+			break;
 	}
 }
 
-void Scheduler::RUNtoBLK(Process* p)
+void Scheduler::moveToBLK(Process* p)
 {
 	p->updateState(BLK);
 	BLKList.enqueue(p);
 }
 
-void Scheduler::BLKtoRDY()
+void Scheduler::moveFromBLK()
 {
 	Process* p = nullptr;
 	Process* p2 = nullptr;
@@ -385,7 +393,7 @@ void Scheduler::BLKtoRDY()
 			if (temp.second == p->getblktime())
 			{
 				p->updateState(READY);
-				Get_ShortestRDY(0)->AddProcess(p);
+				moveToNew(p);
 				p->deqIO();
 				p->resetblktime();
 				BLKList.dequeue(p);
@@ -403,79 +411,69 @@ void Scheduler::BLKtoRDY()
 	}
 }
 
+void Scheduler::moveToNew(Process* p)
+{
+	NewList.enqueue(p, p->getAT());
+}
+
 
 			//-----------------------------------------( Migration & Stealing )------------------------------------------------//
 
 
-bool Scheduler::MigrationRRtoSJF(Process* p)
+bool Scheduler::migrationRRtoSJF(Process* p)
 {
 	if (p != nullptr && p->getRemainingCT() < RTF && NS != 0 && p->getParent() == nullptr)
 	{
-		Get_ShortestRDY(2)->AddProcess(p);
-		p->reset_TS(); //Reset The TimeSlice of The Process to zero
-		RTF_Mig_Cntr++;
-		return true;
+		Processor* Shortest= getShortestRDY(2);
+		if (Shortest)
+		{
+			Shortest->addProcess(p);
+			RTFCounter++;
+			return true;
+		}
 	}
 	return false;
 }
 
-bool Scheduler::MigrationFCFStoRR(Process* p)
+bool Scheduler::migrationFCFStoRR(Process* p)
 {
 	if (p != nullptr && p->getWT(timestep) > MaxW && NR != 0 && p->getParent() == nullptr)
 	{
-		Get_ShortestRDY(3)->AddProcess(p);
-		MaxW_Mig_Cntr++;
-		return true;
+		Processor* Shortest = getShortestRDY(3);
+		if (Shortest)
+		{
+			Shortest->addProcess(p);
+			MaxWCounter++;
+			return true;
+		}
 	}
 	return false;
-}
-
-void Scheduler::Over_Heating()
-{
-	int RandNum = rand() % 100;
-	int randProcessor = rand() % ProcessorNUM;
-	if(RandNum<Overheat_prop)
-	{
-		if(randProcessor<NF&& randProcessor!=0)
-		{
-			//If The Processor is FCFS Then Make Another FCFS Processor Steal It
-			Processor* Shortest = Get_ShortestRDY(1);
-			if (Shortest->get_ID() != ProcessorList[randProcessor]->get_ID()&& Shortest->getState()!=STOP)
-				ProcessorList[randProcessor]->OverHeat(Shortest, timestep, StopTime);
-		}
-		else if(randProcessor < ProcessorNUM&& randProcessor != NF&& randProcessor != NR&& randProcessor != NS)
-		{
-			Processor* Shortest = Get_ShortestRDY(0);
-			if (Shortest->get_ID() != ProcessorList[randProcessor]->get_ID()&&Shortest->getState() != STOP)
-				ProcessorList[randProcessor]->OverHeat(Shortest, timestep, StopTime);
-		}
-	}
 }
 
 void Scheduler::Stealing()
 {
-	Processor* shortest = Get_ShortestRDY(0);
-	Processor* longest = Get_LongestRDY();
-	if (longest->isRDYempty())return;
-	bool Steal_Condition = Calc_StealLimit(longest, shortest) > 40;
-	while (Steal_Condition && (!(longest->isRDYempty()))) // Check that the Steal limit is less than 40 
+	Processor* shortest = getShortestRDY(0);
+	Processor* longest = getLongestRDY();
+	if (longest->isRDYEmpty())return;
+	bool Steal_Condition = calculateStealLimit(longest, shortest) > 40;
+	while (Steal_Condition && (!(longest->isRDYEmpty()))) // Check that the Steal limit is less than 40 
 	{
-		Process* stolen = longest->remove_Top();
+		Process* stolen = longest->removeTop();
 		if (stolen)
 		{
-			shortest->AddProcess(stolen); //add the top process to the shortest 
-			Stl_Cntr++;
-			Steal_Condition = Calc_StealLimit(longest, shortest) > 40;
+			shortest->addProcess(stolen); //add the top process to the shortest 
+			stealCounter++;
+			Steal_Condition = calculateStealLimit(longest, shortest) > 40;
 		}
 		else
 			return;
 	}
 }
 
-double Scheduler::Calc_StealLimit(Processor* longest, Processor* shortest)
+double Scheduler::calculateStealLimit(Processor* longest, Processor* shortest)
 {
-	if (longest->get_Finishtime() != 0)
-		return 100 * ((longest->get_Finishtime() - shortest->get_Finishtime()) / double(longest->get_Finishtime()));
+	if (longest->getFinishTime() != 0)
+		return 100 * ((longest->getFinishTime() - shortest->getFinishTime()) / double(longest->getFinishTime()));
 	return 0;
 }
 
@@ -504,11 +502,11 @@ void Scheduler::Killing()
 					FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
 					if (FPro)
 						//search for process&remove it from rdy/run if exists
-						isDone = FPro->KillProcess(target_id, targetProcess);
+						isDone = FPro->killProcess(target_id, targetProcess);
 					if (isDone)
 					{
-						Kill_Cntr++;
-						MoveToTRM(targetProcess);
+						killCounter++;
+						moveToTRM(targetProcess);
 						targetProcess->updateState(Killed);
 						break;
 					}
@@ -520,15 +518,20 @@ void Scheduler::Killing()
 
 void Scheduler::Fork(Process* runP)
 {
-	NumP++;
-	Fork_Cntr++;
-	Process* forkedProcess = new Process(timestep, NumP, runP->getRemainingCT(), 0, 0, runP);
+	processCount++;
+	forkingCounter++;
+	Process* forkedProcess = new Process(timestep, processCount, runP->getRemainingCT(), 0, 0, runP);
 	runP->setForked(forkedProcess);
 	//create a process forkedProcess
 	//add to shortest FCFS
-	Processor* shortest_FCFS = Get_ShortestRDY(1);
-	shortest_FCFS->AddProcess(forkedProcess);
-	forkedProcess->updateState(READY);
+	Processor* shortest_FCFS = getShortestRDY(1);
+	if (shortest_FCFS)
+	{
+		shortest_FCFS->addProcess(forkedProcess);
+		forkedProcess->updateState(READY);
+	}
+	else
+		moveToTRM(forkedProcess);
 }
 
 bool Scheduler::killOrphan(Process* orphan)
@@ -540,7 +543,7 @@ bool Scheduler::killOrphan(Process* orphan)
 		FCFS_Processor* FPro = dynamic_cast<FCFS_Processor*>(ProcessorList[i]);
 		if (FPro)
 			//search for process&remove it from rdy/run if exists
-			isDone = FPro->KillProcess(target_id, orphan);
+			isDone = FPro->killProcess(target_id, orphan);
 		if (isDone)
 			return true;
 	}
@@ -548,13 +551,13 @@ bool Scheduler::killOrphan(Process* orphan)
 }
 
 	
-						//-----------------------------------( Simulation )----------------------------------------//
+					//-----------------------------------( Simulation )----------------------------------------//
 
 void Scheduler::Scheduling()
 {
 	//Loop On Processors And Call The Function ScheduleAlgo
-	for (int i = 0; i < ProcessorNUM; i++)
-		ProcessorList[i]->ScheduleAlgo(timestep);
+	for (int i = 0; i < processorCount; i++)
+		ProcessorList[i]->scheduleAlgo(timestep);
 }
 
 void Scheduler::Simulation()
@@ -562,50 +565,44 @@ void Scheduler::Simulation()
 	string FileName;
 
 	//Get The Input File Name:
-	FileName = Program_UI->Get_FileName(1);
+	FileName = programUI->getFileName(1);
+	
 	//Read Input From File
-	ReadFile(FileName);
+	readFile(FileName);
 
 	//Get The Screen Output Mode:
-	int mode = Program_UI->chooseMode();	
-	 
+	int mode = programUI->chooseMode();	
+	
 	//Get The Output File Name:
-	FileName = Program_UI->Get_FileName(0);
+	FileName = programUI->getFileName(0);
 	
 	//If The Mode Is Silent: 
 	if (mode == 2)
-		Program_UI->printSilent(1);
+		programUI->printSilent(1);
 
 	while (true)
 	{
 		//If AT Of Peekfront = Timestep , Dequeue And Move
-		NEWtoRDY();
-
+		moveFromNew();
 		//If BlkDuration Of Peekfront =IO Duration Request , Dequeue And Move
-
-		BLKtoRDY();
-
+		moveFromBLK();
 		//If KillSIG Of Peekfront =Timestep , Dequeue And Move
-		Killing();
-		
+		Killing();	
 		//Loop And Call SchedulingAlgo
 		Scheduling();
-	
-		//Processor OverHeat:
-		Over_Heating();
-
+		//Stealing:
 		if (timestep % STL == 0)
 			Stealing();
 
 		if (mode != 2)
-			Program_UI->printOutput(mode, timestep, BLKList, TRMList, ProcessorList, ProcessorNUM);
-		if (NumP == TRMcount)
+			programUI->printOutput(mode, timestep, BLKList, TRMList, ProcessorList, processorCount);
+		if (processCount == terminatedCount)
 		{
 			//Create The OutPut File:
-			OutputFile(FileName);
+			outputFile(FileName);
 			if (mode == 2)
 			{
-				Program_UI->printSilent(0);
+				programUI->printSilent(0);
 			}
 			break;
 		}//Break Loop Condition
