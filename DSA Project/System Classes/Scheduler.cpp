@@ -286,7 +286,7 @@ Processor* Scheduler::getShortestRDY(int Processors_Type)
 			}
 		}
 	}
-	else if (Processors_Type == 3)   //looking for shortest RDY in EDF Processors
+	else if (Processors_Type == 4)   //looking for shortest RDY in EDF Processors
 	{
 		shortest = ProcessorList[NF + NS + NR];
 		for (int i = NF + NS + NR + 1; i < processorCount; i++)
