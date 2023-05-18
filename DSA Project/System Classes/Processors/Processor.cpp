@@ -2,27 +2,28 @@
 #include "../Scheduler.h"
 Processor::Processor(int Id, Scheduler* sc,int OVT)
 {
-	OverHeat_time = OVT;
+	overHeatProbability = 1;
+	overHeatTime = OVT;
 	ID = Id;
-	MYSch = sc;
+	schedulerPtr = sc;
 	RUN = nullptr;
-	state = IDLE;
-	StopTime = 0;
-	FinishTime = 0;
-	BusyTime = 0;
+	State = IDLE;
+	stopTime = 0;
+	finishTime = 0;
+	busyTime = 0;
 }
 
 
 			//-------------------------------------( Getters )------------------------------------------------//
 
-int Processor::get_Finishtime()
+int Processor::getFinishTime()
 {
-	return FinishTime;
+	return finishTime;
 }
 
-PState Processor::getState()
+processorState Processor::getState()
 {
-	return state;
+	return State;
 }
 
 bool Processor::isIdle()
@@ -30,12 +31,12 @@ bool Processor::isIdle()
 	return (RUN == nullptr);
 }
 
-int Processor::get_ID()
+int Processor::getID()
 {
 	return ID;
 }
 
-Process* Processor::GetRunProcess()
+Process* Processor::getRunProcess()
 {
 	return RUN;
 }
@@ -43,58 +44,63 @@ Process* Processor::GetRunProcess()
 
 			//-------------------------------------( Setters )------------------------------------------------//
 
-bool Processor::setRUN(Process* p)
+bool Processor::setRun(Process* p)
 {
-	if (state == IDLE)
+	if (State == IDLE)
 	{
+		if (p!=nullptr)
+		{
+			p->updateState(RUNNING);
+			decreaseFinishTime(p->getRemainingCT());
+		}
 		RUN = p;
 		return true;
 	}
 	return false;
 }
 
-void Processor::Inc_Finishtime(int T)
+void Processor::increaseFinishTime(int Time)
 {
-	FinishTime += T;
+	finishTime += Time;
 }
 
-void Processor::Dec_Finishtime(int T)
+void Processor::decreaseFinishTime(int Time)
 {
-	FinishTime -= T;
+	finishTime -= Time;
 }
 
-void Processor::Dec_RUNCT()
+void Processor::decreaseRunRemainingCT()
 {
 	if (RUN)
 		RUN->decrementCT();
 }
 
-int Processor::get_remainingOverHeat(int TimeStep)
+int Processor::getHealingSteps(int timeStep)
 {
-		return OverHeat_time + StopTime - TimeStep;
+		return overHeatTime + stopTime - timeStep;
 }
 
-void Processor::TurnON(int timestep)
+void Processor::TurnOn(int timeStep)
 {
-	if (get_remainingOverHeat(timestep) <= 0)
+	if (getHealingSteps(timeStep) <= 0)
 	{
 		if (getState() == BUSY)
-			UpdateState(BUSY);
+			updateState(BUSY);
 		else
-			UpdateState(IDLE);
-		StopTime = 0;
+			updateState(IDLE);
+		stopTime = 0;
 	}
 }
 
-void Processor::Inc_BusyTime()
+void Processor::increaseBusyTime()
 {
 	if(!isIdle())
-	BusyTime++;
+	busyTime++;
 }
 
-void Processor::UpdateState(PState st)
+void Processor::updateState(processorState st)
 {
-	state = st;
+	State = st;
 }
 
 
@@ -102,23 +108,23 @@ void Processor::UpdateState(PState st)
 
 int Processor::getBusytime()
 {
-	return BusyTime;
+	return busyTime;
 }
 
 double Processor::processorLoad(int totalTRT)
 {
-	return (BusyTime / (float)totalTRT) * 100;
+	return (busyTime / (float)totalTRT) * 100;
 }
 
 double Processor::processorUtilization(int timeStep)
 {
-	return (BusyTime / (float)timeStep) * 100;
+	return (busyTime / (float)timeStep) * 100;
 }
 
 
 			//-------------------------------------( Scheduling )------------------------------------------------//
 
-bool Processor::FinishRUN()
+bool Processor::isRunFinished()
 {
 	if (RUN)
 	{
@@ -130,23 +136,33 @@ bool Processor::FinishRUN()
 	return false;
 }
 
-void Processor::IO_Req()
+void Processor::requestIO()
 {
 	Pair<int, int> temp;
-	if (GetRunProcess() && GetRunProcess()->GetIO(temp))
+	if (getRunProcess() && getRunProcess()->GetIO(temp))
 	{
-		if (temp.first == (GetRunProcess()->getCT() - GetRunProcess()->getRemainingCT()))
+		if (temp.first == (getRunProcess()->getCT() - getRunProcess()->getRemainingCT()))
 		{
-			MYSch->RUNtoBLK(GetRunProcess());
-			setRUN(nullptr);
+			schedulerPtr->moveToBLK(getRunProcess());
+			setRun(nullptr);
 		}
 	}
+}
+
+void Processor::overHeatHandling(int timeStep)
+{
+	if (getState() == STOP)
+		TurnOn(timeStep);
+	else
+		turnOff(timeStep);
+
 }
 
 
 			//-------------------------------------( Printing )------------------------------------------------//
 
-ostream& operator<<(std::ostream& os, const Processor& p) {
+ostream& operator<<(std::ostream& os, const Processor& p) 
+{
 	os << "(P" << p.ID << ")";
 	return os;
 }

@@ -5,111 +5,114 @@ RR_Processor::RR_Processor(int Id, Scheduler* sc, int OVT, int TS):Processor(Id,
 
 					//---------------------------------------( Scheduling )------------------------------------------------//
 
-void RR_Processor::AddProcess(Process* p)
+void RR_Processor::addProcess(Process* p)
 {
 	p->updateState(READY);
-	RDY.enqueue(p);
-	Inc_Finishtime(p->getRemainingCT());
+	RR_RDY.enqueue(p);
+	increaseFinishTime(p->getRemainingCT());
 }
 
-Process* RR_Processor::remove_Top()
+Process* RR_Processor::removeTop()
 {
 	Process* p=nullptr;
-	if (!RDY.isEmpty())
+	if (!RR_RDY.isEmpty())
 	{
-		RDY.dequeue(p);
-		Dec_Finishtime(p->getRemainingCT());
+		RR_RDY.dequeue(p);
+		decreaseFinishTime(p->getRemainingCT());
 	}
 	return p;
 }
 
-void RR_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
+void RR_Processor::turnOff(int TimeStep)
 {
-	
-	if (!StopTime && get_remainingOverHeat(TimeStep) > 0) //The Processor Isn't OverHeated 
+	srand(time(0));
+	bool Probability_Cond = (rand() % 100 < overHeatProbability);
+	if (Probability_Cond && !stopTime && getHealingSteps(TimeStep) > 0) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
 			// Moving The Run Process To Shortest RDY Queue
-			Process* Rn = GetRunProcess();
-			Shortest->AddProcess(Rn);
-			setRUN(nullptr);
+			Process* Rn = getRunProcess();
+			schedulerPtr->moveToNew(Rn);
+			setRun(nullptr);
 		}
-		if (!isRDYempty())
+		if (!isRDYEmpty())
 		{
 			// Moving The RDY Processes To Shortest RDY Queue
-			for (int i = 0; i < RDY.getcount(); i++)
+			for (int i = 0; i < RR_RDY.getcount(); i++)
 			{
 				Process* p = nullptr;
-				RDY.dequeue(p);
-				Shortest->AddProcess(p);
-				Dec_Finishtime(p->getRemainingCT());
+				RR_RDY.dequeue(p);
+				schedulerPtr->moveToNew(p);
+				decreaseFinishTime(p->getRemainingCT());
 			}
 		}
-		StopTime = TimeStep;
-		UpdateState(STOP);
+		stopTime = TimeStep;
+		updateState(STOP);
 	}
 }
 
-bool RR_Processor::isRDYempty()
+bool RR_Processor::isRDYEmpty()
 {
-	return RDY.isEmpty();
+	return RR_RDY.isEmpty();
 }
 
-void RR_Processor::ScheduleAlgo(int t)
+void RR_Processor::scheduleAlgo(int timeStep)
 {
-	if (FinishRUN()) //The Run Prcocess has Finished
+	//The Run Prcocess has Finished:
+	if (isRunFinished()) 
 	{
-		MYSch->MoveToTRM(GetRunProcess());
-		setRUN(nullptr);
+		schedulerPtr->moveToTRM(getRunProcess());
+		setRun(nullptr);
 	}
-	TurnON(t);
+	//OverHeating Handling:
+	 overHeatHandling(timeStep);
+
+	//Excueting The Run Process:
 	if(!isIdle()){
-		Inc_BusyTime();
-		Process* Rn = GetRunProcess();
+		Process* Rn = getRunProcess();
 		if (Rn->IncrementTS(timeSlice-1))
 		{
-			Inc_Finishtime(Rn->getRemainingCT());
-			RDY.enqueue(Rn);
-			setRUN(nullptr);
+			addProcess(Rn);
+			setRun(nullptr);
 		}
 		else
 		{
-			Dec_RUNCT();
-			IO_Req();
+			increaseBusyTime();
+			decreaseRunRemainingCT();
+			requestIO();
 			return;
 		}
 	}
 	
 
-		if (isRDYempty())
+		if (isRDYEmpty())
 			return;
 
 		//Choose The Next Run Process 
 		Process* RDYprocess;
-		RDY.dequeue(RDYprocess);
-		Dec_Finishtime(RDYprocess->getRemainingCT());
+		RR_RDY.dequeue(RDYprocess);
+		decreaseFinishTime(RDYprocess->getRemainingCT());
 
 		//The Migration part:
-		 bool migrated = MYSch->MigrationRRtoSJF(RDYprocess);
-		 while (migrated && RDY.getcount() != 0)
+		 bool migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
+		 while (migrated && RR_RDY.getcount() != 0)
 		 {
-			 RDY.dequeue(RDYprocess);
-			 Dec_Finishtime(RDYprocess->getRemainingCT());
-			 migrated = MYSch->MigrationRRtoSJF(RDYprocess);
+			 RR_RDY.dequeue(RDYprocess);
+			 decreaseFinishTime(RDYprocess->getRemainingCT());
+			 migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
 		 }
-		 if (migrated && RDY.getcount() == 0)
+		 if (migrated && RR_RDY.getcount() == 0)
 		 {
-			 setRUN(nullptr);
+			 //No More Processes In The RDY To Migrate Or Run:
+			 setRun(nullptr);
 			 return;
 		 }
 		 else if (!migrated&& isIdle())
 		 {
 		 	//Just set The curent Process as A running process
-			 Dec_Finishtime(RDYprocess->getRemainingCT());
-			 RDYprocess->setstart(t);
-			 setRUN(RDYprocess);
-			RDYprocess->updateState(RUNNING);
+			 RDYprocess->setstart(timeStep);
+			 setRun(RDYprocess);
 		 }  
 }
 
@@ -118,11 +121,11 @@ void RR_Processor::ScheduleAlgo(int t)
 
 void RR_Processor::printRDY()
 {
-	RDY.print();
+	RR_RDY.print();
 }
 
 void RR_Processor::printInfo()
 {
-	cout << " [RR  ]: " << RDY.getcount() << " ";
+	cout << " [RR  ]: " << RR_RDY.getcount() << " ";
 }
 

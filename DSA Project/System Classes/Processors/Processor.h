@@ -5,56 +5,57 @@
 class Scheduler;
 
 using namespace std;
-enum PState { BUSY , IDLE , STOP };
+enum processorState { BUSY , IDLE , STOP };
 class Processor
 {
 protected:
-	Scheduler* MYSch;
-	int StopTime;
-	int OverHeat_time;
+	Scheduler* schedulerPtr;
+	int stopTime;
+	int overHeatTime;
+	int overHeatProbability;
 
 private:
 	int ID;
 	Process* RUN;
-	int BusyTime;
-	int FinishTime;
-	PState state;
+	int busyTime;
+	int finishTime;
+	processorState State;
+
 public:
 	//Constructor:
 	Processor(int Id, Scheduler* sc, int OVT);
 	
 	//Data Members Getters:
-	Process* GetRunProcess();
-	int get_Finishtime();
-	PState getState();
+	Process* getRunProcess();
+	int getFinishTime();
+	processorState getState();
 	bool isIdle();
-	virtual bool isRDYempty() = 0;
-	int get_ID();
+	virtual bool isRDYEmpty() = 0;
+	int getID();
 
 	//Processor Statistics:
 	int getBusytime();
 	double processorLoad(int totalTRT);
 	double processorUtilization(int timeStep);
-	
-	//Data Members Setters:
-	bool setRUN(Process* p);
-	void UpdateState(PState st);
+	void updateState(processorState st);
 
 	//Processes Handling:
-	virtual void AddProcess(Process* p) = 0;
-	virtual void OverHeat(Processor* Shortest, int TimeStep, int TStop) = 0;
-	virtual Process* remove_Top() = 0;
-	virtual void ScheduleAlgo(int t) = 0;
-	bool FinishRUN();
-	void IO_Req();
+	bool setRun(Process* p);
+	virtual void addProcess(Process* p) = 0;
+	virtual void turnOff(int TimeStep) = 0;
+	void TurnOn(int timeStep);
+	virtual Process* removeTop() = 0;
+	virtual void scheduleAlgo(int t) = 0;
+	bool isRunFinished();
+	void requestIO();
+	void overHeatHandling(int timeStep);
 
 	//Time Handling:
-	void Inc_Finishtime(int T);
-	void Dec_Finishtime(int T);
-	void Inc_BusyTime();
-	void Dec_RUNCT();
-	int get_remainingOverHeat(int TimeStep);
-	void TurnON(int timestep);
+	void increaseFinishTime(int Time);
+	void decreaseFinishTime(int Time);
+	void increaseBusyTime();
+	void decreaseRunRemainingCT();
+	int getHealingSteps(int timeStep);
 
 	//Printing:
 	virtual void printRDY() = 0;

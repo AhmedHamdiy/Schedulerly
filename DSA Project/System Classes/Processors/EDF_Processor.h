@@ -4,18 +4,18 @@
 class EDF_Processor : public Processor
 {
 private:
-	PriorityQueue<Process*> RDY;
-public:
+	PriorityQueue<Process*> EDF_RDY;
 
+public:
 	//Constructor:
 	EDF_Processor(int Id, Scheduler* sc, int OVT);
 
 	//Processes Handling:
-	void AddProcess(Process* p);
-	virtual Process* remove_Top();
-	virtual void OverHeat(Processor* Shortest, int TimeStep, int TStop);
-	bool isRDYempty();
-	virtual void ScheduleAlgo(int t);
+	void addProcess(Process* p);
+	virtual Process* removeTop();
+	virtual void turnOff(int timeStep);
+	bool isRDYEmpty();
+	virtual void scheduleAlgo(int t);
 
 	//Printing:
 	void printRDY();

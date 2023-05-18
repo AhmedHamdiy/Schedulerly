@@ -8,100 +8,104 @@ EDF_Processor::EDF_Processor(int Id, Scheduler* sc, int OVT):Processor(Id,sc,OVT
 
 					//---------------------------------------( Scheduling )-------------------------------------------------//
 
-void EDF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
+void EDF_Processor::turnOff(int timeStep)
 {
-	if (!StopTime&&get_remainingOverHeat(TimeStep) > 0) //The Processor Isn't OverHeated 
+	srand(time(0));
+	bool Probability_Cond = (rand() % 100 < overHeatProbability);
+	if (Probability_Cond && !stopTime && getHealingSteps(timeStep) > 0) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
 			// Moving The Run Process To Shortest RDY Queue
-			Process* Rn = GetRunProcess();
-			Shortest->AddProcess(Rn);
-			setRUN(nullptr);
+			Process* Rn = getRunProcess();
+			schedulerPtr->moveToNew(Rn);
+			setRun(nullptr);
 		}
-		if (!isRDYempty())
+		if (!isRDYEmpty())
 		{
 			// Moving The RDY Processes To Shortest RDY Queue
-			for (int i = 0; i < RDY.getCount(); i++)
+			for (int i = 0; i < EDF_RDY.getCount(); i++)
 			{
-				Process* p = RDY.Peek();
-				RDY.dequeue();
-				Shortest->AddProcess(p);
-				Dec_Finishtime(p->getRemainingCT());
+				Process* p = EDF_RDY.Peek();
+				EDF_RDY.dequeue();
+				schedulerPtr->moveToNew(p);
+				decreaseFinishTime(p->getRemainingCT());
 			}
 		}
-		StopTime = TimeStep;
-		UpdateState(STOP);
+		stopTime = timeStep;
+		updateState(STOP);
 	}
 }
 
-Process* EDF_Processor::remove_Top()
+Process* EDF_Processor::removeTop()
 {
 	Process* p = nullptr;
-	if (!RDY.isEmpty())
+	if (!EDF_RDY.isEmpty())
 	{
-		p=RDY.Peek();
-		RDY.dequeue();
-		Dec_Finishtime(p->getRemainingCT());
+		p=EDF_RDY.Peek();
+		EDF_RDY.dequeue();
+		decreaseFinishTime(p->getRemainingCT());
 	}
 	return p;
 }
 
-void EDF_Processor::AddProcess(Process* p)
+void EDF_Processor::addProcess(Process* p)
 {
 	p->updateState(READY);
-	RDY.enqueue(p,p->get_DeadLine());	
-	Inc_Finishtime(p->getRemainingCT());
+	EDF_RDY.enqueue(p,p->getDeadline());	
+	increaseFinishTime(p->getRemainingCT());
 }
 
-bool EDF_Processor::isRDYempty()
+bool EDF_Processor::isRDYEmpty()
 {
-	return RDY.isEmpty();
+	return EDF_RDY.isEmpty();
 }
 
-void EDF_Processor::ScheduleAlgo(int t)
+void EDF_Processor::scheduleAlgo(int timeStep)
 {
-	Process* RunP = GetRunProcess();
-	TurnON(t);
-	if (!isIdle())
+	Process* RunP = getRunProcess();
+
+	//The  Run Prcocess has Finished:
+	if (isRunFinished())
 	{
-		if (FinishRUN()) //The  Run Prcocess has Finished
-		{
-			if (RunP->get_DeadLine() >= t)
-				MYSch->Inc_DeadLineCntr();
-			MYSch->MoveToTRM(RunP);
-			setRUN(nullptr);
-		}
-		IO_Req();
-		Inc_BusyTime();	
-		Dec_RUNCT();
+		if (RunP->getDeadline() >= timeStep)
+			schedulerPtr->increaseDeadLineCounter();
+		schedulerPtr->moveToTRM(RunP);
+		setRun(nullptr);
 	}
 
-	if (isRDYempty())
+	//OverHeating Handling:
+	overHeatHandling(timeStep);
+	//Excuting The Current Run:
+	if (!isIdle())
+	{
+		requestIO();
+		increaseBusyTime();
+		decreaseRunRemainingCT();
+	}
+
+	//Choosing The Next Run Process Or Exchange It: 
+	if (isRDYEmpty())
 		return;
 
 	else
 	{
-		Process* EarlyDeadLine = RDY.Peek();
+		Process* EarlyDeadLine = EDF_RDY.Peek();
 		
 		//Exchange The Run Process With A Process With Earlier DeadLine
-		bool Exchange_Condition = (!isIdle()) && (EarlyDeadLine->get_DeadLine() < RunP->get_DeadLine()) ;
+		bool Exchange_Condition = (!isIdle()) && (EarlyDeadLine->getDeadline() < RunP->getDeadline()) ;
 
 		if (isIdle() || Exchange_Condition)
 		{
 			if (Exchange_Condition)
 			{
-				AddProcess(RunP);
-				RunP->updateState(READY);
-				Inc_Finishtime(RunP->getRemainingCT());
-				setRUN(nullptr);
-
+				//Return The Run Process To RDY Queue:
+				addProcess(RunP);
+				setRun(nullptr);
 			}
-			RDY.dequeue();
-			EarlyDeadLine->updateState(RUNNING);
-			Dec_Finishtime(EarlyDeadLine->getRemainingCT());
-			setRUN(EarlyDeadLine);
-			EarlyDeadLine->setstart(t);
+			EDF_RDY.dequeue();
+			setRun(EarlyDeadLine);
+			EarlyDeadLine->setstart(timeStep);
 		}
 
 	}
@@ -112,10 +116,10 @@ void EDF_Processor::ScheduleAlgo(int t)
 
 void EDF_Processor::printRDY()
 {
-	RDY.Print();
+	EDF_RDY.Print();
 }
 
 void EDF_Processor::printInfo()
 {
-	cout << " [EDF ]: " << RDY.getCount() << " ";
+	cout << " [EDF ]: " << EDF_RDY.getCount() << " ";
 }

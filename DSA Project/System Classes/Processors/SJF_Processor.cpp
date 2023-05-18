@@ -7,82 +7,87 @@ SJF_Processor::SJF_Processor(int Id, Scheduler* sc, int OVT):Processor(Id,sc,OVT
 
 					//-------------------------------------( Scheduling )------------------------------------------------//
 
-void SJF_Processor::OverHeat(Processor* Shortest, int TimeStep, int TStop)
+void SJF_Processor::turnOff(int timeStep)
 {
-	if (!StopTime&& get_remainingOverHeat(TimeStep)> 0) //The Processor Isn't OverHeated 
+	srand(time(0));
+	bool Probability_Cond = (rand() % 100 < overHeatProbability);
+	if (Probability_Cond && !stopTime && getHealingSteps(timeStep) > 0) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
 			// Moving The Run Process To Shortest RDY Queue
-			Process* Rn = GetRunProcess();
-			Shortest->AddProcess(Rn);
-			setRUN(nullptr);
+			Process* Rn = getRunProcess();
+			schedulerPtr->moveToNew(Rn);
+			setRun(nullptr);
 		}
-		if (!isRDYempty())
+		if (!isRDYEmpty())
 		{
 			// Moving The RDY Processes To Shortest RDY Queue
-			for (int i = 0; i < RDY.getCount(); i++)
+			for (int i = 0; i < SJF_RDY.getCount(); i++)
 			{
-				Process* p = RDY.Peek();
-				RDY.dequeue();
-				Shortest->AddProcess(p);
-				Dec_Finishtime(p->getRemainingCT());
+				Process* p = SJF_RDY.Peek();
+				SJF_RDY.dequeue();
+				schedulerPtr->moveToNew(p);
+				decreaseFinishTime(p->getRemainingCT());
 			}
 		}
-		StopTime = TimeStep;
-		UpdateState(STOP);
+		stopTime = timeStep;
+		updateState(STOP);
 	}
 }
 
-Process* SJF_Processor::remove_Top()
+Process* SJF_Processor::removeTop()
 {
 	Process* p = nullptr;
-	if (!RDY.isEmpty())
+	if (!SJF_RDY.isEmpty())
 	{
-		p=RDY.Peek();
-		RDY.dequeue();
-		Dec_Finishtime(p->getRemainingCT());
+		p=SJF_RDY.Peek();
+		SJF_RDY.dequeue();
+		decreaseFinishTime(p->getRemainingCT());
 	}
 	return p;
 }
 
-void SJF_Processor::AddProcess(Process* p)
+void SJF_Processor::addProcess(Process* p)
 {
 	p->updateState(READY);
-	RDY.enqueue(p,p->getCT());	
-	Inc_Finishtime(p->getRemainingCT());
+	SJF_RDY.enqueue(p,p->getCT());	
+	increaseFinishTime(p->getRemainingCT());
 }
 
-bool SJF_Processor::isRDYempty()
+bool SJF_Processor::isRDYEmpty()
 {
-	return RDY.isEmpty();
+	return SJF_RDY.isEmpty();
 }
 
-void SJF_Processor::ScheduleAlgo(int t)
+void SJF_Processor::scheduleAlgo(int timeStep)
 {
-	if (FinishRUN()) //The  Run Prcocess has Finished
+	//The Run Prcocess has Finished:
+	if (isRunFinished()) 
 	{
-		MYSch->MoveToTRM(GetRunProcess());
-		setRUN(nullptr);
+		schedulerPtr->moveToTRM(getRunProcess());
+		setRun(nullptr);
 	}
-	TurnON(t);
+	
+	//OverHeating Handling:
+	overHeatHandling(timeStep);
+
+	//Excueting The Run Process:
 	if (!isIdle())
 	{
-		Inc_BusyTime();	
-		Dec_RUNCT();
-		IO_Req();
+		increaseBusyTime();	
+		decreaseRunRemainingCT();
+		requestIO();
 	}
 	else{
-		if (isRDYempty())
+		if (isRDYEmpty())
 			return;
 
 		//Choose The Next Run Process 
-		Process* RDYprocess = RDY.Peek();
-		RDY.dequeue();
-		RDYprocess->updateState(RUNNING);
-		Dec_Finishtime(RDYprocess->getRemainingCT());
-		setRUN(RDYprocess);
-		RDYprocess->setstart(t);
+		Process* RDYprocess = SJF_RDY.Peek();
+		SJF_RDY.dequeue();
+		setRun(RDYprocess);
+		RDYprocess->setstart(timeStep);
 	}
 
 }
@@ -92,10 +97,10 @@ void SJF_Processor::ScheduleAlgo(int t)
 
 void SJF_Processor::printRDY()
 {
-	RDY.Print();
+	SJF_RDY.Print();
 }
 
 void SJF_Processor::printInfo()
 {
-	cout << " [SJF ]: " << RDY.getCount() << " ";
+	cout << " [SJF ]: " << SJF_RDY.getCount() << " ";
 }
