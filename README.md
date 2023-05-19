@@ -10,7 +10,7 @@ https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/1043392b-40b
 
 ## 📷 Screenshots:
 ### 🤐 Silent Mode:
-![11111111](https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/249b2eb9-31ca-451d-8547-5856da27c212)
+![11111111](https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/c60ca5a0-3bd8-4a31-98d1-f533c2c06a42)
 ### 🐱‍👤 Interactive Mode:
 ![123](https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/6e80ced0-01ce-4cdd-a0af-666e9879cfa5)
 ### 👩‍💻 Stepbystep Mode:
