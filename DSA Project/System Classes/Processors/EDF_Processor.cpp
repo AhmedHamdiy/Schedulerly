@@ -109,7 +109,7 @@ void EDF_Processor::scheduleAlgo(int timeStep)
 			}
 			EDF_RDY.dequeue();
 			setRun(EarlyDeadLine);
-			EarlyDeadLine->setstart(timeStep);
+			EarlyDeadLine->setStart(timeStep);
 		}
 
 	}

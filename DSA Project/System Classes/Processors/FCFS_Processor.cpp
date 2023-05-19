@@ -111,13 +111,13 @@ void FCFS_Processor::scheduleAlgo(int timeStep)
 		FCFS_RDY.remove(1);
 
 		//The Migration part:
-		bool migrated = schedulerPtr->migrationFCFStoRR(RDYprocess);
+		bool migrated = schedulerPtr->migrateFCFStoRR(RDYprocess);
 		while (migrated && FCFS_RDY.getcount() != 0)
 		{
 			RDYprocess = FCFS_RDY.getEntry(1);
 			FCFS_RDY.remove(1);
 			decreaseFinishTime(RDYprocess->getRemainingCT());
-			migrated = schedulerPtr->migrationFCFStoRR(RDYprocess);
+			migrated = schedulerPtr->migrateFCFStoRR(RDYprocess);
 		}
 		if (migrated && FCFS_RDY.getcount() == 0)
 		{
@@ -129,7 +129,7 @@ void FCFS_Processor::scheduleAlgo(int timeStep)
 		else if (!migrated && isIdle())
 		{
 			//Just Set The Current Process As A Running Process:
-			RDYprocess->setstart(timeStep);
+			RDYprocess->setStart(timeStep);
 			setRun(RDYprocess);
 		}
 	}

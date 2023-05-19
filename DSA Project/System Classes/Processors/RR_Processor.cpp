@@ -98,12 +98,12 @@ void RR_Processor::scheduleAlgo(int timeStep)
 		RR_RDY.dequeue(RDYprocess);
 
 		//The Migration part:
-		 bool migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
+		 bool migrated = schedulerPtr->migrateRRtoSJF(RDYprocess);
 		 while (migrated && RR_RDY.getcount() != 0)
 		 {
 			 RR_RDY.dequeue(RDYprocess);
 			 decreaseFinishTime(RDYprocess->getRemainingCT());
-			 migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
+			 migrated = schedulerPtr->migrateRRtoSJF(RDYprocess);
 		 }
 		 if (migrated && RR_RDY.getcount() == 0)
 		 {
@@ -115,7 +115,7 @@ void RR_Processor::scheduleAlgo(int timeStep)
 		 else if (!migrated&& isIdle())
 		 {
 		 	//Just set The curent Process as A running process
-			 RDYprocess->setstart(timeStep);
+			 RDYprocess->setStart(timeStep);
 			 setRun(RDYprocess);
 		 }  
 }

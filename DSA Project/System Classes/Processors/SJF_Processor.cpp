@@ -91,7 +91,7 @@ void SJF_Processor::scheduleAlgo(int timeStep)
 		Process* RDYprocess = SJF_RDY.Peek();
 		SJF_RDY.dequeue();
 		setRun(RDYprocess);
-		RDYprocess->setstart(timeStep);
+		RDYprocess->setStart(timeStep);
 	}
 
 }
