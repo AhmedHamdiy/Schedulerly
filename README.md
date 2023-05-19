@@ -11,21 +11,23 @@ https://github.com/ahmada28/Process-Scheduling-Project/assets/111378492/402633ed
 
 ## 📷 Screenshots:
 ### 🤐 Silent Mode:
-![11111111](https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/c60ca5a0-3bd8-4a31-98d1-f533c2c06a42)
+![11111111](https://github.com/ahmada28/Process-Scheduling-Project/assets/111378492/0dffde31-5acc-4c85-9477-d8d3b569558d)
+
 ### 🐱‍👤 Interactive Mode:
-![123](https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/6e80ced0-01ce-4cdd-a0af-666e9879cfa5)
+![123](https://github.com/ahmada28/Process-Scheduling-Project/assets/111378492/dc656741-c35c-4180-a04b-dc3ae1b0ec2a)
+
 ### 👩‍💻 Stepbystep Mode:
-![11](https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/efe74ffe-82fb-4f29-a2da-daffa9043484)
+![11](https://github.com/ahmada28/Process-Scheduling-Project/assets/111378492/e5b539d8-4547-4c15-9b55-264d60baed70)
+
 ### ✅ OutputFile:
-![i7](https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/28e4a958-5ee0-4438-842c-2f39c6aaea92)
+![i7](https://github.com/ahmada28/Process-Scheduling-Project/assets/111378492/ea97759b-235a-4137-9032-a71a55cc79e9)
 
 ## Conventions and team guidelines:
 
 ### 🆎 Naming : 
 #### Minimize the use of abbreviations:
 #### Do not abbreviate by deleting letters within a word.
- int stlcntr = 7; ❌ 
- int stealCounter = 7; ✅
+        int stlcntr = 7; ❌ 
 #### Variables and Functions should be written in "camelCase".
         killOrphan(); ✅
 #### Functions maybe start with verbs.
