@@ -24,8 +24,8 @@ https://github.com/ahmada28/Process-Scheduling-Project/assets/111378492/402633ed
 ### 🆎 Naming : 
 #### Minimize the use of abbreviations:
 Do not abbreviate by deleting letters within a word.
-    -int stlcntr = 7; ❌
-    -int stealCounter = 7; ✅
+-int stlcntr = 7; ❌ 
+-int stealCounter = 7; ✅
 #### Variables and Functions should be written in "camelCase".
         killOrphan(); ✅
 #### Functions maybe start with verbs.
