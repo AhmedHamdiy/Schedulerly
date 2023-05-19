@@ -58,7 +58,7 @@ public:
 	void setRemainingCT(int t);
 	void setTT(int t);
 	void updateState(processState s);
-	void setstart(int t);
+	void setStart(int t);
 	void removeChildrenPtr();
 
 	//I_O Handling:

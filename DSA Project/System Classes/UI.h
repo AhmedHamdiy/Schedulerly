@@ -125,7 +125,7 @@ public:
 		{
 			//interactive
 			SetConsoleTextAttribute(col, 15); // sets Console color to White
-			cout << "\nPRESS ENTER TO MOVE TO THE NEXT STEP!" << endl;
+			cout << "\nPRESS ANY KEY TO MOVE TO THE NEXT STEP!" << endl;
 			cin.get();
 		}
 		else

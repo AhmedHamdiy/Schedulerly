@@ -108,7 +108,7 @@ void Process::setTT(int t)
 	TT = t;
 }
 
-void Process::setstart(int t)
+void Process::setStart(int t)
 {
 	if (CT == remainingCT)
 		startFirst = t;

@@ -76,23 +76,23 @@ public:
 	void moveFromBLK();
 	void moveToNew(Process* p);
 
-	//Stealing And Migration:
+	//Steal And Migration:
 
-	void Stealing();
+	void Steal();
 	bool stealCondition(Processor* longest, Processor* shortest);
-	bool migrationRRtoSJF(Process* p);
-	bool migrationFCFStoRR(Process* p);
+	bool migrateRRtoSJF(Process* p);
+	bool migrateFCFStoRR(Process* p);
 	
 	//Killing And Forking:
 
-	void Killing();
+	void Kill();
 	void Fork(Process* runP);
 	bool killOrphan(Process* orphan);
 	
 	//Simulation:
 
-	void Simulation();
-	void Scheduling();
+	void Simulate();
+	void Schedule();
 };
 
 

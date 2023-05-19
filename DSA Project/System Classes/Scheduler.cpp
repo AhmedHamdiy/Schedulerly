@@ -430,11 +430,11 @@ void Scheduler::moveToNew(Process* p)
 }
 
 
-			//-----------------------------------------( Migration & Stealing )------------------------------------------------//
+			//-----------------------------------------( Migration & Steal )------------------------------------------------//
 
 
 //Process migrate from RR processor to the SJF processor with shortest rdy queue
-bool Scheduler::migrationRRtoSJF(Process* p)
+bool Scheduler::migrateRRtoSJF(Process* p)
 {
 	if (p != nullptr && p->getRemainingCT() < RTF && NS != 0 && p->getParent() == nullptr)
 	{
@@ -451,7 +451,7 @@ bool Scheduler::migrationRRtoSJF(Process* p)
 
 
 //Process migrate from FCFS processor to the RR processor with shortest rdy queue
-bool Scheduler::migrationFCFStoRR(Process* p)
+bool Scheduler::migrateFCFStoRR(Process* p)
 {
 	if (p != nullptr && p->getWT(timestep) > MaxW && NR != 0 && p->getParent() == nullptr)
 	{
@@ -467,7 +467,7 @@ bool Scheduler::migrationFCFStoRR(Process* p)
 }
 
 //Steal processes from the rdy queue of the longest processor and add it to the rdy queue of the shortest processor
-void Scheduler::Stealing()
+void Scheduler::Steal()
 {
 	Processor* shortest = getShortestRDY(0);
 	Processor* longest = getLongestRDY();
@@ -502,7 +502,7 @@ bool Scheduler::stealCondition(Processor* longest, Processor* shortest)
 						//-----------------------------------( Killing & Forking )----------------------------------------//
 
 //Kill the process if its kill sign == time step
-void Scheduler::Killing()
+void Scheduler::Kill()
 {
 	while (1)
 	{
@@ -575,13 +575,13 @@ bool Scheduler::killOrphan(Process* orphan)
 
 
 //Loop on processors and call the function scheduleAlgo
-void Scheduler::Scheduling()
+void Scheduler::Schedule()
 {
 	for (int i = 0; i < processorCount; i++)
 		ProcessorList[i]->scheduleAlgo(timestep);
 }
 
-void Scheduler::Simulation()
+void Scheduler::Simulate()
 {
 	string FileName;
 
@@ -608,12 +608,12 @@ void Scheduler::Simulation()
 		//If BlkDuration Of Peekfront =IO Duration Request , Dequeue And Move
 		moveFromBLK();
 		//If KillSIG Of Peekfront =Timestep , Dequeue And Move
-		Killing();	
+		Kill();	
 		//Loop And Call SchedulingAlgo
-		Scheduling();
-		//Stealing:
+		Schedule();
+		//Steal:
 		if (timestep % STL == 0)
-			Stealing();
+			Steal();
 
 		if (mode != 2)
 			programUI->printOutput(mode, timestep, BLKList, TRMList, ProcessorList, processorCount);
