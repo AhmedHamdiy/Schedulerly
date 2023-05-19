@@ -5,6 +5,7 @@ RR_Processor::RR_Processor(int Id, Scheduler* sc, int OVT, int TS):Processor(Id,
 
 					//---------------------------------------( Scheduling )------------------------------------------------//
 
+//Add process to rdy queue
 void RR_Processor::addProcess(Process* p)
 {
 	p->updateState(READY);
@@ -12,6 +13,7 @@ void RR_Processor::addProcess(Process* p)
 	increaseFinishTime(p->getRemainingCT());
 }
 
+//Remove the peek process of rdy queue
 Process* RR_Processor::removeTop()
 {
 	Process* p=nullptr;
@@ -23,11 +25,12 @@ Process* RR_Processor::removeTop()
 	return p;
 }
 
+//Overheat the processor for overheat duration and move all the processes in it to the shortest rdy queue
 void RR_Processor::turnOff(int TimeStep)
 {
-	srand(time(0));
-	bool Probability_Cond = (rand() % 100 < overHeatProbability);
-	if (Probability_Cond && !stopTime && getHealingSteps(TimeStep) > 0) //The Processor Isn't OverHeated 
+	srand(time(nullptr));
+	bool Probability_Cond = (rand() % 1000 < overHeatProbability);
+	if (Probability_Cond && !stopTime) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -57,6 +60,7 @@ bool RR_Processor::isRDYEmpty()
 	return RR_RDY.isEmpty();
 }
 
+//Handle the run process and top rdy processes
 void RR_Processor::scheduleAlgo(int timeStep)
 {
 	//The Run Prcocess has Finished:
@@ -97,13 +101,14 @@ void RR_Processor::scheduleAlgo(int timeStep)
 		 bool migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
 		 while (migrated && RR_RDY.getcount() != 0)
 		 {
-			 decreaseFinishTime(RDYprocess->getRemainingCT());
 			 RR_RDY.dequeue(RDYprocess);
+			 decreaseFinishTime(RDYprocess->getRemainingCT());
 			 migrated = schedulerPtr->migrationRRtoSJF(RDYprocess);
 		 }
 		 if (migrated && RR_RDY.getcount() == 0)
 		 {
 			 //No More Processes In The RDY To Migrate Or Run:
+			 decreaseFinishTime(RDYprocess->getRemainingCT());
 			 setRun(nullptr);
 			 return;
 		 }

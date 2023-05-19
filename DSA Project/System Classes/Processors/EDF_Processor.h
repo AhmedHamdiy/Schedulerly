@@ -8,9 +8,11 @@ private:
 
 public:
 	//Constructor:
+
 	EDF_Processor(int Id, Scheduler* sc, int OVT);
 
 	//Processes Handling:
+	
 	void addProcess(Process* p);
 	virtual Process* removeTop();
 	virtual void turnOff(int timeStep);
@@ -18,6 +20,7 @@ public:
 	virtual void scheduleAlgo(int t);
 
 	//Printing:
+	
 	void printRDY();
 	virtual void printInfo();
 };

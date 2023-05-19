@@ -23,9 +23,11 @@ private:
 
 public:
 	//Constructor:
+
 	Processor(int Id, Scheduler* sc, int OVT);
 	
 	//Data Members Getters:
+	
 	Process* getRunProcess();
 	int getFinishTime();
 	processorState getState();
@@ -34,16 +36,18 @@ public:
 	int getID();
 
 	//Processor Statistics:
+	
 	int getBusytime();
 	double processorLoad(int totalTRT);
 	double processorUtilization(int timeStep);
 	void updateState(processorState st);
 
 	//Processes Handling:
+	
 	bool setRun(Process* p);
 	virtual void addProcess(Process* p) = 0;
 	virtual void turnOff(int TimeStep) = 0;
-	void TurnOn(int timeStep);
+	void turnOn(int timeStep);
 	virtual Process* removeTop() = 0;
 	virtual void scheduleAlgo(int t) = 0;
 	bool isRunFinished();
@@ -51,6 +55,7 @@ public:
 	void overHeatHandling(int timeStep);
 
 	//Time Handling:
+	
 	void increaseFinishTime(int Time);
 	void decreaseFinishTime(int Time);
 	void increaseBusyTime();
@@ -58,6 +63,7 @@ public:
 	int getHealingSteps(int timeStep);
 
 	//Printing:
+	
 	virtual void printRDY() = 0;
 	virtual void printInfo() = 0;
 	friend ostream& operator<<(std::ostream& os, const Processor& p);

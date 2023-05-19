@@ -2,7 +2,7 @@
 #include "../Scheduler.h"
 Processor::Processor(int Id, Scheduler* sc,int OVT)
 {
-	overHeatProbability = 1;
+	overHeatProbability = 2;
 	overHeatTime = OVT;
 	ID = Id;
 	schedulerPtr = sc;
@@ -80,7 +80,7 @@ int Processor::getHealingSteps(int timeStep)
 		return overHeatTime + stopTime - timeStep;
 }
 
-void Processor::TurnOn(int timeStep)
+void Processor::turnOn(int timeStep)
 {
 	if (getHealingSteps(timeStep) <= 0)
 	{
@@ -139,7 +139,7 @@ bool Processor::isRunFinished()
 void Processor::requestIO()
 {
 	Pair<int, int> temp;
-	if (getRunProcess() && getRunProcess()->GetIO(temp))
+	if (getRunProcess() && getRunProcess()->getIO(temp))
 	{
 		if (temp.first == (getRunProcess()->getCT() - getRunProcess()->getRemainingCT()))
 		{
@@ -152,10 +152,9 @@ void Processor::requestIO()
 void Processor::overHeatHandling(int timeStep)
 {
 	if (getState() == STOP)
-		TurnOn(timeStep);
+		turnOn(timeStep);
 	else
 		turnOff(timeStep);
-
 }
 
 

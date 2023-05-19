@@ -7,6 +7,7 @@ FCFS_Processor::FCFS_Processor(int Id, Scheduler* sc, int OVT, int ForkingP) :Pr
 
 		//---------------------------------------( Scheduling )--------------------------------------------------//
 
+//Add process to rdy queue
 void FCFS_Processor::addProcess(Process* p)
 {
 	p->updateState(READY);
@@ -14,6 +15,7 @@ void FCFS_Processor::addProcess(Process* p)
 	increaseFinishTime(p->getRemainingCT());
 }
 
+//Remove the peek unforked process of rdy queue
 Process* FCFS_Processor::removeTop()
 {
 	Process* p = nullptr;
@@ -33,11 +35,12 @@ Process* FCFS_Processor::removeTop()
 	return nullptr;
 }
 
+//Overheat the processor for overheat duration and move all the processes in it to the shortest rdy queue
 void FCFS_Processor::turnOff(int timeStep)
 {
-	srand(time(0));
-	bool Probability_Cond = (rand() % 100 < overHeatProbability);
-	if (Probability_Cond && !stopTime && getHealingSteps(timeStep) > 0) //The Processor Isn't OverHeated 
+	srand(time(nullptr));
+	bool Probability_Cond = (rand() % 1000 < overHeatProbability);
+	if (Probability_Cond && !stopTime) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -73,6 +76,7 @@ bool FCFS_Processor::isRDYEmpty()
 	return FCFS_RDY.getcount() == 0;
 }
 
+//Handle the run process and top rdy processes
 void FCFS_Processor::scheduleAlgo(int timeStep)
 {
 	//The Run Prcocess has Finished:
@@ -110,14 +114,15 @@ void FCFS_Processor::scheduleAlgo(int timeStep)
 		bool migrated = schedulerPtr->migrationFCFStoRR(RDYprocess);
 		while (migrated && FCFS_RDY.getcount() != 0)
 		{
-			decreaseFinishTime(RDYprocess->getRemainingCT());
 			RDYprocess = FCFS_RDY.getEntry(1);
 			FCFS_RDY.remove(1);
+			decreaseFinishTime(RDYprocess->getRemainingCT());
 			migrated = schedulerPtr->migrationFCFStoRR(RDYprocess);
 		}
 		if (migrated && FCFS_RDY.getcount() == 0)
 		{
 			//No More Processes In The RDY To Migrate Or Run:
+			decreaseFinishTime(RDYprocess->getRemainingCT());
 			setRun(nullptr);
 			return;
 		}
@@ -134,6 +139,7 @@ void FCFS_Processor::scheduleAlgo(int timeStep)
 
 //---------------------------------------( FCFS Special )------------------------------------------------//
 
+//Check if the running process should fork
 bool FCFS_Processor::forkProcess(Process*& runProcess)
 {
 	if (isIdle())
@@ -159,9 +165,9 @@ bool FCFS_Processor::forkProcess(Process*& runProcess)
 		return false;
 }
 
+//Search for process & remove it from rdy/run if exists then return a pointer to it
 bool FCFS_Processor::killProcess(int ID, Process*& target)
 {
-	//search for process,remove it from ready/run if exists then return a pointer to it
 	if (getRunProcess() && getRunProcess()->getID() == ID)
 	{
 		target = getRunProcess();

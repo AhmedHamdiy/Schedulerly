@@ -7,11 +7,12 @@ SJF_Processor::SJF_Processor(int Id, Scheduler* sc, int OVT):Processor(Id,sc,OVT
 
 					//-------------------------------------( Scheduling )------------------------------------------------//
 
+//Overheat the processor for overheat duration and move all the processes in it to the shortest rdy queue
 void SJF_Processor::turnOff(int timeStep)
 {
-	srand(time(0));
-	bool Probability_Cond = (rand() % 100 < overHeatProbability);
-	if (Probability_Cond && !stopTime && getHealingSteps(timeStep) > 0) //The Processor Isn't OverHeated 
+	srand(time(nullptr));
+	bool Probability_Cond = (rand() % 1000 < overHeatProbability);
+	if (Probability_Cond && !stopTime) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -36,6 +37,7 @@ void SJF_Processor::turnOff(int timeStep)
 	}
 }
 
+//Remove the peek process of rdy queue
 Process* SJF_Processor::removeTop()
 {
 	Process* p = nullptr;
@@ -48,6 +50,7 @@ Process* SJF_Processor::removeTop()
 	return p;
 }
 
+//Add process to rdy queue
 void SJF_Processor::addProcess(Process* p)
 {
 	p->updateState(READY);
@@ -60,6 +63,7 @@ bool SJF_Processor::isRDYEmpty()
 	return SJF_RDY.isEmpty();
 }
 
+//Handle the run process and top rdy processes
 void SJF_Processor::scheduleAlgo(int timeStep)
 {
 	//The Run Prcocess has Finished:

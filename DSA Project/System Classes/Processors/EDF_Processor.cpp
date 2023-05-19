@@ -8,11 +8,12 @@ EDF_Processor::EDF_Processor(int Id, Scheduler* sc, int OVT):Processor(Id,sc,OVT
 
 					//---------------------------------------( Scheduling )-------------------------------------------------//
 
+//Overheat the processor for overheat duration and move all the processes in it to the shortest rdy queue
 void EDF_Processor::turnOff(int timeStep)
 {
-	srand(time(0));
-	bool Probability_Cond = (rand() % 100 < overHeatProbability);
-	if (Probability_Cond && !stopTime && getHealingSteps(timeStep) > 0) //The Processor Isn't OverHeated 
+	srand(time(nullptr));
+	bool Probability_Cond = (rand() % 1000 < overHeatProbability);
+	if (Probability_Cond && !stopTime) //The Processor Isn't OverHeated 
 	{
 		if (!isIdle())
 		{
@@ -37,6 +38,7 @@ void EDF_Processor::turnOff(int timeStep)
 	}
 }
 
+//Remove the peek process of rdy queue
 Process* EDF_Processor::removeTop()
 {
 	Process* p = nullptr;
@@ -49,6 +51,7 @@ Process* EDF_Processor::removeTop()
 	return p;
 }
 
+//Add process to rdy queue
 void EDF_Processor::addProcess(Process* p)
 {
 	p->updateState(READY);
@@ -61,6 +64,7 @@ bool EDF_Processor::isRDYEmpty()
 	return EDF_RDY.isEmpty();
 }
 
+//Handle the run process and top rdy processes
 void EDF_Processor::scheduleAlgo(int timeStep)
 {
 	Process* RunP = getRunProcess();
