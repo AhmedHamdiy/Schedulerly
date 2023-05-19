@@ -5,7 +5,8 @@ In this project you we have developed a program that simulates the operation of 
 ## 🎥 Demo:
 
 
-https://github.com/ahmada28/DSA-Scheduling-Project/assets/111378492/1043392b-40bb-494e-a4d4-aad65d9611f3
+
+https://github.com/ahmada28/Process-Scheduling-Project/assets/111378492/402633ed-f19b-4c5a-9e9f-d018b08f679e
 
 
 ## 📷 Screenshots:
