@@ -19,6 +19,7 @@ Process::Process(int at, int id, int ct, int dead_line, int n,  Process* P) :AT(
 
 						//-------------------------------------( Getters )------------------------------------------------//
 
+//Check if process has empty child pointer to fork
 bool Process::canFork() const
 {
 	return (!rightChild || !leftChild);
@@ -36,7 +37,7 @@ int Process::getTT()
 	return TT + 1;
 }
 
-int Process::getstart()
+int Process::getStart()
 {
 	return startProcessing;
 }
@@ -84,19 +85,20 @@ int Process::getDeadline()
 	return Deadline;
 }
 
-int Process::getIOduration()
+int Process::getBlkDuration()
 {
 	return IOduration;
 }
 
-void Process::clear_IOList()
+void Process::clearIOList()
 {
 	IOList.clear();
 }
 
 
 						//-------------------------------------( Setters )------------------------------------------------//
-void Process::Inc_IOduration(int t)
+
+void Process::IncreaseBlkDuration(int t)
 {
 	IOduration += t;
 }
@@ -113,10 +115,15 @@ void Process::setstart(int t)
 	startProcessing = t;
 }
 
-void Process::reset_TS()
+void Process::removeChildrenPtr()
+{
+		leftChild = nullptr;
+		rightChild = nullptr;
+}
+
+void Process::resetTimeSlice()
 {
 	TS = 0;
-	updateState(READY);
 }
 
 void Process::setKillTime(int k)
@@ -153,7 +160,7 @@ bool Process::IncrementTS(int TSlice)
 	}
 	else
 	{
-		reset_TS();
+		resetTimeSlice();
 		return true;
 	}
 }
@@ -161,12 +168,12 @@ bool Process::IncrementTS(int TSlice)
 
 						//-------------------------------------( Forking )------------------------------------------------//
 
-Process*& Process::get_LChild()
+Process*& Process::getLeftChild()
 {
 	return leftChild;
 }
 
-Process*& Process::get_RChild()
+Process*& Process::getRightChild()
 {
 	return rightChild;
 }
@@ -176,6 +183,7 @@ Process*& Process::getParent()
 	return Parent;
 }
 
+//Assign the forked process to the empty child pointer
 bool Process::setForked(Process* forkedP)
 {
 	if (!leftChild)
@@ -195,34 +203,35 @@ bool Process::setForked(Process* forkedP)
 
 						//-----------------------------------( I/O Handling )----------------------------------------//
 
-void Process::AddIO(Pair<int, int> p)
+
+void Process::addIO(Pair<int, int> p)
 {
 	IOList.enqueue(p);
 }
 
-void Process::inc_blktime()
+void Process::increaseBlkTime()
 {
 	BLKduration++;
 }
 
-void Process::resetblktime()
+void Process::resetBlkTime()
 {
 	BLKduration = 0;
 }
 
-void Process::deqIO()
+void Process::deqeueIORequest()
 {
 	Pair<int, int> p;
 	IOList.dequeue(p);
-	Inc_IOduration(p.second);
+	IncreaseBlkDuration(p.second);
 }
 
-int Process::getblktime()
+int Process::getBlkTime()
 {
 	return BLKduration;
 }
 
-bool Process::GetIO(Pair<int, int>& temp)
+bool Process::getIO(Pair<int, int>& temp)
 {
 	if (IOList.isEmpty())
 		return false;
@@ -233,7 +242,8 @@ bool Process::GetIO(Pair<int, int>& temp)
 
 						//-----------------------------------( Printing )----------------------------------------//
 
-ostream& operator << (ostream& out, Process* p) //overloading stream operator to print id
+//Overloading stream operator to print id
+ostream& operator << (ostream& out, Process* p) 
 {
 	out << p->PID;
 	return out;

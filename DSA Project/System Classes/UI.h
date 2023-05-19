@@ -64,11 +64,11 @@ public:
 
 	//Print Output For Step By Step And Interactive 
 	//Works For Step By Step And Interactive Since They Are Almost Similar
-	void printOutput(bool mode, int timestep, const LinkedQueue<Process*>& blk, const LinkedQueue<Process*>& trm, Processor* Parr[], int pCount)
+	void printOutput(bool mode, int timeStep, const LinkedQueue<Process*>& blk, const LinkedQueue<Process*>& trm, Processor* Parr[], int pCount)
 	{
 		HANDLE col = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(col, 1); // sets Console color to Blue
-		cout << "Current Timestep:" << timestep << endl;
+		cout << "Current Timestep:" << timeStep << endl;
 
 		SetConsoleTextAttribute(col, 6); // sets Console color to Yellow
 		cout << "--------------     RDY PROCESSES     --------------" << endl;
@@ -87,7 +87,7 @@ public:
 				else
 					Parr[i]->printRDY();
 			}
-			else cout << "OVERHEATED FOR "<<Parr[i]->getHealingSteps(timestep)<< " TIME STEPS!" << endl;
+			else cout << "OVERHEATED FOR "<<Parr[i]->getHealingSteps(timeStep)<< " TIME STEPS!" << endl;
 		}
 
 		SetConsoleTextAttribute(col, 4); // sets Console color to Red
@@ -125,7 +125,7 @@ public:
 		{
 			//interactive
 			SetConsoleTextAttribute(col, 15); // sets Console color to White
-			cout << "\nPRESS ENTER TO MOVE TO THE NEXT STEP!" << endl;
+			cout << "\nPRESS ANY KEY TO MOVE TO THE NEXT STEP!" << endl;
 			cin.get();
 		}
 		else

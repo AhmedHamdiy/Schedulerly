@@ -1,7 +1,5 @@
 #ifndef _SCHEDULER
 #define _SCHEDULER
-
-
 #include"../DS Implementation/Pair/pair.h"
 #include"Processors/FCFS_Processor.h"
 #include"Processors/SJF_Processor.h"
@@ -54,20 +52,24 @@ private:
 
 public:
 	//Constructor And Destructor:
+
 	Scheduler();
 	~Scheduler();
 
 	//File Handling:
+
 	void readFile(string FileName);
 	void outputFile(string FileName);
 	void processStatistics(float& avWT, float& avRT, float& avTRT, int& Tct);
 	
 	//Data Members Getters:
+
 	Processor* getShortestRDY(int b);
 	Processor* getLongestRDY();
 	void increaseDeadLineCounter();
 	
 	//Moving Between The Lists:
+
 	void moveToTRM(Process* p);
 	void moveFromNew();
 	void moveToBLK(Process* p);
@@ -75,17 +77,20 @@ public:
 	void moveToNew(Process* p);
 
 	//Stealing And Migration:
+
 	void Stealing();
-	double calculateStealLimit(Processor* longest, Processor* shortest);
+	bool stealCondition(Processor* longest, Processor* shortest);
 	bool migrationRRtoSJF(Process* p);
 	bool migrationFCFStoRR(Process* p);
 	
 	//Killing And Forking:
+
 	void Killing();
 	void Fork(Process* runP);
 	bool killOrphan(Process* orphan);
 	
-	//Simulation
+	//Simulation:
+
 	void Simulation();
 	void Scheduling();
 };
